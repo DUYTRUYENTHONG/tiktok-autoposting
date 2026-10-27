@@ -50,3 +50,13 @@ Scheduled local tasks can use skills/plugins, but official documentation does no
 - [TikTok Content Sharing Guidelines](https://developers.tiktok.com/docs/en/content-sharing-guidelines)
 - [Official scheduled-task documentation](https://learn.chatgpt.com/docs/automations)
 - Session plugin-directory results for Metricool, TinyFish, and Canva; connection states above reflect discovery time, not a future guarantee.
+
+## Implemented update · 2026-10-27
+
+The signed-in account is @saigomlia. Photo uploads and native scheduling were verified with real carousels and platform receipts. The user later changed the pilot to immediate publishing and added Vựa Sầu Riêng Cô Ba, 322 Đ. Huỳnh Thị Hai. Studio disables commercial-post edit/Delete controls with an app-only tooltip. The latest user decision preserves all nine schedules. New immediate posts can remain under content review, which is not confirmed publication.
+
+The local Node tracker, carousel review gallery, five Vietnamese skills, four role profiles and packaged read-only MCP plugin now exist. Agent profiles are definitions, not evidence of parallel execution. The personal marketplace source is registered; desktop plugin installation/connection is not yet verified. Metrics ingestion remains observation/import based. Metricool is not connected. DeerFlow is cloned with custom skills but its full service is not running. See DEERFLOW_INTEGRATION.md for source revisions and readiness limits.
+
+The initial setup notes above are historical; use README.md and private canonical state for current operation.
+
+The current KPI is20 verified published posts/day, superseding the pilot-only stop. The active05:30 preparation /22:30 review follow-up uses this target; background publication is not yet verified. The tracker separates published, scheduled and moderation-pending counts. The story bank adds28 painpoint hypotheses and per-post inquiry codes; lead import retains observed pseudonymous attribution and unknown missing data. Posts19–20 use actual account-recommended Chốt Đơn Ngay; national trend rank and independent commercial-library clearance were not verified.

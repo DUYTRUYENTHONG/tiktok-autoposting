@@ -18,11 +18,11 @@ Build intake → measurement/schedule → creative/skills → tracker → delive
 
 ## Implementation contract
 
-Use Node.js 22+ built-ins, no external dependencies, JSON local state, loopback-only read-only HTTP dashboard. Separate DeerFlow clone remains upstream-clean except ignored custom skill copies. No provider credentials are assumed. Product facts originate from the user's files. Templates produce hypotheses, not evidence-backed winners. Customer-facing copy and UI are Vietnamese.
+Use Node.js 22+ built-ins for the engine/dashboard and the official MCP SDK plus Zod for plugin tools; esbuild bundles the plugin. JSON local state and loopback-only read-only HTTP dashboard. Separate DeerFlow clone remains upstream-clean except ignored custom skill copies. No provider credentials are assumed. Product facts originate from the user's files. Templates produce hypotheses, not evidence-backed winners. Customer-facing copy and UI are Vietnamese.
 
 Commands: `npm test`, `npm start`, `npm run campaign -- init`, `npm run campaign -- ingest <absolute-folder> --area <area>`, `npm run campaign -- import <absolute-json>`, `npm run campaign -- brief`, `npm run campaign -- install-skills <absolute-deerflow-root>`.
 
-Structure: src/ = state/domain/CLI/server, public/ = dashboard, test/ = Node tests, skills/ = source skill packages, prompts/ = implementation and operating prompts, examples/ = explicit synthetic fixtures. state/ remains ignored.
+Structure: src/ = state/domain/CLI/server, public/ = dashboard, test/ = Node tests and synthetic fixtures, skills/ = source skill packages, prompts/ = implementation and operating prompts. Root *.example.json files are legacy setup examples, not the active queue. state/ remains ignored.
 
 Code style: ESM, pure calculations separated from filesystem/network, explicit validation errors, UTF-8, escaping through DOM textContent. Example: `const rate = views > 0 ? interactions / views : null;`.
 
@@ -41,5 +41,9 @@ Tests must prove missing-data handling, no snapshot double counting, attribution
 - Actual media generation and posting remain blocked until product references/provider access/scheduling controls are verified. No background recurring task is activated without a cadence and successful posting acceptance.
 
 ## Boundaries
+
+Current operating contract:20 receipt-verified published posts/day by Asia/Ho_Chi_Minh calendar. Scheduled and under_review counts remain separate; reserved schedules and accepted submissions reduce new preparation to prevent duplicates. Uncertain submissions block replanning. Preserve the nine original schedules. The daily target supersedes the original pilot stop;100 is a cumulative milestone. Background publication remains unverified until an actual unattended run succeeds.
+
+Lead events use pseudonymous immutable ID, postId and firstSeenAt, with monotonically updated observedAt/status (inquiry, qualified, order). Only published attributed posts are eligible. No events means unknown, not zero. Never infer leads or orders from views/likes. See docs/DAILY_OPERATIONS.md for the import contract.
 
 Always validate imports, preserve historical snapshots, record source provenance, keep private data ignored, and verify tests before push. Ask only for missing inputs or actions whose applicable policy requires it. Never invent product claims, testimonials, scarcity, customer activity, attribution, results, or integrations. No core DeerFlow changes or paid provider submissions in this first slice.

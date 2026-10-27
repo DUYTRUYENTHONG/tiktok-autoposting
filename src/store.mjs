@@ -3,10 +3,11 @@ import {createReadStream} from 'node:fs';
 import {createHash,randomUUID} from 'node:crypto';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {homedir} from 'node:os';
 import {emptyState} from './engine.mjs';
 
 export const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
-export const defaultFile=path.join(root,'state','campaign.json');
+export const defaultFile=process.env.TIKTOK_CAMPAIGN_FILE??path.join(homedir(),'.codex','data','tiktok-autoposting','campaign.json');
 export async function loadState(file=defaultFile){
   try{return JSON.parse(await readFile(file,'utf8'));}catch(e){if(e.code==='ENOENT')return emptyState();throw e;}
 }

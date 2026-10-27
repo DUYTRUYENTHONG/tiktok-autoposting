@@ -4,9 +4,10 @@ import path from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {loadState,root} from './store.mjs';
 import {analyze,recommendSlots} from './engine.mjs';
+import {dailyKpi,leadSummary} from './daily-kpi.mjs';
 
 export function createServer(stateFile){
-  const files={'/':['index.html','text/html; charset=utf-8'],'/app.js':['app.js','text/javascript; charset=utf-8'],'/style.css':['style.css','text/css; charset=utf-8']};
+  const files={'/':['index.html','text/html; charset=utf-8'],'/review':['review.html','text/html; charset=utf-8'],'/review.js':['review.js','text/javascript; charset=utf-8'],'/app.js':['app.js','text/javascript; charset=utf-8'],'/style.css':['style.css','text/css; charset=utf-8']};
   return http.createServer(async(req,res)=>{
     const host=req.headers.host??'';
     if(!/^(127\.0\.0\.1|localhost)(:\d+)?$/.test(host)){res.writeHead(403);res.end('Forbidden');return;}
@@ -16,12 +17,20 @@ export function createServer(stateFile){
     if(req.method!=='GET'){res.writeHead(405);res.end('Read-only');return;}
     try{
       const url=new URL(req.url,'http://localhost');
+      if(/^\/assets\/[a-f0-9]{64}$/.test(url.pathname)){
+        const state=await loadState(stateFile);const hash=url.pathname.split('/').pop();
+        const assets=[...state.products.flatMap(p=>p.assets),...(state.queue??[]).flatMap(q=>q.assets)];
+        const asset=assets.find(a=>a.sha256===hash);
+        if(!asset||!(/\.(png|jpe?g|webp)$/i.test(asset.path))){res.writeHead(404);res.end('Not found');return;}
+        const content=await readFile(asset.path);const type=/\.png$/i.test(asset.path)?'image/png':/\.webp$/i.test(asset.path)?'image/webp':'image/jpeg';
+        res.writeHead(200,{'Content-Type':type});res.end(content);return;
+      }
       if(url.pathname==='/api/state'){
         const state=await loadState(stateFile);
         const products=state.products.map(({sourceDirectory,assets,...p})=>({...p,assets:assets.map(({path:filename,...asset})=>asset)}));
         const angles=state.angles.map(({assets,...a})=>a);
         const analysis=analyze({...state,angles});
-        const output={...state,products,angles,analysis,schedule:recommendSlots(state),connections:{metrics:'Nhập số liệu cục bộ · chưa kết nối TikTok tự động',publishing:'Chưa bật đăng tự động',deerflow:'Đã clone · chưa chạy dịch vụ'},now:new Date().toISOString()};
+        const output={...state,products,angles,analysis,dailyKpi:dailyKpi(state),leadSummary:leadSummary(state),schedule:recommendSlots(state),connections:{metrics:'Quan sát trình duyệt / nhập cục bộ · cần phiên TikTok hoạt động',publishing:'Đăng qua trình duyệt · đối soát bằng biên nhận',leads:'Gắn nguồn bình luận/DM bằng mã bài · chưa trả lời tự động',deerflow:'Đã clone · chưa chạy dịch vụ'},now:new Date().toISOString()};
         res.writeHead(200,{'Content-Type':'application/json; charset=utf-8'});res.end(JSON.stringify(output));return;
       }
       if(!files[url.pathname]){res.writeHead(404);res.end('Not found');return;}

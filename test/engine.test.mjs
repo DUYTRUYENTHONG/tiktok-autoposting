@@ -55,3 +55,12 @@ test('photo angles use photo outcomes and exclude missing engagement fields',()=
   state.snapshots=[{postId:'p',observedAt:'2026-10-21T00:00:00Z',views:500,likes:10}];
   const result=analyze(state).angles[0];assert.equal(result.views,500);assert.equal(result.engagementRate,null);
 });
+
+test('paid and unknown distributions cannot act as organic controls',()=>{
+  const state=emptyState();state.angles=[{id:'a',productId:'x',format:'photo',distribution:'organic'}];
+  for(let i=0;i<9;i++){
+    state.posts.push({id:`d${i}`,angleId:i<3?'a':'b',productId:'x',format:'photo',distribution:i<3?'organic':i<6?'paid':undefined,publishedAt:'2026-10-20T00:00:00Z'});
+    state.snapshots.push({postId:`d${i}`,observedAt:'2026-10-21T00:00:00Z',views:500,likes:10,comments:0,shares:0,saves:0});
+  }
+  const result=analyze(state).angles[0];assert.equal(result.posts,3);assert.equal(result.controlPosts,0);assert.equal(result.signal,'Chưa có đối chứng');
+});

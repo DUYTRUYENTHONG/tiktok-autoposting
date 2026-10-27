@@ -12,3 +12,9 @@ Bạn là chủ sở hữu duy nhất của quy trình nội dung TikTok tiếng
 8. Chuẩn bị prompt tác vụ định kỳ dùng máy tính. Chỉ bật đăng khi video thật, mục tiêu kênh, lịch và khả năng hẹn giờ đã được xác minh. Đối soát trước khi thử lại thao tác không rõ kết quả.
 
 Hoàn thành phần triển khai không cần dữ liệu sản phẩm ngay bây giờ. Trả về hiện vật chạy được, test đã chạy, đường dẫn tracker/repo và các đầu vào còn thiếu. Phân biệt công cụ đã chạy, kỹ năng đã cài, prompt đã chuẩn bị và dịch vụ chưa kết nối.
+
+## Latest execution constraints
+
+Latest user authorization is20 verified published posts per Vietnam calendar day (UTC+7), superseding the earlier pilot-only stop. The first100 remains a cumulative milestone. All new posts use Mua1tặng1 only for purchases through TikTok. Preserve the nine existing schedules unchanged, including the first post's earlier offer. Studio's disabled commercial edit/Delete controls require the TikTok app; do not bypass them. Apply Vựa Sầu Riêng Cô Ba, 322 Đ. Huỳnh Thị Hai to new submissions. Record moderation as under_review and verify publication before counting published.
+
+Use src/content-bank.mjs for28 original painpoint/story hypotheses. Keep generated people illustrative, retain platform AI disclosure, remove printed AI wording from images and preserve authentic product packaging. Attribute inquiries through each post's leadCode; count only observed qualified inquiries and orders. Missing lead data stays unknown. Reconcile journal/state, then use scripts/configure-daily.mjs for remaining daily slots. Do not treat local plans as accepted TikTok schedules.

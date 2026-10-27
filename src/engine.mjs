@@ -1,4 +1,4 @@
-export const emptyState = () => ({version:1,account:'saigomlia',language:'vi',products:[],angles:[],posts:[],snapshots:[],evidence:[],audience:null,updatedAt:null});
+export const emptyState = () => ({version:1,account:'saigomlia',language:'vi',products:[],angles:[],posts:[],snapshots:[],leadEvents:[],evidence:[],audience:null,updatedAt:null});
 const requireValue = (ok, message) => { if(!ok) throw new Error(message); };
 export function timestamp(value) {
   requireValue(typeof value==='string' && /(?:Z|[+-]\d{2}:\d{2})$/.test(value) && Number.isFinite(Date.parse(value)), 'Thời gian phải theo ISO 8601 và có múi giờ');
@@ -6,17 +6,18 @@ export function timestamp(value) {
 }
 export function validateImport(input, state=emptyState()) {
   requireValue(input && typeof input==='object' && !Array.isArray(input),'Dữ liệu phải là một đối tượng JSON');
-  for(const key of Object.keys(input)) requireValue(['posts','snapshots','audience','evidence'].includes(key),`Trường nhập không hỗ trợ: ${key}`);
-  for(const key of ['posts','snapshots','evidence']) if(input[key]!==undefined) requireValue(Array.isArray(input[key]),`${key} phải là danh sách`);
+  for(const key of Object.keys(input)) requireValue(['posts','snapshots','leadEvents','audience','evidence'].includes(key),`Trường nhập không hỗ trợ: ${key}`);
+  for(const key of ['posts','snapshots','leadEvents','evidence']) if(input[key]!==undefined) requireValue(Array.isArray(input[key]),`${key} phải là danh sách`);
   const posts = new Map(state.posts.map(p=>[p.id,p]));
   for(const p of input.posts??[]) {
     requireValue(typeof p.id==='string' && p.id.length>0,'Bài đăng cần id');
     timestamp(p.publishedAt);
     requireValue(['video','photo'].includes(p.format),'Định dạng phải là video hoặc photo');
+    if(p.distribution!==undefined)requireValue(['organic','paid','unknown'].includes(p.distribution),'Phân phối phải là organic, paid hoặc unknown');
     if(p.angleId) requireValue(state.angles.some(a=>a.id===p.angleId && a.productId===p.productId),'Góc nội dung không khớp sản phẩm');
     if(p.productId) requireValue(state.products.some(x=>x.id===p.productId),'Sản phẩm chưa được nhập');
     const previous=posts.get(p.id);
-    if(previous) requireValue(['productId','angleId','format','publishedAt'].every(k=>previous[k]===p[k]),'Không được thay đổi định danh hoặc cohort của bài đã nhập');
+    if(previous) requireValue(['productId','angleId','format','publishedAt','distribution'].every(k=>previous[k]===p[k]),'Không được thay đổi định danh hoặc cohort của bài đã nhập');
     posts.set(p.id,p);
   }
   for(const s of input.snapshots??[]) {
@@ -27,6 +28,19 @@ export function validateImport(input, state=emptyState()) {
       if(key==='views'||s[key]!==undefined) requireValue(Number.isSafeInteger(s[key]) && s[key]>=0,`Chỉ số ${key} phải là số nguyên không âm`);
     }
     for(const key of ['completionRate','retention3s']) if(s[key]!==undefined) requireValue(Number.isFinite(s[key])&&s[key]>=0&&s[key]<=1,`${key} phải trong khoảng 0–1`);
+  }
+  const leads=new Map((state.leadEvents??[]).map(e=>[e.id,e]));
+  for(const e of input.leadEvents??[]){
+    requireValue(e&&typeof e.id==='string'&&e.id.length>0,'Lead cần id');
+    requireValue(Object.keys(e).every(key=>['id','postId','firstSeenAt','observedAt','status','source'].includes(key)),'Lead chỉ hỗ trợ định danh giả, bài nguồn, thời gian, trạng thái và nguồn quan sát');
+    requireValue(posts.has(e.postId),'Lead tham chiếu bài chưa được nhập');
+    requireValue(['inquiry','qualified','order'].includes(e.status),'Trạng thái lead không hợp lệ');
+    requireValue(typeof e.source==='string'&&e.source.trim().length>0,'Lead cần nguồn quan sát');
+    requireValue(timestamp(e.firstSeenAt)>=timestamp(posts.get(e.postId).publishedAt),'Lead có trước bài đăng');
+    requireValue(timestamp(e.observedAt)>=timestamp(e.firstSeenAt),'Quan sát lead có trước liên hệ đầu tiên');
+    const previous=leads.get(e.id);
+    if(previous)requireValue(previous.postId===e.postId&&previous.firstSeenAt===e.firstSeenAt,'Không đổi định danh hoặc bài nguồn của lead');
+    leads.set(e.id,e);
   }
   if(input.audience) {
     const a=input.audience;
@@ -51,7 +65,9 @@ export function validateImport(input, state=emptyState()) {
 export function mergeImport(state,input) {
   validateImport(input,state);
   const merge=(a,b,key)=>[...new Map([...a,...b].map(x=>[key(x),x])).values()];
-  return {...state,posts:merge(state.posts,input.posts??[],x=>x.id),snapshots:merge(state.snapshots,input.snapshots??[],x=>`${x.postId}:${x.observedAt}`),evidence:merge(state.evidence,input.evidence??[],x=>x.id),audience:input.audience??state.audience};
+  const leads=new Map((state.leadEvents??[]).map(e=>[e.id,e]));
+  for(const e of input.leadEvents??[])if(!leads.has(e.id)||Date.parse(e.observedAt)>=Date.parse(leads.get(e.id).observedAt))leads.set(e.id,e);
+  return {...state,posts:merge(state.posts,input.posts??[],x=>x.id),snapshots:merge(state.snapshots,input.snapshots??[],x=>`${x.postId}:${x.observedAt}`),leadEvents:[...leads.values()],evidence:merge(state.evidence,input.evidence??[],x=>x.id),audience:input.audience??state.audience};
 }
 function latestSnapshots(state,eligibleOnly=false) {
   const posts=new Map(state.posts.map(p=>[p.id,p])); const latest=new Map();
@@ -75,10 +91,12 @@ export function analyze(state) {
   };
   const angles=state.angles.map(a=>{
     const candidates=state.posts.filter(p=>p.angleId===a.id&&p.productId===a.productId);
-    // Format cohorts are never mixed. Generic briefs default to video.
+    // Neither format nor paid/organic distribution cohorts are mixed.
     const format=a.format??'video';
-    const own=aggregate(candidates.filter(p=>p.format===format));
-    const control=aggregate(state.posts.filter(p=>p.productId===a.productId&&p.angleId&&p.angleId!==a.id&&p.format===format));
+    const distribution=a.distribution??'unknown';
+    const sameCohort=p=>p.format===format&&(p.distribution??'unknown')===distribution;
+    const own=aggregate(candidates.filter(sameCohort));
+    const control=aggregate(state.posts.filter(p=>p.productId===a.productId&&p.angleId&&p.angleId!==a.id&&sameCohort(p)));
     let signal='Chưa đủ dữ liệu'; let uplift=null;
     if(own.posts>=3&&own.completePosts>=3&&own.views>=500){
       signal='Chưa có đối chứng';
@@ -87,7 +105,9 @@ export function analyze(state) {
         signal=uplift>=0.2?'Tín hiệu tốt':uplift<=-0.2?'Cần cải thiện':'Tiếp tục thử nghiệm';
       }
     }
-    return {...a,...own,controlPosts:control.posts,uplift,signal};
+    const postIds=new Set(candidates.map(p=>p.id));
+    const leads=(state.leadEvents??[]).filter(e=>postIds.has(e.postId));
+    return {...a,...own,controlPosts:control.posts,uplift,signal,observedQualifiedLeads:leads.length?leads.filter(e=>['qualified','order'].includes(e.status)).length:null};
   });
   const newest=[...latest.values()].map(s=>s.observedAt).sort((a,b)=>Date.parse(b)-Date.parse(a))[0]??null;
   return {angles,totalPosts:state.posts.length,totalViews:[...latest.values()].reduce((n,s)=>n+s.views,0),unattributed:state.posts.filter(p=>!p.angleId).length,lastObservedAt:newest,allocation:angles.some(a=>a.signal==='Tín hiệu tốt')?'70% góc có tín hiệu · 30% thử nghiệm':'Chia đều các giả thuyết để lấy dữ liệu',measurement:'Tương tác / lượt xem; cửa sổ quan sát 24–72 giờ; tín hiệu vận hành, chưa phải kết luận nhân quả'};

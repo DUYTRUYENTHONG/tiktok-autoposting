@@ -7,10 +7,12 @@ function render(data){
   current=data;const a=data.analysis;$('account').textContent=`@${data.account}`;
   const newTime=a.lastObservedAt?new Date(a.lastObservedAt).toLocaleString('vi-VN',{timeZone:'Asia/Ho_Chi_Minh'}):'Chưa có quan sát TikTok';
   $('freshness').textContent=`Số liệu: ${newTime}`;$('updated').textContent=`Cập nhật ${new Date().toLocaleTimeString('vi-VN')}`;
-  const cards=[['Lượt xem đã ghi nhận',a.totalViews,'Snapshot mới nhất, không cộng trùng'],['Bài đã theo dõi',a.totalPosts,`${a.unattributed} bài chưa gắn góc nội dung`],['Giả thuyết nội dung',data.angles.length,'Chưa mặc định là góc thắng'],['Bài đã xuất bản',data.queue?.filter(p=>p.status==='published'&&p.receipt?.publishedVerifiedAt).length??0,'Mục tiêu 100 bài có xác minh']];
+  const k=data.dailyKpi;
+  const cards=[['Lượt xem đã ghi nhận',a.totalViews,'Snapshot mới nhất, không cộng trùng'],['Bài đã theo dõi',a.totalPosts,`${a.unattributed} bài chưa gắn góc nội dung`],['Giả thuyết nội dung',data.angles.length,'Chưa mặc định là góc thắng'],[`Đăng hôm nay · mục tiêu ${k?.target??20}`,k?.published??0,`${k?.scheduled??0} đã hẹn hôm nay · ${k?.underReview??0} đang xét duyệt · UTC+7`]];
   $('overview').replaceChildren(...cards.map(([label,value,detail])=>{const card=element('article',undefined,'stat');card.append(element('div',label,'stat-label'),element('div',fmt(value),'stat-value'),element('div',detail,'stat-detail'));return card;}));
   $('campaign-summary').textContent=data.products.length?`${data.products.map(p=>p.name).join(' · ')}. ${data.campaign?.area??data.products[0].area}. Ưu tiên carousel ảnh, nội dung tiếng Việt.`:'Chờ nhập thư mục sản phẩm.';
-  $('allocation').textContent=a.allocation;$('measurement').textContent=a.measurement;
+  $('campaign-offer').textContent=data.campaign?.offer??'Chưa xác nhận ưu đãi';
+  $('allocation').textContent=`${a.allocation}. Lead đủ thông tin đã ghi nhận: ${data.leadSummary?.qualified??'Chưa thu thập'}.`;$('measurement').textContent=a.measurement;
   $('connections').replaceChildren(...Object.values(data.connections).map(t=>element('li',t)));
   const selected=$('product-filter').value;
   $('product-filter').replaceChildren(element('option','Tất cả'));
@@ -22,9 +24,10 @@ function render(data){
   const queue=data.queue??[];const published=queue.filter(p=>p.status==='published'&&p.receipt?.publishedVerifiedAt).length;
   const scheduled=queue.filter(p=>p.status==='scheduled'&&p.receipt?.scheduledVerifiedAt).length;
   const prepared=queue.filter(p=>p.assetsVerified).length;
-  $('queue-counts').replaceChildren(...[[queue.length,'Ý tưởng trong hàng đợi'],[prepared,'Đủ ảnh đã kiểm tra'],[scheduled,'Đã hẹn, có biên nhận'],[published,'Đã xuất bản']].map(([n,t])=>{const node=element('div');node.append(element('strong',fmt(n)),element('span',t));return node;}));
+  const review=queue.filter(p=>p.status==='under_review').length;
+  $('queue-counts').replaceChildren(...[[queue.length,'Ý tưởng trong hàng đợi'],[prepared,'Đủ ảnh đã kiểm tra'],[scheduled,'Đã hẹn, có biên nhận'],[review,'TikTok đang xét duyệt'],[published,'Đã xuất bản']].map(([n,t])=>{const node=element('div');node.append(element('strong',fmt(n)),element('span',t));return node;}));
   $('progress-fill').style.width=`${Math.min(published,100)}%`;$('progress-fill').parentElement.setAttribute('aria-valuenow',String(Math.min(published,100)));
-  $('briefs').replaceChildren(...data.angles.slice(0,12).map(a=>{const d=element('details');d.append(element('summary',a.name),element('p',a.hookA),element('p',a.imagePrompt),element('p',a.videoPrompt));return d;}));
+  $('briefs').replaceChildren(...data.angles.map(a=>{const d=element('details');d.append(element('summary',a.name),element('p',a.hookA),element('p',a.imagePrompt),element('p',a.videoPrompt));return d;}));
 }
 function renderAngles(){
   const rows=current.analysis.angles.filter(a=>!$('product-filter').value||a.productId===$('product-filter').value);
