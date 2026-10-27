@@ -1,0 +1,14 @@
+{
+  "enabled": false,
+  "account_handle": null,
+  "browser": "iab",
+  "video_directory": null,
+  "timezone": "Asia/Bangkok",
+  "publication_times": [],
+  "preparation_schedule": null,
+  "max_batch_size": null,
+  "visibility": null,
+  "interaction_settings": null,
+  "disclosure_instructions": null,
+  "first_post_verified": false
+}

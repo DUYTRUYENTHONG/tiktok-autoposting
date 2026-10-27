@@ -1,0 +1,19 @@
+{
+  "items": [
+    {
+      "id": "example-do-not-submit",
+      "account_handle": null,
+      "video_path": null,
+      "caption": null,
+      "publish_at": null,
+      "timezone": "Asia/Bangkok",
+      "visibility": null,
+      "interaction_settings": null,
+      "disclosures": null,
+      "approved": false,
+      "status": "pending",
+      "file_sha256": null,
+      "receipt": null
+    }
+  ]
+}
