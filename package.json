@@ -1,0 +1,21 @@
+{
+  "name": "tiktok-autoposting",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build:plugin": "node scripts/build-plugin.mjs",
+    "test": "node --test",
+    "start": "node src/server.mjs",
+    "campaign": "node src/cli.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}

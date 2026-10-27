@@ -1,59 +1,81 @@
-# TikTok Autoposting
+# TikTok Autoposting · Sakura Content Lab
 
-Schedule TikTok videos through computer use in the ChatGPT/Codex internal browser, with a local content queue and verified scheduling receipts.
+Vietnamese product carousel planning, TikTok Studio scheduling through computer use, and a local performance tracker. Built for **@saigomlia**, offline sales in Ho Chi Minh City and online sales across Vietnam.
 
-**Status: setup prepared; posting is not active.** This repository contains an operating playbook, configuration templates, and a scheduled-task prompt. It does not contain a standalone posting service, installed custom skill, or running scheduler. Login, account eligibility, video access, captions, posting times, and an end-to-end test are still required.
+## Current operating scope
 
-## How it works
+- Operating KPI: **20 receipt-verified published posts per Vietnam calendar day (UTC+7)**, starting October 27, 2026. This replaces the earlier stop-after-20 pilot restriction. The first 100 remains a cumulative milestone, not a daily limit.
+- The user changed the pilot from scheduling to **publish now** on October27. Nine items were already scheduled; Studio disables changes to commercial posts and requires the TikTok app. The latest user decision is **keep the nine schedules unchanged**. The remaining11 are immediate submissions. Never silently duplicate scheduled items.
+- New immediate posts use **Vựa Sầu Riêng Cô Ba — 322 Đ. Huỳnh Thị Hai** as their TikTok location.
+- Promotion for all new posts: **Mua 1 tặng 1, chỉ khi mua qua TikTok**. The first scheduled post retains its earlier Mua3tặng1 offer under the explicit keep decision.
+- Posts19–20 introduce original human-story covers and recommended music. Printed AI wording was removed from the new covers; the platform AI disclosure stays enabled. Music on the existing18 was not changed: Studio's commercial-post edit/Delete restriction requires the TikTok app.
+- Ten content angles, two caption-hook variants each. Paired variants reuse the same verified image set; this is an observational pilot, not a causal A/B test.
+- The daily backlog adds 28 original painpoint/story hypotheses with post-specific inquiry codes. Generated characters are illustrations, not customer testimonials. Reused covers are identified in the private asset manifest; 28 concepts does not mean 28 new image sets.
+- Native photo scheduling, local uploads, commercial disclosure, AI labels and account avatar changes have been verified in the signed-in browser. Scheduling receipts live outside Git. Scheduled does not mean published.
 
-1. You sign in to TikTok Studio in the internal browser.
-2. You provide the account handle, local videos, exact captions, visibility, disclosures, and publication times.
-3. The agent uploads approved queue items through the visible TikTok Studio interface and selects TikTok's native scheduling option.
-4. After submission, the agent verifies each scheduled item in TikTok and records a receipt locally.
-5. Once accepted by TikTok, TikTok handles publication. A recurring local task can replenish the queue after its browser/file access has been tested.
+## Run the tracker
 
-Scheduling an upload and publishing a video are separate events. A successful upload alone is not proof of either.
+Requires Node.js 22 or later.
 
-## Initial setup
+```powershell
+npm ci
+npm test
+npm start
+```
 
-1. Open [TikTok Studio](https://www.tiktok.com/tiktokstudio/upload) in the internal browser and sign in yourself.
-2. Copy `config.example.json` to `config.local.json`. Fill in the account, absolute video folder, publication times, audience, and disclosure instructions. Keep `enabled` false until the first test succeeds.
-3. Copy `queue.example.json` to `queue.local.json`. Replace the example with real items. Use explicit ISO 8601 dates with UTC offsets. Set `approved` true only for content you authorize for the named account.
-4. Ask the agent to run [the first-post checklist](docs/OPERATIONS.md). Confirm that the browser can access the selected local video; local filesystem access does not establish browser upload access.
-5. Verify the first scheduled item in TikTok, then activate a recurring task at your chosen preparation times using [the saved prompt](automation/PROMPT.md).
+Open [the local tracker](http://127.0.0.1:4318) or [carousel review](http://127.0.0.1:4318/review). The read-only server binds to loopback, checks the Host header, and refreshes displayed state every 15 seconds. TikTok metrics change only when new observations are imported; this is not an installed TikTok analytics API integration.
 
-The timezone proposal is **Asia/Bangkok (UTC+7)**. Confirm the timezone shown by TikTok before scheduling. Templates deliberately contain no real account or publishable video.
+Canonical private data: `%USERPROFILE%\.codex\data\tiktok-autoposting\campaign.json`. Override with `TIKTOK_CAMPAIGN_FILE`. The repository's ignored `state/` directory stores working upload manifests and browser evidence journals; it is not the canonical campaign database.
 
-## Scheduling choices
+```powershell
+npm run campaign -- init
+npm run campaign -- sakura "C:\absolute\product-folder"
+npm run campaign -- ingest "C:\absolute\other-products" --area "TP.HCM · online toàn quốc"
+npm run campaign -- import "C:\absolute\observations.json"
+npm run campaign -- status
+node scripts/reconcile-pilot.mjs
+node scripts/configure-daily.mjs
+```
 
-| Route | Role | Current status |
-| --- | --- | --- |
-| Internal browser + TikTok native scheduler | Primary computer-use workflow | Login page opened; eligibility and upload not tested |
-| Local recurring task | Refill TikTok's scheduled queue | Prompt prepared; no automation created or activated |
-| Metricool plugin | Optional managed scheduling integration | Found in plugin directory; not connected or tested |
-| Custom TikTok Direct Post API | Separate developer integration | Not implemented; unsuitable for this private utility under current guidelines |
+Do not run preparation commands against an active campaign without checking existing receipts and the latest instructions. `scripts/prepare-pilot.mjs` prepares this dated Sakura pilot, preserves verified submissions and requires an absolute product folder plus a verified promotion image. It does not upload or schedule anything. `scripts/reconcile-pilot.mjs` imports verified local scheduling journal entries and rejects conflicting receipts.
 
-TikTok's published scheduler guide describes a 15-minute to 10-day scheduling window and a computer-based timezone default. Its account eligibility wording is inconsistent between creators and Business Accounts, so verify the actual signed-in UI. If scheduling is unavailable, report it; do not change account type automatically. [Official guide](https://ads.tiktok.com/business/en/blog/introducing-video-scheduler-now-you-can-plan-tiktoks-in-advance).
+`scripts/configure-daily.mjs` prepares remaining slots for today and tomorrow, subtracting verified schedules and accepted moderation-pending submissions. It preserves receipts and blocks on uncertain submissions; it does not post to TikTok. Proposed windows are experiments, not proven audience peaks. The existing Codex follow-up **Sakura · 20 posts per day** prepares content at05:30 and checks results at22:30 local time. It requires an available computer, app and signed-in browser; a background publishing run has not yet been verified. The running dashboard URL is recorded in private campaign.trackerUrl when it differs from the default port.
 
-Local scheduled tasks require the computer on, the desktop app running, and the project accessible. Browser sign-in persistence, unattended browser availability, and local upload access must be tested before relying on automatic refills. [Official scheduled-task documentation](https://learn.chatgpt.com/docs/automations).
+## Content, skills and agents
 
-## Repository contents
+The product folder supplies authentic references and nine cleaning-product carousel sets. The fabric-spray set is a different product and is excluded. Painpoint covers and a generated TikTok-only promotion card are visually checked before upload. Never invent cleaning results, prices, certifications, delivery terms or testimonials.
 
-- `config.example.json`: account and schedule configuration template.
-- `queue.example.json`: one illustrative queue item; do not submit it.
-- `automation/PROMPT.md`: durable instructions for a future recurring task.
-- `docs/OPERATIONS.md`: setup, verification, duplicate prevention, and recovery.
-- `docs/TOOLING_REVIEW.md`: skills, agent roles, plugin findings, and route decision.
-- `AGENTS.md`: instructions for future agents working in this repository.
+Five reusable skills are included in `skills/`: Vietnamese research, angle experiments, carousel creative, product video and performance posting. Four role profiles are in `.codex/agents/`: researcher, creative producer, performance analyst and posting operator. Profiles do not mean four agents are running. They inherit the active model; no model or cost substitution is automatic.
 
-## Content and state
+```powershell
+npm run campaign -- install-skills "C:\absolute\deer-flow"
+npm run campaign -- install-agents
+npm run build:plugin
+npm run campaign -- register-plugin
+```
 
-Keep videos, actual queues, configuration, receipts, screenshots, browser profiles, cookies, and credentials outside Git. The included `.gitignore` excludes common local paths and media formats. Never export a browser login session into the repository.
+Installers preserve existing differing definitions rather than overwriting them. Refresh/restart Codex and install `sakura-content-lab` from the personal plugin source to load it into a new runtime. Local packaging and MCP stdio behavior are tested; registration alone does not prove the desktop has connected the plugin.
 
-The queue workflow uses `pending`, `submitting`, `scheduled`, `published`, `needs_review`, and `failed`. These are operating conventions for the agent, not an implemented queue engine. Record `submitting` before clicking Schedule. If the outcome is uncertain, reconcile against TikTok before retrying; mark `needs_review` when it cannot be established.
+The plugin exposes four **read-only** MCP tools: campaign summary, angle performance, schedule recommendations and creative briefs. Publishing remains a browser workflow. The bundled server runs without a separate `node_modules` installation after building.
 
-## Next information needed
+## DeerFlow and model providers
 
-Account handle; video folder and first video; exact caption/hashtags; posting dates or recurrence; timezone; audience; interaction settings; commercial/AI disclosures where applicable. No posting cadence has been chosen on your behalf.
+[DeerFlow](https://github.com/bytedance/deer-flow) was cloned separately at `f443f107a3919872346a12ed6a31f35b1e407dae`; custom skills use its extension directories. Its full service is not running: required Python/runtime dependencies and provider credentials are not configured. See [integration notes](docs/DEERFLOW_INTEGRATION.md).
 
-Reviewed on 2026-10-27. See [the tooling review](docs/TOOLING_REVIEW.md) for sources and verification limits.
+Built-in image generation produced the account avatar and promotion images. Video generation is the next phase after the carousel pilot. Gemini can be used through a separately configured supported provider and plan; no Gemini API account, key or paid generation is configured by this repository. Recheck current official model availability before configuring any model.
+
+## Measurement and posting
+
+Attribute every post to product, angle, variant and immutable platform ID. Import cumulative metric snapshots with observation times; the engine uses the latest snapshot rather than adding repeated totals. It compares posts from the same product/format at comparable 24–72-hour age and reports limited evidence as a signal, not a proven winner. Missing engagement data stays missing.
+
+The existing account audience mainly watched durian content. Its historical peak is not proof of cleaner-product demand or posting time. Reassess angles after comparable 24–72-hour observations, accounting for the first post's different promotion, small sample size and content reuse. Daily volume is user-authorized; an angle is not a winner just because it was posted.
+
+Qualified inquiries require an observed cleaning need and surface/material, attributed by a post-specific code or direct reply context. Import only pseudonymous event IDs, post ID, timestamps and status; keep customer identities and messages outside this repository. See [daily operations and lead import](docs/DAILY_OPERATIONS.md).
+
+Follow [operations](docs/OPERATIONS.md) for UI verification, disclosure settings, duplicate prevention and recovery. A timeout after Schedule requires reconciliation, never a blind retry. A browser session or scheduled follow-up is not an unattended publishing guarantee. Keep the computer and Codex app running for local automations.
+
+## Privacy and validation
+
+Private campaign data, product media, credentials, cookies, screenshots and receipts are excluded from Git. Do not export the browser login. The repository contains code, example schemas, prompts and reusable instructions only.
+
+`npm test` covers attribution, snapshot deduplication, evidence thresholds, validation, local state concurrency, server boundaries, campaign planning and MCP tool behavior. `npm run build:plugin` creates the distributable MCP server. See [specification](docs/CONTENT_ENGINE_SPEC.md), [tool review](docs/TOOLING_REVIEW.md), and [implementation prompt](prompts/IMPLEMENTATION.md).

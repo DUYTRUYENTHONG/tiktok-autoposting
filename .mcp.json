@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "sakura-campaign": {
+      "command": "node",
+      "args": ["${PLUGIN_ROOT}/dist/sakura-mcp.mjs"]
+    }
+  }
+}
