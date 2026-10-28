@@ -12,17 +12,17 @@ await updateState(s=>{
     const sourceAngle=s.angles.find(a=>a.id===source.angleId);
     if(!sourceAngle)throw Error('Source angle missing');
     if(!s.angles.some(a=>a.id===angleId))s.angles.push({...sourceAngle,id:angleId,name:sourceAngle.name+' · lời kể',format:'video',sourceAngleId:source.angleId,promotionKey:'buy1-get1-tiktok'});
-    const caption=source.caption.replaceAll(source.leadCode??'__no_lead_code__',leadCode)+`\n\nBản thử lời kể tổng hợp. Nhắn mã “${leadCode}” kèm vật liệu và nhu cầu cần vệ sinh. Giọng đọc máy tiếng Việt từ Microsoft Windows.`;
+    const caption=source.caption.replaceAll(source.leadCode??'__no_lead_code__',leadCode)+`\n\nBản thử lời kể tổng hợp. Nhắn mã “${leadCode}” kèm vật liệu và nhu cầu cần vệ sinh.`;
     s.queue.push({id,account:source.account,productId:source.productId,angleId,variantId:'narrated-slideshow-test',sourceQueueId:source.id,format:'video',phase:'voice-test',title:source.title,caption,leadCode,storyType:'illustrative',sourceAssets:source.assets.map(a=>({...a})),assets:[],assetsVerified:false,status:'needs_render',approved:true,publishMode:'now',publishAt:null,promotionKey:'buy1-get1-tiktok',location:source.location,disclosures:{ownBrand:true,aiGenerated:true},music:{status:'needs_selection',backgroundUnderNarration:true},authorization:'User explicitly authorized ten additional narrated slideshow videos on 2026-10-28; preserve the original20 reservations.'});
   }
-  s.campaign.voiceTest={day:'2026-10-28',count:10,queueIds:Array.from({length:10},(_,i)=>`sakura-${101+i}`),mode:'additional_videos',status:'preparing',approvalSource:'User: Publish10additionaltestvideos'};
+  s.campaign.voiceTest??={day:'2026-10-28',count:10,queueIds:Array.from({length:10},(_,i)=>`sakura-${101+i}`),mode:'additional_videos',status:'preparing',approvalSource:'User: Publish10additionaltestvideos'};
   for(const item of s.queue.filter(q=>q.phase==='voice-test'&&!q.receipt)){
     const story=voicePainStories[item.angleId.replace(/-voice$/,'')];
     if(!story)continue;
     const source=s.queue.find(q=>q.id===item.sourceQueueId),promotion=s.campaign.currentPromotion;
     const tail=source.caption.split(/\n\s*\n/).slice(2).join('\n\n').replaceAll(source.leadCode??'__no_lead_code__',item.leadCode);
     const currentTail=promotion?tail.replaceAll('Mua 1 tặng 1, chỉ áp dụng khi mua qua TikTok.',promotion.text+'.'):tail;
-    item.caption=`${promotion?promotion.text+'\n\n':''}${story.hook}\n\n${story.story}\n\n${currentTail}\n\nBản thử lời kể tổng hợp. Nhắn mã “${item.leadCode}” kèm vật liệu và nhu cầu cần vệ sinh. Giọng đọc máy tiếng Việt từ Microsoft Windows.`;
+    item.caption=`${promotion?promotion.text+'\n\n':''}${story.hook}\n\n${story.story}\n\n${currentTail}\n\nBản thử lời kể tổng hợp. Nhắn mã “${item.leadCode}” kèm vật liệu và nhu cầu cần vệ sinh.`;
     if(promotion)item.promotionKey=promotion.key;
     item.voiceCopyRevision=promotion?'promo-first50-v3':'painpoint-v2';
   }

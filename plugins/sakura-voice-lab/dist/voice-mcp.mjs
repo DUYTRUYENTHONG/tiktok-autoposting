@@ -36792,7 +36792,7 @@ function voiceBrief(state, queueId) {
     spokenLeadCode,
     language: "vi-VN",
     script,
-    performance: "Conversational stock narration; no impersonation, testimonial or invented outcome.",
+    performance: "Conversational synthetic narration; no impersonation, testimonial or invented outcome.",
     targetSeconds: "20\u201335; verify actual duration after synthesis",
     copyRevision: promotion ? "promo-first50-v3" : tailored ? "painpoint-v2" : "brief-v1",
     status: "script_draft",
@@ -36801,6 +36801,17 @@ function voiceBrief(state, queueId) {
 }
 async function voiceRuntime(home = voiceHome) {
   const config2 = JSON.parse((await readFile2(path2.join(home, "runtime.json"), "utf8")).replace(/^\uFEFF/, ""));
+  if (config2.provider === "vieneu") {
+    if (config2.language !== "vi-VN" || config2.version !== "3.8.3" || ![config2.python, config2.modelManifest, config2.hfCache, config2.ffmpeg].every((p) => typeof p === "string" && path2.isAbsolute(p))) throw Error("Invalid local VieNeu runtime");
+    voiceProfile(config2);
+    if (await hashFile(config2.modelManifest) !== config2.modelSha256) throw Error("VieNeu asset manifest checksum mismatch");
+    const manifest = JSON.parse(await readFile2(config2.modelManifest, "utf8"));
+    if (!manifest.files?.length) throw Error("VieNeu assets are missing");
+    for (const asset of manifest.files) {
+      if (!path2.isAbsolute(asset.path) || !/^[a-f0-9]{64}$/.test(asset.sha256) || await hashFile(asset.path) !== asset.sha256) throw Error("VieNeu asset checksum mismatch");
+    }
+    return { ...config2, configFile: path2.join(home, "runtime.json") };
+  }
   if (config2.provider === "windows-sapi") {
     if (config2.language !== "vi-VN" || typeof config2.powershell !== "string" || !path2.isAbsolute(config2.powershell)) throw Error("Invalid Windows voice runtime");
     const helper = fileURLToPath2(new URL("../scripts/voice-render.ps1", import.meta.url));
@@ -36812,10 +36823,21 @@ async function voiceRuntime(home = voiceHome) {
   if (await hashFile(config2.model) !== config2.modelSha256 || await hashFile(config2.model + ".json") !== config2.configSha256) throw Error("Voice model/config checksum mismatch");
   return config2;
 }
-async function renderVoice(state, queueId, script, { home = voiceHome } = {}) {
+function voiceProfile(runtime, { voiceName, speed } = {}) {
+  if (runtime.provider !== "vieneu") {
+    if (voiceName !== void 0 || speed !== void 0) throw Error("Preset selection and speaking speed require the VieNeu provider");
+    return { voice: runtime.voice };
+  }
+  const voice = voiceName ?? runtime.voice, rate = speed ?? runtime.speed;
+  if (!runtime.presetVoices?.some((v) => v.name === voice)) throw Error("Unknown Vietnamese preset voice");
+  if (!Number.isFinite(rate) || rate < 1 || rate > 2 || !Number.isFinite(runtime.temperature) || runtime.temperature < 0.5 || runtime.temperature > 1) throw Error("Invalid local speaking profile");
+  return { voice, speed: rate, temperature: runtime.temperature };
+}
+async function renderVoice(state, queueId, script, { home = voiceHome, voiceName, speed } = {}) {
   const brief = voiceBrief(state, queueId), runtime = await voiceRuntime(home);
+  const profile = voiceProfile(runtime, { voiceName, speed });
   if (typeof script !== "string" || script.trim().length < 10 || script.length > 1500) throw Error("Expected a short reviewed script");
-  const digest = createHash2("sha256").update(JSON.stringify({ queueId, script, provider: runtime.provider, voice: runtime.voice, model: runtime.modelSha256, config: runtime.configSha256, version: runtime.version, renderer: 3 })).digest("hex");
+  const digest = createHash2("sha256").update(JSON.stringify({ queueId, script, provider: runtime.provider, ...profile, model: runtime.modelSha256, config: runtime.configSha256, version: runtime.version, renderer: 4 })).digest("hex");
   const outputDir = path2.join(home, "renders");
   await mkdir2(outputDir, { recursive: true });
   const base = path2.join(outputDir, `${queueId}-${digest.slice(0, 16)}`), receipt = base + ".json";
@@ -36835,7 +36857,10 @@ async function renderVoice(state, queueId, script, { home = voiceHome } = {}) {
   }
   try {
     await writeFile2(base + ".txt", script, { encoding: "utf8", flag: "w" });
-    if (runtime.provider === "windows-sapi") {
+    if (runtime.provider === "vieneu") {
+      const helper = fileURLToPath2(new URL("../scripts/voice-vieneu.py", import.meta.url));
+      await run(runtime.python, ["-I", helper, "--config", runtime.configFile, "--input", base + ".txt", "--output", base + ".partial.wav", "--voice", profile.voice, "--speed", String(profile.speed)], { timeout: 3e5, maxBuffer: 2 * 1024 * 1024, windowsHide: true, env: { ...process.env, PYTHONUTF8: "1" } });
+    } else if (runtime.provider === "windows-sapi") {
       const helper = fileURLToPath2(new URL("../scripts/voice-render.ps1", import.meta.url));
       await run(runtime.powershell, ["-NoProfile", "-NonInteractive", "-File", helper, "-InputFile", base + ".txt", "-OutputFile", base + ".partial.wav", "-VoiceName", runtime.voice], { timeout: 12e4, maxBuffer: 1024 * 1024, windowsHide: true });
     } else {
@@ -36853,7 +36878,8 @@ async function renderVoice(state, queueId, script, { home = voiceHome } = {}) {
       sha256: await hashFile(base + ".wav"),
       qa,
       provider: runtime.provider,
-      voice: runtime.voice,
+      ...profile,
+      offline: true,
       createdAt: (/* @__PURE__ */ new Date()).toISOString(),
       listeningVerified: false,
       attribution: runtime.attribution ?? `Vietnamese stock voice: VAIS1000 / rhasspy Piper voice; dataset CC BY 4.0; ${runtime.modelCard}. Synthetic narration adapted for Sakura.`,
@@ -36868,7 +36894,7 @@ async function renderVoice(state, queueId, script, { home = voiceHome } = {}) {
 }
 
 // src/voice-mcp.mjs
-var server = new McpServer({ name: "sakura-voice-lab", version: "0.1.0" });
+var server = new McpServer({ name: "sakura-voice-lab", version: "0.2.0" });
 var readOnly = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false };
 var result = (value) => ({ content: [{ type: "text", text: JSON.stringify(value, null, 2) }] });
 var safe = (fn) => async (args) => {
@@ -36878,10 +36904,14 @@ var safe = (fn) => async (args) => {
     return { isError: true, content: [{ type: "text", text: e.message }] };
   }
 };
-server.registerTool("voice_status", { description: "Verify the installed Vietnamese Windows stock voice or optional Piper runtime/model hashes. No downloads or cloud calls.", inputSchema: {}, annotations: readOnly }, safe(async () => {
+server.registerTool("voice_status", { description: "Verify configured local Vietnamese speech assets and checksums. No downloads or cloud calls; readiness is not listening approval.", inputSchema: {}, annotations: readOnly }, safe(async () => {
   const r = await voiceRuntime();
-  return { provider: r.provider, version: r.version, voice: r.voice, language: r.language, ready: true };
+  return { provider: r.provider, version: r.version, voice: r.voice, speed: r.speed, language: r.language, ready: true, listeningApproved: false };
+}));
+server.registerTool("voice_presets", { description: "List configured local Vietnamese preset voices and speaking speed. Does not clone a person, download models or generate audio.", inputSchema: {}, annotations: readOnly }, safe(async () => {
+  const r = await voiceRuntime();
+  return { provider: r.provider, voices: r.presetVoices ?? [{ name: r.voice }], defaultVoice: r.voice, defaultSpeed: r.speed ?? null };
 }));
 server.registerTool("voice_brief", { description: "Prepare a short Vietnamese story narration from one attributed Sakura queue item. Does not generate or post audio.", inputSchema: { queueId: external_exports.string().regex(/^sakura-\d{3}$/) }, annotations: readOnly }, safe(async ({ queueId }) => voiceBrief(await loadState(), queueId)));
-server.registerTool("render_voice", { description: "Generate a local stock Vietnamese WAV preview from the supplied reviewed script. Writes local files, never uploads, clones a person or approves publication. Listening review is still required.", inputSchema: { queueId: external_exports.string().regex(/^sakura-\d{3}$/), script: external_exports.string().min(10).max(1500) }, annotations: { ...readOnly, readOnlyHint: false } }, safe(async ({ queueId, script }) => renderVoice(await loadState(), queueId, script)));
+server.registerTool("render_voice", { description: "Render an offline Vietnamese WAV preview from the supplied script. VieNeu supports preset voice selection and 1.0\u20132.0x speed. Never posts or approves pronunciation.", inputSchema: { queueId: external_exports.string().regex(/^sakura-\d{3}$/), script: external_exports.string().min(10).max(1500), voiceName: external_exports.string().min(1).max(80).optional(), speed: external_exports.number().min(1).max(2).optional() }, annotations: { ...readOnly, readOnlyHint: false } }, safe(async ({ queueId, script, voiceName, speed }) => renderVoice(await loadState(), queueId, script, { voiceName, speed })));
 await server.connect(new StdioServerTransport());

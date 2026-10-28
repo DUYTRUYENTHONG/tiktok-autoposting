@@ -4,7 +4,20 @@ The user requested spoken stories and a different suitable trending sound for ea
 
 ## Sakura Voice Lab
 
-The separate local plugin is in [plugins/sakura-voice-lab](../plugins/sakura-voice-lab). It provides three MCP tools: voice_status checks the optional engine and model hashes; voice_brief prepares an attributed Vietnamese script; render_voice writes a local WAV preview with technical QA. Rendering does not post, attach audio, change a schedule, or approve pronunciation.
+The separate local plugin is in [plugins/sakura-voice-lab](../plugins/sakura-voice-lab). Its four MCP tools are voice_status, voice_presets, voice_brief and render_voice. They check local assets, list preset voices, prepare attributed Vietnamese scripts and render WAV previews. Rendering does not post, attach audio, change a schedule, or approve pronunciation.
+
+The user rejected both Windows An and the Piper VAIS1000 preview as robotic, requested faster speech, and then chose **our own local system without ElevenLabs**. Sakura Voice Lab0.2 adds a local [VieNeu-TTS v3 Turbo](https://huggingface.co/pnnbao-ump/VieNeu-TTS-v3-Turbo) backend. The plugin is our integration around existing open-source weights, with upstream attribution retained. It uses the CPU/ONNX backend, built-in presets and pitch-preserving speed adjustment; no cloud speech request or customer voice cloning is exposed.
+
+Use a real Python3.12 installation and the existing pinned FFmpeg toolchain:
+
+```powershell
+python scripts/setup-vieneu.py --ffmpeg "C:\absolute\ffmpeg.exe" --activate
+node scripts/voice-batch.mjs sakura-101 --voice "Thùy Dung" --speed 1.2
+```
+
+Setup pins SDK3.8.3, model revision61b85e3d937fbbacb387714180e8182823512523 and codec revisionceff0d0749bfb3fa2d61149794ec6feef0d1e1ae. It downloads assets once into private storage, records SHA-256 values and backs up a previous runtime when activating. Without --activate it writes a candidate configuration only. Each render verifies those hashes, disables network connections in the Python worker and produces a new cache key for the selected preset, speed and script. Allowed speed is1.0–2.0. The user rejected the Adam and Ngọc Huyền samples and specifically requested a Southern female voice. Setup now starts with Thùy Dung at1.2x, adjustable through --voice and --speed. This remains a listening candidate, not an approved voice. See [research and local execution evidence](LOCAL_VOICE_RESEARCH.md).
+
+Test one sample before regenerating the ten videos. Keep the rejected browser draft separate from a new approved revision; its saved music does not update when a local WAV changes. No new narration is publication-ready merely because a model loads or waveform QA passes.
 
 ```powershell
 # Prefer an already-installed Vietnamese Windows voice.

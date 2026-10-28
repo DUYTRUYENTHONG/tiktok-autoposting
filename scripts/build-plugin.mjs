@@ -9,6 +9,7 @@ await build({entryPoints:[path.join(root,'src','voice-mcp.mjs')],outfile:path.jo
 await mkdir(path.join(voiceRoot,'scripts'),{recursive:true});
 await cp(path.join(root,'scripts','voice-render.py'),path.join(voiceRoot,'scripts','voice-render.py'));
 await cp(path.join(root,'scripts','voice-render.ps1'),path.join(voiceRoot,'scripts','voice-render.ps1'));
+await cp(path.join(root,'scripts','voice-vieneu.py'),path.join(voiceRoot,'scripts','voice-vieneu.py'));
 await cp(path.join(root,'skills','vn-voiceover'),path.join(voiceRoot,'skills','vn-voiceover'),{recursive:true});
 await mkdir(path.join(root,'dist','licenses'),{recursive:true});
 // Preserve the full notices of every package whose code enters the bundle.
