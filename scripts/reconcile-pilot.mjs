@@ -37,7 +37,7 @@ await updateState(state=>{
   const verified=state.queue.filter(q=>q.phase==='pilot'&&q.status==='scheduled'&&q.receipt?.scheduledVerifiedAt).length;
   const published=state.queue.filter(q=>q.phase==='pilot'&&q.status==='published'&&q.receipt?.publishedVerifiedAt).length;
   state.campaign.scheduleStatus=`${verified} scheduled, ${published} published; pilot20`;
-  state.campaign.requestedMode='publish_now';
+  state.campaign.requestedMode=state.campaign.scaleCampaign?'rolling_schedule':'publish_now';
   state.campaign.location='Vựa Sầu Riêng Cô Ba · 322 Đ. Huỳnh Thị Hai';
   for(const angle of state.angles.filter(a=>a.productId==='sakura-cleaner-500ml')){angle.distribution='organic';angle.promotionKey??='buy1-get1-tiktok';}
   return state;

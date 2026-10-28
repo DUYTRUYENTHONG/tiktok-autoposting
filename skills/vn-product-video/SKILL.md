@@ -5,6 +5,8 @@ description: Prepare and generate Vietnamese short product videos from approved 
 
 # Video sản phẩm tiếng Việt
 
+Latest1,000-post expansion supersedes mandatory promotion-first copy for new unsubmitted scale videos: discounts only while verified eligible; unknown remaining orders means evergreen/no-discount. Open with the honest story hook. A demo may be an authentic product/label/material-question walkthrough; stock does not demonstrate Sakura efficacy. The isolated scale producer renders one authorized intent with new narration and hash-bound captions, retaining listening/playback review. Follow docs/SCALE_VIDEO_PRODUCTION.md and the registered plan/progress workflow; preserve accepted videos and never count previews as schedules.
+
 Read the approved product facts, angle ID, offer and reference assets. Start with a 20–25-second storyboard: 0–3s hook, 3–15s explanation/demonstration supported by facts, 15–20s real product detail, final CTA. Write narration, subtitles, shot duration and sound directions in Vietnamese.
 
 Use an actually available connected video generator or DeerFlow's configured video-generation provider. Verify credential/dependency readiness and generation costs before a paid job; do not invent output URLs or treat a prompt file as a rendered video. Preserve job IDs, output file paths, product references and generation settings. If unavailable, deliver a production-ready prompt/storyboard and state the blocker.

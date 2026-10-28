@@ -6,7 +6,7 @@
 - These are real stock recordings of cleaning activities. They are not verified Sakura demonstrations, customer testimonials or evidence of cleaning efficacy. Do not imply that a model endorses Sakura or that a generic bottle in stock footage is Sakura.
 - Use authentic Sakura500ml product reference photography for the product packshot. Label contextual footage in Vietnamese as illustrative; do not construct before/after evidence.
 - The user explicitly accepted the local **Thùy Dung Southern female** voice sample at1.2x, then requested stronger promotion-first pain-point hooks. This approves the voice profile; it does not make every later script or video listening-reviewed.
-- Current new-content offer: **Mua1tặng1 cho50đơn đầu tiên từTikTok**. No remaining redemption count is verified. Keep already accepted posts unchanged.
+- Declared campaign offer: **Mua1tặng1 cho50đơn đầu tiên từTikTok**. The latest1,000-post instruction permits discounts only while eligibility is verified. No remaining redemption count/order ledger is verified, so new unsubmitted media is evergreen/no-discount and no longer requires offer-first speech. Preserve already accepted posts unchanged.
 - Location: **Vựa Sầu Riêng Cô Ba,322 Đ.Huỳnh Thị Hai**. Offline TP.HCM, online Vietnam. No verified price, delivery promise or deadline is available.
 - Add suitable music from the account's native commercially filtered library and keep it below narration. Capture the actual selected track and mix per post. A recommendation is not evidence of a Vietnam chart rank; no music has been added merely by rendering a local voice-only file.
 

@@ -5,6 +5,8 @@ description: Create Vietnamese product carousel copy and image-generation prompt
 
 # Carousel sản phẩm tiếng Việt
 
+Latest1,000-post expansion is500carousels/500videos at20/day including preserved reservations. For new unsubmitted media, show discounts only while verified eligible; unknown remaining orders means evergreen/no-discount, overriding earlier required offer-first cards. BẾP301 has a reviewed evergreen six-slide variant with discount copy removed from both cover and offer card. Reuse the registered immutable scale plan, create fresh reviewed story assets, respect native five-minute slots and the actual format-specific scheduling horizon, then record a real receipt. A CSV of500photo intents is not500ready carousels.
+
 Inspect each product reference before generating. Preserve exact product identity, bottle geometry, label, volume, colors and intended use. Existing complete carousel images may be reused after visual QA; existing captions/prompts are drafts rather than substantiation of efficacy.
 
 Build each carousel around one customer question: hook → specific context → grounded explanation or clearly labeled illustration → offer → CTA. Use the aspect ratios accepted by the current photo-upload UI; the Sakura source carousels are 3:4. Keep large Vietnamese text, accurate accents, generous margins and a clear slide sequence. Do not force 9:16 onto a 3:4 asset set.

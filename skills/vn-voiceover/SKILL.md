@@ -5,6 +5,8 @@ description: Prepare and render Vietnamese product-story narration with Sakura V
 
 # Lời kể sản phẩm tiếng Việt
 
+Latest expansion:1,000additional posts,500photo/500video,20/day including accepted reservations. New discounts may appear only while eligibility is verified. No verified remaining-order ledger exists, so new scale narration is evergreen/no-discount and no longer requires an offer-first opening. Preserve accepted audio/posts and never inherit their listening approval onto a new script. Use the registered scale plan and isolated one-item producer documented in docs/SCALE_VIDEO_PRODUCTION.md; native schedules require actual reviewed assets, music, format-specific calendar evidence and a platform receipt. A plan row is not rendered or scheduled media.
+
 Use the selected product, angle and queue ID. Write a short spoken hook, one everyday situation and one clear CTA. Speak numbers naturally; do not read hashtags, URLs or long captions. Preserve the verified offer and explain that the character is illustrative in the accompanying caption. Never invent a testimonial, result or person's voice.
 
 The user chose our own local voice system, without ElevenLabs. Windows An and the Piper VAIS1000 candidate were rejected as robotic; faster delivery is requested. Prefer the configured VieNeu-TTS v3 Turbo preset engine after checking actual readiness. Use voice_presets for the installed catalog, then render_voice with a preset and speed chosen from the actual sample duration. Regional labels come from upstream metadata, not a verified listener judgment. Do not fall back to a rejected voice or call a style parameter expressive when the engine ignores it.

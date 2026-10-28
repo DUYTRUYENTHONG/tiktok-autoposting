@@ -4,6 +4,8 @@ Vietnamese product carousel planning, TikTok Studio scheduling through computer 
 
 ## Current operating scope
 
+- Latest expansion: **1,000 additional posts:500carousels and500videos**,20/day with10ofeach format including preserved reservations. [Scale campaign operations](docs/SCALE_CAMPAIGN.md) documents the private plan, real readiness gates and receipt-based progress. Current allocation spans October29–December18;1,000 intent rows are not1,000 produced or scheduled posts. New discounts appear only while eligibility is verified; without an order ledger, new media is evergreen/no-discount. The account's photo calendar currently exposes dates through November27, so later dates require rolling preparation and native scheduling.
+
 - Operating KPI: **20 receipt-verified published posts per Vietnam calendar day (UTC+7)**, starting October 27, 2026. This replaces the earlier stop-after-20 pilot restriction. The first 100 remains a cumulative milestone, not a daily limit.
 - The user changed the pilot from scheduling to **publish now** on October27. Nine items were already scheduled; Studio disables changes to commercial posts and requires the TikTok app. The latest user decision is **keep the nine schedules unchanged**. The remaining11 are immediate submissions. Never silently duplicate scheduled items.
 - New immediate posts use **Vựa Sầu Riêng Cô Ba — 322 Đ. Huỳnh Thị Hai** as their TikTok location.

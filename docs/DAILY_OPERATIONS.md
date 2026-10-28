@@ -2,6 +2,8 @@
 
 The active KPI is20 unique receipt-verified published posts per Asia/Ho_Chi_Minh day, starting2026-10-27. The first100 remains a cumulative milestone. Scheduled and under-review posts are shown separately. They reserve capacity but do not satisfy the publication KPI.
 
+For the active1,000-post expansion, use the registered immutable500photo/500video plan and [scale progress workflow](SCALE_CAMPAIGN.md). Do not run the legacy daily planner to add extra rows on top of that plan. Preserve accepted reservations, use native five-minute slots, and bind actual reviewed media before submission. Discounts require verified current eligibility; unknown means evergreen/no-discount. The projected calendar extends beyond the current native window, so later posts remain unsubmitted until eligible.
+
 Preserve the nine original schedules. Reconcile the browser submission journal before planning. `node scripts/configure-daily.mjs` prepares today's and tomorrow's remaining experimental slots, excluding existing reservations and uncertain outcomes. It does not upload. Review local plans at http://127.0.0.1:4318/review. If a slot expires, replan only unsubmitted items. Never repeat an uncertain submission.
 
 The existing recurring follow-up is **Sakura ·20 posts per day**,05:30 preparation and22:30 publication review in Vietnam time, attached to the current chat. Its maintained operating prompt is [automation/PROMPT.md](../automation/PROMPT.md). Background publishing has not yet been verified. Keep Codex, the computer and the signed-in internal browser available. Use private campaign.trackerUrl for the currently running dashboard if it differs from the default port.
