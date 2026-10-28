@@ -24,3 +24,7 @@ node_modules/
 *cookies*.json
 *storage-state*.json
 *.log
+*.wav
+*.mp3
+*.onnx
+__pycache__/

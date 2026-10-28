@@ -43,12 +43,13 @@ try{
       catch(e){if(e.code!=='ENOENT')throw e;await writeFile(target,text,{encoding:'utf8',flag:'wx'});}
       console.log(target);
     }
-  }else if(command==='register-plugin'){
+  }else if(command==='register-plugin'||command==='register-voice-plugin'){
     const file=path.join(homedir(),'.agents','plugins','marketplace.json');let catalog={name:'duytruyenthong-personal',interface:{displayName:'DuyTruyenThong Personal Tools'},plugins:[]};
     try{catalog=JSON.parse(await readFile(file,'utf8'));}catch(e){if(e.code!=='ENOENT')throw e;}
-    const relative=path.relative(homedir(),root).split(path.sep).join('/');
+    const pluginRoot=command==='register-voice-plugin'?path.join(root,'plugins','sakura-voice-lab'):root;
+    const relative=path.relative(homedir(),pluginRoot).split(path.sep).join('/');
     if(relative.startsWith('..')||path.isAbsolute(relative))throw new Error('Personal marketplace requires the checkout inside the user home');
-    const entry={name:'sakura-content-lab',source:{source:'local',path:`./${relative}`},policy:{installation:'AVAILABLE',authentication:'ON_INSTALL'},category:'Productivity'};
+    const entry={name:command==='register-voice-plugin'?'sakura-voice-lab':'sakura-content-lab',source:{source:'local',path:`./${relative}`},policy:{installation:'AVAILABLE',authentication:'ON_INSTALL'},category:'Productivity'};
     const old=catalog.plugins.find(p=>p.name===entry.name);
     if(old&&JSON.stringify(old.source)!==JSON.stringify(entry.source))throw new Error('Plugin cùng tên đã có nguồn khác; giữ nguyên cấu hình');
     if(!old){catalog.plugins.push(entry);await mkdir(path.dirname(file),{recursive:true});await writeFile(file,JSON.stringify(catalog,null,2),'utf8');}

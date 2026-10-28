@@ -1,0 +1,9 @@
+{
+  "name":"sakura-voice-lab",
+  "version":"0.1.0",
+  "description":"Prepare Vietnamese Sakura narration and generate local stock-voice WAV previews for listening review.",
+  "author":{"name":"DUYTRUYENTHONG"},
+  "skills":"./skills/",
+  "mcpServers":"./.mcp.json",
+  "interface":{"displayName":"Sakura Voice Lab","shortDescription":"Lời kể tiếng Việt và bản nghe thử cục bộ.","longDescription":"Attributed Vietnamese voice briefs and local Piper WAV previews. No cloud transmission, automatic posting, or voice cloning.","developerName":"DUYTRUYENTHONG","category":"Productivity","capabilities":[],"defaultPrompt":"Chuẩn bị lời kể tiếng Việt cho bài Sakura, tạo bản nghe thử và báo rõ phần cần kiểm tra."}
+}

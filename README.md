@@ -58,6 +58,10 @@ Installers preserve existing differing definitions rather than overwriting them.
 
 The plugin exposes four **read-only** MCP tools: campaign summary, angle performance, schedule recommendations and creative briefs. Publishing remains a browser workflow. The bundled server runs without a separate `node_modules` installation after building.
 
+The separate **Sakura Voice Lab** plugin prepares Vietnamese story scripts and renders local stock-voice WAV previews with duration and waveform checks. It supports an installed Windows Vietnamese voice and optional Piper. Pronunciation review and a supported TikTok attachment path remain required; see [voice setup and music rotation](docs/VOICE_AND_MUSIC.md). The user authorized ten additional narrated slideshow tests on October28, with separate codes and video attribution. The daily planner requests distinct, freshly verified Vietnam commercial-use sounds instead of repeating one recommendation.
+
+The [ten-test narration prompt book](prompts/VOICE_TEST_OCTOBER28.md) records the executed scripts and source-carousel IDs. Media receipts explicitly distinguish rendered voice previews, music selection, listening review and verified publication.
+
 ## DeerFlow and model providers
 
 [DeerFlow](https://github.com/bytedance/deer-flow) was cloned separately at `f443f107a3919872346a12ed6a31f35b1e407dae`; custom skills use its extension directories. Its full service is not running: required Python/runtime dependencies and provider credentials are not configured. See [integration notes](docs/DEERFLOW_INTEGRATION.md).

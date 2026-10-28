@@ -4,6 +4,7 @@ import {updateState,loadState,root} from '../src/store.mjs';
 import {painpointStories} from '../src/content-bank.mjs';
 import {vietnamDay,dailyKpi,planDailySlots} from '../src/daily-kpi.mjs';
 import {coverForPost} from '../src/creative-assets.mjs';
+import {selectMusic} from '../src/music-policy.mjs';
 
 const now=new Date(),today=vietnamDay(now),tomorrow=vietnamDay(new Date(Number(now)+86400000));
 try{
@@ -26,8 +27,9 @@ await updateState(s=>{
     const id=`sakura-pain-${concept.key}`;
     if(!s.angles.some(a=>a.id===id))s.angles.push({id,productId:product.id,name:concept.pain,format:'photo',distribution:'organic',hookA:concept.hook,hookB:`Nếu là bạn: ${concept.hook}`,status:concept.status,evidenceIds:[],proofRequired:concept.proof,imagePrompt:`Nhân vật người Việt trưởng thành trong tình huống ${concept.story} Giữ đúng ảnh sản phẩm, không dựng kết quả. Không in chữ AI lên ảnh; bật khai báo AI của nền tảng.`,videoPrompt:'Dựng sau khi có tín hiệu và provider phù hợp.'});
   }
-  const available=s.queue.filter(q=>!q.receipt&&q.phase!=='pilot');
+  const available=s.queue.filter(q=>!q.receipt&&q.phase!=='pilot'&&q.phase!=='voice-test');
   const firstKeys=['khach-den','noi-quen','dep-tan-ca','gach-lam-tam','khay-goc','xe-vat-lieu','may-vo','uu-dai-kenh'];
+  const musicHistory=s.queue.filter(q=>q.receipt&&q.music).map(q=>q.music);
   const concepts=[...firstKeys.map(key=>painpointStories.find(c=>c.key===key)),...painpointStories.filter(c=>!firstKeys.includes(c.key))];
   for(const q of available){
     // Keep concept attribution stable across repeated preparations and daily runs.
@@ -42,6 +44,8 @@ await updateState(s=>{
     const code=`${c.keyword}${q.id.split('-').pop()}`;
     Object.assign(q,{angleId:`sakura-pain-${c.key}`,variantId:`story-${Math.floor(i/painpointStories.length)+1}`,phase:'daily',title:`${c.hook} | Sakura`.slice(0,90),caption:`${i<painpointStories.length?c.hook:`Một góc nhìn khác: ${c.hook}`}\n\n${c.story}\n\nBạn đang cần vệ sinh góc nào? Nhắn “${code}” kèm ảnh bề mặt, tên vật liệu và loại vết bám để hỏi độ phù hợp, giá và cách dùng.\n\n🎁 Mua 1 tặng 1, chỉ áp dụng khi mua qua TikTok. Hỏi rõ giá và điều kiện trước khi đặt. 📍 Vựa Sầu Riêng Cô Ba, 322 Đ. Huỳnh Thị Hai. Mua trực tiếp tại TP.HCM, nhận đơn online toàn quốc.\n\nNhân vật và tình huống minh họa, không phải lời chứng thực. Chỉ dùng theo nhãn, kiểm tra vật liệu, thử vùng khuất khi được phép; không trộn chất tẩy rửa.\n\n#Sakura #NuocLauDaNang ${familyTags[c.family]} #HoChiMinh #Mua1Tang1 #UuDaiTikTok`,leadCode:code,storyType:'illustrative',creativeRevision:2,assets:[cover,source[1],source[2],offer,source[4]],assetsVerified:true,status:'ready',approved:true,publishAt:null,disclosures:{ownBrand:true,aiGenerated:true},location:'Vựa Sầu Riêng Cô Ba · 322 Đ.Huỳnh Thị Hai',music:{title:'Chốt Đơn Ngay',artist:'Minh Hoàng Band',source:'TikTok Studio recommendation',chartRankVerified:false}});
     q.requiresFreshCover=requiresFreshCover;
+    q.music=selectMusic(s.musicCatalog??[],musicHistory,{now});
+    if(q.music.soundId)musicHistory.push(q.music);
     q.assetsVerified=ready;q.status=ready?'ready':'needs_generation';
     if(requiresFreshCover&&ready)q.creativeRevision=3;
   }

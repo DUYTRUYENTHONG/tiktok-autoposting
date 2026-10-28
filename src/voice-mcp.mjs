@@ -1,0 +1,13 @@
+import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
+import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
+import {z} from 'zod';
+import {loadState} from './store.mjs';
+import {voiceBrief,voiceRuntime,renderVoice} from './voice.mjs';
+const server=new McpServer({name:'sakura-voice-lab',version:'0.1.0'});
+const readOnly={readOnlyHint:true,destructiveHint:false,idempotentHint:true,openWorldHint:false};
+const result=value=>({content:[{type:'text',text:JSON.stringify(value,null,2)}]});
+const safe=fn=>async args=>{try{return result(await fn(args));}catch(e){return {isError:true,content:[{type:'text',text:e.message}]};}};
+server.registerTool('voice_status',{description:'Verify the installed Vietnamese Windows stock voice or optional Piper runtime/model hashes. No downloads or cloud calls.',inputSchema:{},annotations:readOnly},safe(async()=>{const r=await voiceRuntime();return {provider:r.provider,version:r.version,voice:r.voice,language:r.language,ready:true};}));
+server.registerTool('voice_brief',{description:'Prepare a short Vietnamese story narration from one attributed Sakura queue item. Does not generate or post audio.',inputSchema:{queueId:z.string().regex(/^sakura-\d{3}$/)},annotations:readOnly},safe(async({queueId})=>voiceBrief(await loadState(),queueId)));
+server.registerTool('render_voice',{description:'Generate a local stock Vietnamese WAV preview from the supplied reviewed script. Writes local files, never uploads, clones a person or approves publication. Listening review is still required.',inputSchema:{queueId:z.string().regex(/^sakura-\d{3}$/),script:z.string().min(10).max(1500)},annotations:{...readOnly,readOnlyHint:false}},safe(async({queueId,script})=>renderVoice(await loadState(),queueId,script)));
+await server.connect(new StdioServerTransport());

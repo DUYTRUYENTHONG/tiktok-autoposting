@@ -1,9 +1,15 @@
 import {build} from 'esbuild';
 import path from 'node:path';
-import {mkdir,readFile,readdir,writeFile} from 'node:fs/promises';
+import {mkdir,readFile,readdir,writeFile,cp} from 'node:fs/promises';
 import {root} from '../src/store.mjs';
 
 const result=await build({entryPoints:[path.join(root,'src','mcp.mjs')],outfile:path.join(root,'dist','sakura-mcp.mjs'),bundle:true,metafile:true,platform:'node',target:'node22',format:'esm',banner:{js:"import { createRequire as __sakuraCreateRequire } from 'node:module'; const require = __sakuraCreateRequire(import.meta.url);"},legalComments:'eof'});
+const voiceRoot=path.join(root,'plugins','sakura-voice-lab');
+await build({entryPoints:[path.join(root,'src','voice-mcp.mjs')],outfile:path.join(voiceRoot,'dist','voice-mcp.mjs'),bundle:true,platform:'node',target:'node22',format:'esm',banner:{js:"import { createRequire as __voiceCreateRequire } from 'node:module'; const require = __voiceCreateRequire(import.meta.url);"},legalComments:'eof'});
+await mkdir(path.join(voiceRoot,'scripts'),{recursive:true});
+await cp(path.join(root,'scripts','voice-render.py'),path.join(voiceRoot,'scripts','voice-render.py'));
+await cp(path.join(root,'scripts','voice-render.ps1'),path.join(voiceRoot,'scripts','voice-render.ps1'));
+await cp(path.join(root,'skills','vn-voiceover'),path.join(voiceRoot,'skills','vn-voiceover'),{recursive:true});
 await mkdir(path.join(root,'dist','licenses'),{recursive:true});
 // Preserve the full notices of every package whose code enters the bundle.
 const packages=new Set();
@@ -25,4 +31,5 @@ for(const relative of [...packages].sort()){
   }
 }
 await writeFile(path.join(root,'dist','licenses','NOTICE.txt'),notices.join('\n')+'\n','utf8');
+await cp(path.join(root,'dist','licenses'),path.join(voiceRoot,'dist','licenses'),{recursive:true});
 console.log('Built dist/sakura-mcp.mjs with dependency notices.');
