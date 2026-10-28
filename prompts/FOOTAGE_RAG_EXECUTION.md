@@ -11,12 +11,16 @@ Executed: catalog/interval review, pinned full FFmpeg, local RAG grounding, auth
 ```powershell
 node scripts/knowledge.mjs index
 node scripts/knowledge.mjs hybrid-query e5 "Chính sách video footage và giọng nữ miền Nam?"
-node scripts/voice-batch.mjs sakura-101 --voice "Thùy Dung" --speed 1.2 --reference-style speaker-only
+node scripts/voice-batch.mjs sakura-102 --voice "Thùy Dung" --speed 1.2 --reference-style speaker-only
 node scripts/prepare-footage-tests.mjs
-node scripts/render-footage-tests.mjs sakura-101
+node scripts/render-footage-tests.mjs sakura-102
+node scripts/prepare-video-subtitles.mjs sakura-102
+node scripts/burn-video-subtitles.mjs sakura-102
 ```
 
 The renderer requires a private reviewed-footage manifest and verified local runtimes. These commands prepare local files, not TikTok posts. Continue only authorized IDs with actual listening/visual review and suitable music. A moderation-pending browser receipt is under_review, not published.
+
+The [caption integration](../docs/VIDEO_SUBTITLES.md) was exercised on all five exact narration inputs and local burned videos. ASR lexical coverage is about61–78%; genuine phrase anchors, measured RMS speech activity and actual WAV boundaries support playback previews rather than word-perfect claims. The burn step stream-copies audio and binds source/video/ASS hashes, with display aliases for Sakura/TikTok and actually spoken codes. Remaining102–105 use native-UI-safe inquiryCTA y214, stock label y532 and caption-bottom y1330; the reusable ASR ASS default stays y1620. Preserve the accepted101audio and earlier published layout. Four safe-layout contact sheets and a full102frame were inspected; remaining listening feedback and final playback/mix remain pending, not automatically approved by a render.
 
 ## RAG execution prompt
 

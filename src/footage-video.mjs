@@ -56,7 +56,7 @@ export function createFootageEdl(q,review,audio,rag){
   });
   const seconds=Math.max(20,Math.ceil(audio.qa.durationSeconds+2));
   if(seconds>30)throw Error('Narration exceeds the reviewed short-video window');
-  const edl={queueId:q.id,account:q.account,variant:'stock-footage-pain-hook-v5',language:'vi',promotionKey:q.promotionKey,leadCode:q.leadCode,headline:story.headline,hookDetail:hookDetails[q.id],takeaway:story.takeaway,scenes,transitions:{type:'fade',duration:0.25,count:5},stockSeconds:14,packshotSeconds:seconds-15+1.25,seconds,width:1080,height:1920,fps:30,voice:{path:audio.path,sha256:audio.sha256,provider:audio.provider,voice:audio.voice,speed:audio.speed,script:audio.script,copyRevision:audio.copyRevision},rag:{corpusHash:rag.corpusHash,sourceIds},stockIsSakuraDemo:false,musicAdded:false,publicationVerified:false};
+  const edl={queueId:q.id,account:q.account,variant:'stock-footage-pain-hook-v6-safe-text',language:'vi',promotionKey:q.promotionKey,leadCode:q.leadCode,headline:story.headline,hookDetail:hookDetails[q.id],takeaway:story.takeaway,scenes,transitions:{type:'fade',duration:0.25,count:5},safeText:{inquiryY:214,captionBottomY:1330,stockLabelY:532},stockSeconds:14,packshotSeconds:seconds-15+1.25,seconds,width:1080,height:1920,fps:30,voice:{path:audio.path,sha256:audio.sha256,provider:audio.provider,voice:audio.voice,speed:audio.speed,script:audio.script,copyRevision:audio.copyRevision},rag:{corpusHash:rag.corpusHash,sourceIds},stockIsSakuraDemo:false,musicAdded:false,publicationVerified:false};
   edl.revision=createHash('sha256').update(JSON.stringify(edl)).digest('hex').slice(0,12);
   return edl;
 }

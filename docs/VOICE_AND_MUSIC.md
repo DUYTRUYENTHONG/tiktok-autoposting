@@ -25,6 +25,8 @@ Voice Lab0.3 adds the real v3Turbo `use_ref_codes` choice as `referenceStyle`: `
 
 The user subsequently selected B (Thùy Dung1.2x, speaker-only). The accepted101 script/WAV remains exactly v6;102–105 now use shorter colloquial v7 dialogue, with printed GIỌNG codes retained and the long spoken code ending omitted. Remaining delivery/pronunciation revisions and actual clip listening for102–105 remain pending; no exact wrong word has been identified. Preserve the accepted101 WAV. Profile approval is recorded independently of each clip approval. No content or voice adapter has been trained.
 
+[Local narration captions](VIDEO_SUBTITLES.md) bind real ASR phrase anchors to each exact WAV/script/model hash, with measured speech activity and explicit low-confidence playback status. The burn renderer copies the existing audio stream and places captions at y1330 for the current native-UI-safe102–105 layout; it does not re-synthesize speech, add music or approve pronunciation. Preserve accepted101 audio and its earlier layout. Roughly61–78% lexical coverage is not word-perfect alignment, and remaining102–105 still require actual listening feedback.
+
 ```powershell
 # Prefer an already-installed Vietnamese Windows voice.
 .\scripts\setup-voice.ps1

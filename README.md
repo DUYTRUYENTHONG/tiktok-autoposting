@@ -68,6 +68,16 @@ The [footage workflow](docs/FOOTAGE_EDITING.md) edits reviewed stock intervals w
 
 The image-footage slice has prepared ten distinct RAG-grounded photo briefs and rendered40slides at1080×1440. [Prepare briefs](scripts/prepare-footage-carousels.mjs) reads current facts through local LangChain/E5; [render carousels](scripts/render-footage-carousels.mjs) applies reviewed stock images, accurate scene copy and authentic Sakura packshots. Their private manifests retain codesẢNH201–210, hashes and review status. Rendered files are not publication receipts, and neither a content LLM nor a fine-tuned model produced the copy.
 
+[Narration captions](docs/VIDEO_SUBTITLES.md) use actual local Whisper ASR timestamps, the reviewed script, measured speech activity and exact WAV/model hashes. Current preparations have about61–78% lexical coverage; phrase previews require playback review and do not establish word-perfect alignment. The burn step copies the original audio stream and updates only an authorized unsubmitted local preview. Accepted101 audio and its earlier caption layout remain immutable. Remaining102–105 use the native-UI-safe layout and still await actual listening feedback.
+
+```powershell
+# Add --download-model only if the pinned public ASR assets are missing.
+node scripts/prepare-video-subtitles.mjs sakura-102 sakura-103 sakura-104 sakura-105
+node scripts/burn-video-subtitles.mjs sakura-102 sakura-103 sakura-104 sakura-105
+```
+
+The current burn renderer places phrase captions at y1330 above the native UI, while the reusable ASR ASS template defaults to y1620. It preserves hash-bound timing receipts and normalizes displayed Sakura/TikTok names without changing speech. Inspect the final video, actual music mix and platform disclosures before a single reconciled submission.
+
 The [local knowledge system](docs/KNOWLEDGE_AND_TUNING.md) implements real LangChain retrieval with BM25 and optional local multilingual E5 embeddings. It returns source-grounded prompts and abstains on missing facts; no content LLM is attached. Both [content tuning](docs/KNOWLEDGE_AND_TUNING.md#content-fine-tuning-readiness) and [voice tuning](docs/VOICE_TUNING.md) have dataset preparation, training and evaluation entry points. Neither has trained a model: approved content examples and consented human recordings are missing, and voice training also requires suitable CUDA hardware. Generated media is not a substitute training corpus.
 
 ## DeerFlow and model providers
