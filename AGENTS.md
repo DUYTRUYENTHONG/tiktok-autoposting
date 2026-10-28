@@ -21,3 +21,4 @@
 - Keep config.local.json, queue.local.json, videos, credentials, screenshots, and receipts out of Git. Stage explicit tracked files only.
 - Run npm test, npm run build:plugin, JSON and documentation link checks at a meaningful feature gate. Tests/builds use tools directly; no peer agent for routine checks.
 - Use codex/ for future feature branches. Preserve other work; do not modify the unrelated Cho Kenh checkout.
+- Latest CTA instruction: new unsubmitted creatives should explicitly ask customers to inbox the shop, retaining the unique post code and surface/material inquiry. A secondary call-via-bio CTA is requested, but enable it only after the exact clickable destination is supplied and verified. Current profile shows contact text, not a verified call link. See private state/cta-policy.json. Preserve already accepted posts and exact approved narration; visual CTA changes may reuse its WAV.
