@@ -88,6 +88,8 @@ Built-in image generation produced the account avatar and promotion images. Loca
 
 ## Measurement and posting
 
+The next creative prototype has a complete [six-slide sales funnel](docs/SALES_FUNNEL.md) and [executed BẾP301 image prompts](prompts/CAROUSEL_FUNNEL_301.md): six reviewed3:4 redesigned images, separate from published media. [Story voice prompts](prompts/STORY_VOICE_FUNNEL.md) provide three new Vietnamese story scripts; one21.061-second Southern female preview was rendered locally and still needs listening review. The funnel includes manual inquiry qualification, verified price/terms, order confirmation and after-sale replies. These drafts do not create platform posts, customers or orders.
+
 Attribute every post to product, angle, variant and immutable platform ID. Import cumulative metric snapshots with observation times; the engine uses the latest snapshot rather than adding repeated totals. It compares the same product, format, distribution and promotion at comparable24–72-hour age; the preserved Mua3tặng1 post cannot act as a control for Mua1tặng1. Limited evidence is a signal, not a proven winner. Missing engagement data stays missing.
 
 Fresh daily covers are registered by product/story after visual QA and remain attached when the unsubmitted plan is refreshed. From sakura-029 onward a library fallback alone is not ready. See the [executed October28 prompt set](prompts/OCTOBER_28_STORIES.md) and [daily operations](docs/DAILY_OPERATIONS.md).
