@@ -19,11 +19,17 @@ Repository popularity and model claims do not establish listener preference. Har
 | Kim Thanh | Female, Southern, story reading | Earlier sample; not selected as a conversational winner. |
 | Adam | Male, Southern, natural reading | A regional candidate for HCMC product stories. |
 | Ngọc Huyền | Female, Northern, natural reading | A contrasting natural-delivery candidate. |
-| Thùy Dung | Female, Southern, news reading; upstream editor's pick | Current candidate after the user explicitly requested a Southern female voice. |
+| Thùy Dung | Female, Southern, news reading; upstream editor's pick | Selected B profile:1.2x, speaker-only reference style. Per-clip listening remains separate. |
 
 These labels come from the installed SDK's preset JSON. They do not certify the perceived accent or naturalness. Use the same Sakura101 script to compare them. Measure duration rather than assuming the same speed multiplier yields the same pace across speakers. Keep Vietnamese tones, the first50orders offer, Sakura and GIỌNG101 intelligible.
 
-The user rejected the Adam and Ngọc Huyền comparison as insufficiently natural, then specifically requested a Southern female voice. Retain those rejections; do not call either preset a winner. Thùy Dung is the next bounded test, rather than an approved replacement.
+The user rejected the Adam and Ngọc Huyền comparison as insufficiently natural, then specifically requested a Southern female voice. Retain those rejections; do not call either preset a winner. The later accepted B selection supersedes Thùy Dung's initial candidate status.
+
+Later feedback supersedes that initial trial status: the earlier Thùy Dung1.2x profile was accepted, but revised footage narration still lacked the requested natural emphasis. Thục Đoan, the installed Southern female storytelling preset, was also rejected. No consenting training speaker is available. Further local experiments compare Mỹ Duyên's built-in Southern female reading preset and Thùy Dung with `use_ref_codes=False` while retaining its built-in speaker embedding. Same speed multiplier does not establish identical perceived pace. These are listening candidates, not trained voices or verified naturalness improvements.
+
+The pinned SDK3.8.3 source was checked: short exclamations may normalize to periods; short chunks merge; the old style parameter is ignored. Only the documented nonverbal cues are mapped; invented emphasis tags can be spoken as text. The supported reference-code choice changes actual conditioning. See the [official SDK implementation](https://github.com/pnnbao97/VieNeu-TTS/blob/04044e1b8f822f946bafb2c88b716459f4164152/src/vieneu/v3turbo.py).
+
+Latest decision: the user selected B, Thùy Dung1.2x with referenceStyle=speaker-only, and that profile is activated privately. The accepted101 script/WAV stays v6; only102–105 use shorter colloquial v7 copy, omitting the long spoken code ending while retaining printed caption/video attribution. Remaining delivery/pronunciation revisions in102–105 are pending; no exact wrong word has been identified. Preserve the accepted101 WAV. This profile decision does not approve every generated clip, establish naturalness metrics or train a new voice. The current dated immediate batch is five videos101–105 plus ten photo carousels201–210, preserving all accepted/scheduled items.
 
 The [upstream model card](https://huggingface.co/pnnbao-ump/VieNeu-TTS-v3-Turbo) states that the bundled presets may generate commercial audio and that their rightsholders consented. Preserve its attribution and notices. The local plugin exposes presets only; it does not enroll or clone a person's voice.
 

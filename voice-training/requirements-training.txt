@@ -1,0 +1,12 @@
+# Optional separate CUDA training environment. NOT installed by preparation or tests.
+# First install CUDA torch/torchaudio from the official cu128 index (see VOICE_TUNING.md).
+# Direct versions compatible with the pinned upstream 3.8.3 source/lock; transitive
+# resolution still needs a recorded pip freeze and CUDA acceptance on the target host.
+torch==2.8.0
+torchaudio==2.8.0
+transformers==4.57.6
+peft==0.14.0
+accelerate==1.13.0
+pyarrow==24.0.0
+safetensors==0.7.0
+sea-g2p==0.9.1

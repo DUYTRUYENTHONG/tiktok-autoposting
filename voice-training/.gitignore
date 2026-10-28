@@ -1,0 +1,16 @@
+# Source templates only. Private corpus/derivatives must stay outside this checkout.
+*.parquet
+*.safetensors
+*.jsonl
+*.csv
+*.flac
+corpus.json
+readiness.json
+launch-readiness.json
+base-vs-adapter.json
+listening-review*.json
+listening-results.json
+raw_audio/
+prepared/
+output/
+runs/

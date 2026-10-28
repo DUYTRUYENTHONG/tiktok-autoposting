@@ -1,63 +1,65 @@
-# Thử nghiệm giọng kể ·28/10/2026
+# Lời kể hiện hành ·28/10/2026
 
-Mười video bổ sung đã được người dùng cho phép, giữ nguyên20 lịch/carousel đã nhận. Bản MP4 hiện có giọng kể máy Microsoft An, chưa có nhạc nền, chưa được nghe duyệt và chưa xuất bản. Video1080×1440, H.264/AAC; thời lượng thực được lưu trong manifest. Dùng mã hỏi hàng riêng để không gộp lead với bài ảnh nguồn.
+Phạm vi đăng ngay mới nhất:5video101–105 và10carousel ảnh201–210, mỗi bài một nhạc phù hợp khác nhau.106–110 là bản nháp hoãn, không thuộc lệnh đăng ngay hiện tại. Giữ nguyên mọi bài đã nhận/lên lịch.
+
+Hồ sơ B đã được chọn: Thùy Dung nữ miền Nam,1.2x, referenceStyle=speaker-only. Giữ nguyên script/WAV101v6 đã được chấp nhận. Chỉ102–105 dùng hội thoại ngắn v7, bỏ đoạn đọc mã dài; mã GIỌNG vẫn giữ trên video và caption. Những clip này còn chờ nghe duyệt cách nói/phát âm, chưa có từ sai cụ thể được xác định. Bản MP4/WAV cục bộ không chứng minh nhạc đã thêm hoặc bài đã xuất bản. Không có mô hình fine-tuned hay LLM nội dung được dùng.
 
 ## sakura-101 · GIỌNG101
 
-Nguồn: sakura-029. Góc: sakura-pain-tan-ca-voice.
+Nguồn carousel: sakura-029. Góc: sakura-pain-tan-ca-voice. Phiên bản: promo-first50-conversational-v6.
 
-Mua một, tặng một! Chỉ năm mươi đơn đầu tiên từ Tích Tóc. Tặng thêm một chai cũng không giải quyết việc nhà dồn hết lên bạn. Đừng ôm hết mọi việc cùng lúc. Chọn một góc nhỏ, và xem đó là vật liệu gì trước khi chọn dung dịch. Cần tư vấn Sa cu ra? Nhắn mã giọng một không một, kèm ảnh bề mặt. Dùng theo nhãn.
+Mua một, tặng một!
+Chỉ năm mươi đơn đầu tiên từ Tích Tóc.
+
+Tan ca rồi. Lại tăng ca ở bếp hả?
+Việc nhà, mình chia nhau nha. Trước khi chọn nước lau, nhớ xem đúng chất liệu.
+
+Cần tư vấn Sa cu ra? Nhắn: giọng một không một. Gửi kèm ảnh bề mặt. Dùng theo nhãn.
 
 ## sakura-102 · GIỌNG102
 
-Nguồn: sakura-030. Góc: sakura-pain-chia-viec-voice.
+Nguồn carousel: sakura-030. Góc: sakura-pain-chia-viec-voice. Phiên bản: promo-first50-colloquial-v7.
 
-Mua một, tặng một! Chỉ năm mươi đơn đầu tiên từ Tích Tóc. Ăn cùng nhau mà một người phải dọn: bạn thấy công bằng không? Thử chia nhau từng góc nhỏ. Thống nhất xem bề mặt và hướng dẫn trước khi bắt đầu. Cần tư vấn Sa cu ra? Nhắn mã giọng một không hai, kèm ảnh bề mặt. Dùng theo nhãn.
+Mua một, tặng một!
+Chỉ năm mươi đơn đầu tiên từ Tích Tóc.
+
+Cùng ăn, cùng dọn mới công bằng chứ, đúng không?
+Nhà mình có ai hay ôm hết phần dọn không?
+Muốn hỏi Sa cu ra có hợp bề mặt nhà mình không, chụp ảnh gửi shop nha.
 
 ## sakura-103 · GIỌNG103
 
-Nguồn: sakura-031. Góc: sakura-pain-phong-tro-voice.
+Nguồn carousel: sakura-031. Góc: sakura-pain-phong-tro-voice. Phiên bản: promo-first50-colloquial-v7.
 
-Mua một, tặng một! Chỉ năm mươi đơn đầu tiên từ Tích Tóc. Phòng nhỏ không cần thêm một chai nước lau sai nhu cầu. Trước khi mua thêm một chai, hỏi rõ dùng cho đâu, và có hợp vật liệu trong phòng không. Cần tư vấn Sa cu ra? Nhắn mã giọng một không ba, kèm ảnh bề mặt. Dùng theo nhãn.
+Mua một, tặng một!
+Chỉ năm mươi đơn đầu tiên từ Tích Tóc.
+
+Phòng đã chật, sao chai lọ cứ nhiều thêm vậy?
+Mua đúng thứ mình cần trước nha.
+Muốn hỏi Sa cu ra có hợp chỗ cần lau không, chụp ảnh gửi shop nha.
 
 ## sakura-104 · GIỌNG104
 
-Nguồn: sakura-032. Góc: sakura-pain-vat-lieu-voice.
+Nguồn carousel: sakura-032. Góc: sakura-pain-vat-lieu-voice. Phiên bản: promo-first50-colloquial-v7.
 
-Mua một, tặng một! Chỉ năm mươi đơn đầu tiên từ Tích Tóc. Chữ đa năng không có nghĩa là lau đâu cũng được. Sơn gỗ, đá, và gạch có thể có hướng dẫn khác nhau. Đừng để vẻ ngoài quyết định cách vệ sinh. Cần tư vấn Sa cu ra? Nhắn mã giọng một không bốn, kèm ảnh bề mặt. Dùng theo nhãn.
+Mua một, tặng một!
+Chỉ năm mươi đơn đầu tiên từ Tích Tóc.
+
+Nhìn giống nhau, đâu chắc lau giống nhau?
+Đá, gạch hay gỗ, mình hỏi rõ chất liệu trước nha.
+Cần hỏi Sa cu ra có hợp không, chụp ảnh gửi shop nha.
 
 ## sakura-105 · GIỌNG105
 
-Nguồn: sakura-033. Góc: sakura-pain-so-hong-voice.
+Nguồn carousel: sakura-033. Góc: sakura-pain-so-hong-voice. Phiên bản: promo-first50-colloquial-v7.
 
-Mua một, tặng một! Chỉ năm mươi đơn đầu tiên từ Tích Tóc. Đừng mua vội, nếu bạn chưa biết món đồ làm bằng gì. Ngại là đúng khi chưa rõ chất liệu. Xem nhãn chăm sóc, và hỏi kỹ trước khi dùng dung dịch. Cần tư vấn Sa cu ra? Nhắn mã giọng một không năm, kèm ảnh bề mặt. Dùng theo nhãn.
+Mua một, tặng một!
+Chỉ năm mươi đơn đầu tiên từ Tích Tóc.
 
-## sakura-106 · GIỌNG106
+Vết bám thì nhỏ, mà lỡ hỏng món đồ lại tiếc, đúng không?
+Mình xem nhãn chăm sóc trước nha.
+Cần hỏi Sa cu ra có hợp không, chụp ảnh gửi shop nha.
 
-Nguồn: sakura-002. Góc: sakura-bep-voice.
+## Bản nháp lịch sử106–110
 
-Mua một, tặng một! Chỉ năm mươi đơn đầu tiên từ Tích Tóc. Chà mạnh hơn chưa chắc là dọn đúng hơn. Đợi bề mặt nguội, nhận diện vật liệu và loại vết bám. Đừng chọn nước lau chỉ vì lời hứa sạch mọi thứ. Cần tư vấn Sa cu ra? Nhắn mã giọng một không sáu, kèm ảnh bề mặt. Dùng theo nhãn.
-
-## sakura-107 · GIỌNG107
-
-Nguồn: sakura-034. Góc: sakura-pain-nham-chai-voice.
-
-Mua một, tặng một! Chỉ năm mươi đơn đầu tiên từ Tích Tóc. Cùng tên Sa cu ra không có nghĩa là cùng một sản phẩm. Bạn đang tìm nước lau đa năng năm trăm mi li lít. Hãy đối chiếu ảnh nhãn, và tách rõ với xả vải khô trước khi đặt. Cần tư vấn Sa cu ra? Nhắn mã giọng một không bảy, kèm ảnh bề mặt. Dùng theo nhãn.
-
-## sakura-108 · GIỌNG108
-
-Nguồn: sakura-035. Góc: sakura-pain-lop-phu-voice.
-
-Mua một, tặng một! Chỉ năm mươi đơn đầu tiên từ Tích Tóc. Một vết bám có đáng để bạn liều với lớp phủ chiếc nồi? Nhìn mặt ngoài và tìm đúng hướng dẫn của hãng. Chất liệu và tình trạng vết bám cần được hỏi rõ trước. Cần tư vấn Sa cu ra? Nhắn mã giọng một không tám, kèm ảnh bề mặt. Dùng theo nhãn.
-
-## sakura-109 · GIỌNG109
-
-Nguồn: sakura-036. Góc: sakura-pain-dep-chat-lieu-voice.
-
-Mua một, tặng một! Chỉ năm mươi đơn đầu tiên từ Tích Tóc. Màu trắng không nói cho bạn biết đôi dép làm bằng gì. Nhựa, cao su, và da không nên được coi là một. Gửi ảnh nhãn chăm sóc thay vì đoán qua màu sắc. Cần tư vấn Sa cu ra? Nhắn mã giọng một không chín, kèm ảnh bề mặt. Dùng theo nhãn.
-
-## sakura-110 · GIỌNG110
-
-Nguồn: sakura-037. Góc: sakura-pain-gach-lop-phu-voice.
-
-Mua một, tặng một! Chỉ năm mươi đơn đầu tiên từ Tích Tóc. Phòng tắm lấm tấm chưa chắc vì bạn lau chưa kỹ. Gạch men, đá và lớp phủ có hướng dẫn khác nhau. Một tấm ảnh rõ bề mặt giúp câu hỏi cụ thể hơn. Cần tư vấn Sa cu ra? Nhắn mã giọng một một không, kèm ảnh bề mặt. Dùng theo nhãn.
+Giữ nguồn, mã và lịch sử; không tự xuất bản hoặc thay tài sản đã được nhận. Chỉ tiếp tục khi có phạm vi được cho phép và nghe duyệt thực tế. Ưu đãi50đơn là giới hạn chung của chương trình, không đặt lại theo bài hoặc ngày.

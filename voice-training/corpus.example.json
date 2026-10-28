@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "purpose": "example-only",
+  "speakerId": "replace-with-consenting-adult-id",
+  "accent": "vi-VN-southern",
+  "gender": "female",
+  "consents": [{"id": "consent-001", "speakerId": "replace-with-consenting-adult-id", "adult": true, "signedAt": "2026-10-28", "revoked": false, "permittedUses": ["tts-training", "commercial-synthesis"], "storage": "local-only", "evidence": "consent/signed-permission.txt", "evidenceSha256": "REPLACE_WITH_SHA256"}],
+  "clips": [{"id": "clip-001", "audio": "audio/clip-001.wav", "text": "Mua một tặng một cho năm mươi đơn đầu tiên từ TikTok.", "sourceKind": "human-recording", "sourceId": "original-recording-001", "sessionId": "recording-day-001", "textGroup": "offer-line", "speakerId": "replace-with-consenting-adult-id", "consentId": "consent-001", "transcriptReviewed": true, "cleanSpeechReviewed": true}]
+}

@@ -9,6 +9,7 @@ for(let i=0;i<args.length;i++){
   if(arg==='--prepare-only')prepareOnly=true;
   else if(arg==='--voice'){if(!args[i+1]||args[i+1].startsWith('--'))throw Error('Missing preset voice');options.voiceName=args[++i];}
   else if(arg==='--speed'){if(!args[i+1])throw Error('Missing speaking speed');options.speed=Number(args[++i]);if(!Number.isFinite(options.speed)||options.speed<1||options.speed>2)throw Error('Speaking speed must be 1.0–2.0');}
+  else if(arg==='--reference-style'){options.referenceStyle=args[++i];if(!['preset','speaker-only'].includes(options.referenceStyle))throw Error('Expected preset or speaker-only reference style');}
   else if(arg.startsWith('--'))throw Error('Unknown option');
   else ids.push(arg);
 }

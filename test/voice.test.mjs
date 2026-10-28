@@ -13,7 +13,13 @@ test('voice brief preserves attribution and remains an unapproved narration draf
 });
 test('first50 queue narration opens with the current limited offer',()=>{
   const item={...q,promotionKey:'buy1-get1-tiktok-first50',angleId:'sakura-pain-tan-ca-voice'};
-  const brief=voiceBrief({queue:[item]},item.id);assert.match(brief.script,/^Mua một, tặng một! Chỉ năm mươi đơn đầu tiên/);assert.equal(brief.copyRevision,'promo-first50-v3');
+  const brief=voiceBrief({queue:[item]},item.id);assert.match(brief.script,/^Mua một, tặng một!\s+Chỉ năm mươi đơn đầu tiên/);assert.equal(brief.copyRevision,'promo-first50-conversational-v6');
+});
+test('v7 colloquial narration keeps printed attribution while omitting long spoken codes',()=>{
+  const item={...q,id:'sakura-102',leadCode:'GIỌNG102',promotionKey:'buy1-get1-tiktok-first50',angleId:'sakura-pain-chia-viec-voice',caption:q.caption+'\n\nNhắn GIỌNG102'};
+  const before=JSON.stringify(item),brief=voiceBrief({queue:[item]},item.id);
+  assert.equal(brief.copyRevision,'promo-first50-colloquial-v7');assert.equal(brief.spokenLeadCodeIncluded,false);assert.equal(brief.leadCode,'GIỌNG102');
+  assert.equal(brief.status,'script_draft');assert.doesNotMatch(brief.script,/giọng một không hai/);assert.match(item.caption,/GIỌNG102/);assert.equal(JSON.stringify(item),before);
 });
 test('voice runtime rejects corrupted model/config before executing an engine',async()=>{
   const home=await mkdtemp(path.join(tmpdir(),'voice-'));
@@ -26,7 +32,9 @@ test('voice runtime rejects corrupted model/config before executing an engine',a
 });
 test('local speech profiles require real presets and bounded pitch-preserving speed',()=>{
   const runtime={provider:'vieneu',voice:'Kim Thanh',speed:1.15,temperature:0.8,presetVoices:[{name:'Kim Thanh'},{name:'Adam'}]};
-  assert.deepEqual(voiceProfile(runtime),{voice:'Kim Thanh',speed:1.15,temperature:0.8});
+  assert.deepEqual(voiceProfile(runtime),{voice:'Kim Thanh',speed:1.15,temperature:0.8,referenceStyle:'preset'});
+  assert.equal(voiceProfile(runtime,{referenceStyle:'speaker-only'}).referenceStyle,'speaker-only');
+  assert.throws(()=>voiceProfile(runtime,{referenceStyle:'expressive'}));
   assert.equal(voiceProfile(runtime,{voiceName:'Adam',speed:1.2}).voice,'Adam');
   assert.equal(voiceProfile(runtime,{speed:1.5}).speed,1.5);
   assert.equal(voiceProfile(runtime,{speed:2}).speed,2);

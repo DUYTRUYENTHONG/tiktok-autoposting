@@ -14,6 +14,7 @@ test('isolated voice plugin exposes safe schemas and reports missing runtime ins
     const tools=(await client.listTools()).tools;assert.equal(tools.length,4);
     assert.equal(tools.find(t=>t.name==='voice_presets').annotations.readOnlyHint,true);
     assert.equal(tools.find(t=>t.name==='render_voice').inputSchema.properties.speed.maximum,2);
+    assert.deepEqual(tools.find(t=>t.name==='render_voice').inputSchema.properties.referenceStyle.enum,['preset','speaker-only']);
     assert.equal(tools.find(t=>t.name==='render_voice').annotations.readOnlyHint,false);
     assert.equal((await client.callTool({name:'voice_status',arguments:{}})).isError,true);
     assert.equal((await client.callTool({name:'voice_brief',arguments:{queueId:'../../escape'}})).isError,true);

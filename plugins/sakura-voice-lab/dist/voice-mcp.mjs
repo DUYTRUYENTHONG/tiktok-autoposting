@@ -36717,49 +36717,81 @@ function inspectWav(bytes) {
 // src/voice-copy.mjs
 var voicePainStories = {
   "sakura-pain-tan-ca": {
-    hook: "T\u1EB7ng th\xEAm m\u1ED9t chai c\u0169ng kh\xF4ng gi\u1EA3i quy\u1EBFt vi\u1EC7c nh\xE0 d\u1ED3n h\u1EBFt l\xEAn b\u1EA1n.",
-    story: "\u0110\u1EEBng \xF4m h\u1EBFt m\u1ECDi vi\u1EC7c c\xF9ng l\xFAc. Ch\u1ECDn m\u1ED9t g\xF3c nh\u1ECF, v\xE0 xem \u0111\xF3 l\xE0 v\u1EADt li\u1EC7u g\xEC tr\u01B0\u1EDBc khi ch\u1ECDn dung d\u1ECBch."
+    hook: "Tan ca r\u1ED3i, b\u1EA1n c\xF2n ph\u1EA3i t\u0103ng ca \u1EDF b\u1EBFp?",
+    story: "Vi\u1EC7c nh\xE0 \u0111\u1EEBng d\u1ED3n h\u1EBFt l\xEAn m\u1ED9t ng\u01B0\u1EDDi. Chia nhau m\u1ED9t g\xF3c nh\u1ECF, r\u1ED3i xem \u0111\xFAng ch\u1EA5t li\u1EC7u tr\u01B0\u1EDBc khi ch\u1ECDn n\u01B0\u1EDBc lau."
   },
   "sakura-pain-chia-viec": {
-    hook: "\u0102n c\xF9ng nhau m\xE0 m\u1ED9t ng\u01B0\u1EDDi ph\u1EA3i d\u1ECDn: b\u1EA1n th\u1EA5y c\xF4ng b\u1EB1ng kh\xF4ng?",
-    story: "Th\u1EED chia nhau t\u1EEBng g\xF3c nh\u1ECF. Th\u1ED1ng nh\u1EA5t xem b\u1EC1 m\u1EB7t v\xE0 h\u01B0\u1EDBng d\u1EABn tr\u01B0\u1EDBc khi b\u1EAFt \u0111\u1EA7u."
+    hook: "C\xF9ng \u0103n m\u1ED9t b\u1EEFa, sao m\u1ED9t ng\u01B0\u1EDDi \xF4m h\u1EBFt ph\u1EA7n d\u1ECDn?",
+    story: "B\u1EA1n ch\u1ECDn r\u1EEDa ch\xE9n hay d\u1ECDn g\xF3c b\u1EBFp? Chia vi\u1EC7c cho r\xF5, r\u1ED3i xem h\u01B0\u1EDBng d\u1EABn c\u1EE7a t\u1EEBng b\u1EC1 m\u1EB7t."
   },
   "sakura-pain-phong-tro": {
-    hook: "Ph\xF2ng nh\u1ECF kh\xF4ng c\u1EA7n th\xEAm m\u1ED9t chai n\u01B0\u1EDBc lau sai nhu c\u1EA7u.",
-    story: "Tr\u01B0\u1EDBc khi mua th\xEAm m\u1ED9t chai, h\u1ECFi r\xF5 d\xF9ng cho \u0111\xE2u, v\xE0 c\xF3 h\u1EE3p v\u1EADt li\u1EC7u trong ph\xF2ng kh\xF4ng."
+    hook: "Ph\xF2ng tr\u1ECD \u0111\xE3 ch\u1EADt, sao \u0111\u1ED3 d\u1ECDn nh\xE0 c\u1EE9 nhi\u1EC1u l\xEAn?",
+    story: "\u0110\u1EEBng ch\u1ED1t th\xEAm ch\u1EC9 v\xEC nghe ch\u1EEF \u0111a n\u0103ng. N\xF3i r\xF5 g\xF3c c\u1EA7n lau v\xE0 ch\u1EA5t li\u1EC7u, r\u1ED3i h\u1ECFi s\u1EA3n ph\u1EA9m c\xF3 ph\xF9 h\u1EE3p kh\xF4ng."
   },
   "sakura-pain-vat-lieu": {
-    hook: "Ch\u1EEF \u0111a n\u0103ng kh\xF4ng c\xF3 ngh\u0129a l\xE0 lau \u0111\xE2u c\u0169ng \u0111\u01B0\u1EE3c.",
-    story: "S\u01A1n g\u1ED7, \u0111\xE1, v\xE0 g\u1EA1ch c\xF3 th\u1EC3 c\xF3 h\u01B0\u1EDBng d\u1EABn kh\xE1c nhau. \u0110\u1EEBng \u0111\u1EC3 v\u1EBB ngo\xE0i quy\u1EBFt \u0111\u1ECBnh c\xE1ch v\u1EC7 sinh."
+    hook: "Nh\xECn gi\u1ED1ng nhau l\xE0 lau gi\u1ED1ng nhau? B\u1EA1n ch\u1EAFc ch\u01B0a?",
+    story: "S\u01A1n g\u1ED7, \u0111\xE1 v\xE0 g\u1EA1ch c\xF3 th\u1EC3 c\u1EA7n c\xE1ch ch\u0103m s\xF3c kh\xE1c nhau. Ch\u1EE5p r\xF5 b\u1EC1 m\u1EB7t v\xE0 nh\xE3n v\u1EADt li\u1EC7u tr\u01B0\u1EDBc khi h\u1ECFi."
   },
   "sakura-pain-so-hong": {
-    hook: "\u0110\u1EEBng mua v\u1ED9i, n\u1EBFu b\u1EA1n ch\u01B0a bi\u1EBFt m\xF3n \u0111\u1ED3 l\xE0m b\u1EB1ng g\xEC.",
-    story: "Ng\u1EA1i l\xE0 \u0111\xFAng khi ch\u01B0a r\xF5 ch\u1EA5t li\u1EC7u. Xem nh\xE3n ch\u0103m s\xF3c, v\xE0 h\u1ECFi k\u1EF9 tr\u01B0\u1EDBc khi d\xF9ng dung d\u1ECBch."
+    hook: "Mu\u1ED1n s\u1EA1ch v\u1EBFt b\xE1m, nh\u01B0ng l\u1EA1i s\u1EE3 h\u1ECFng m\xF3n \u0111\u1ED3?",
+    story: "\u0110\u1EEBng \u0111o\xE1n ch\u1EC9 qua m\u1ED9t t\u1EA5m \u1EA3nh qu\u1EA3ng c\xE1o. Xem nh\xE3n ch\u0103m s\xF3c v\xE0 h\u1ECFi \u0111\xFAng ch\u1EA5t li\u1EC7u tr\u01B0\u1EDBc khi ch\u1ECDn dung d\u1ECBch."
   },
   "sakura-bep": {
-    hook: "Ch\xE0 m\u1EA1nh h\u01A1n ch\u01B0a ch\u1EAFc l\xE0 d\u1ECDn \u0111\xFAng h\u01A1n.",
-    story: "\u0110\u1EE3i b\u1EC1 m\u1EB7t ngu\u1ED9i, nh\u1EADn di\u1EC7n v\u1EADt li\u1EC7u v\xE0 lo\u1EA1i v\u1EBFt b\xE1m. \u0110\u1EEBng ch\u1ECDn n\u01B0\u1EDBc lau ch\u1EC9 v\xEC l\u1EDDi h\u1EE9a s\u1EA1ch m\u1ECDi th\u1EE9."
+    hook: "M\u1ED9t b\u1EEFa c\u01A1m xong, g\xF3c b\u1EBFp l\u1EA1i th\xE0nh ca l\xE0m th\u1EE9 hai?",
+    story: "Ch\u1ECDn m\u1ED9t g\xF3c c\u1EA7n x\u1EED l\xFD, \u0111\u1EE3i b\u1EC1 m\u1EB7t ngu\u1ED9i r\u1ED3i x\xE1c \u0111\u1ECBnh v\u1EADt li\u1EC7u. H\u1ECFi \u0111\xFAng nhu c\u1EA7u tr\u01B0\u1EDBc khi mua n\u01B0\u1EDBc lau."
   },
   "sakura-pain-nham-chai": {
-    hook: "C\xF9ng t\xEAn Sa cu ra kh\xF4ng c\xF3 ngh\u0129a l\xE0 c\xF9ng m\u1ED9t s\u1EA3n ph\u1EA9m.",
-    story: "B\u1EA1n \u0111ang t\xECm n\u01B0\u1EDBc lau \u0111a n\u0103ng n\u0103m tr\u0103m mi li l\xEDt. H\xE3y \u0111\u1ED1i chi\u1EBFu \u1EA3nh nh\xE3n, v\xE0 t\xE1ch r\xF5 v\u1EDBi x\u1EA3 v\u1EA3i kh\xF4 tr\u01B0\u1EDBc khi \u0111\u1EB7t."
+    hook: "Th\u1EA5y ch\u1EEF Sa cu ra l\xE0 ch\u1ED1t \u0111\u01A1n? Khoan \u0111\xE3!",
+    story: "B\u1EA1n c\u1EA7n n\u01B0\u1EDBc lau \u0111a n\u0103ng hay x\u1EA3 v\u1EA3i kh\xF4? C\xF9ng t\xEAn ch\u01B0a ch\u1EAFc c\xF9ng s\u1EA3n ph\u1EA9m. \u0110\u1ED1i chi\u1EBFu \u0111\xFAng nh\xE3n chai n\u0103m tr\u0103m mi li l\xEDt."
   },
   "sakura-pain-lop-phu": {
-    hook: "M\u1ED9t v\u1EBFt b\xE1m c\xF3 \u0111\xE1ng \u0111\u1EC3 b\u1EA1n li\u1EC1u v\u1EDBi l\u1EDBp ph\u1EE7 chi\u1EBFc n\u1ED3i?",
-    story: "Nh\xECn m\u1EB7t ngo\xE0i v\xE0 t\xECm \u0111\xFAng h\u01B0\u1EDBng d\u1EABn c\u1EE7a h\xE3ng. Ch\u1EA5t li\u1EC7u v\xE0 t\xECnh tr\u1EA1ng v\u1EBFt b\xE1m c\u1EA7n \u0111\u01B0\u1EE3c h\u1ECFi r\xF5 tr\u01B0\u1EDBc."
+    hook: "\u0110\xE1y n\u1ED3i b\xE1m b\u1EA9n: b\u1ECF th\xEC ti\u1EBFc, ch\xE0 l\u1EA1i s\u1EE3 h\u1ECFng?",
+    story: "Khoan ch\u1ECDn theo l\u1EDDi h\u1EE9a s\u1EA1ch nh\u01B0 m\u1EDBi. \u0110\xE2y l\xE0 m\u1EB7t ngo\xE0i \u0111\xE1y n\u1ED3i: xem ch\u1EA5t li\u1EC7u, l\u1EDBp ph\u1EE7 v\xE0 h\u01B0\u1EDBng d\u1EABn c\u1EE7a h\xE3ng tr\u01B0\u1EDBc."
   },
   "sakura-pain-dep-chat-lieu": {
-    hook: "M\xE0u tr\u1EAFng kh\xF4ng n\xF3i cho b\u1EA1n bi\u1EBFt \u0111\xF4i d\xE9p l\xE0m b\u1EB1ng g\xEC.",
-    story: "Nh\u1EF1a, cao su, v\xE0 da kh\xF4ng n\xEAn \u0111\u01B0\u1EE3c coi l\xE0 m\u1ED9t. G\u1EEDi \u1EA3nh nh\xE3n ch\u0103m s\xF3c thay v\xEC \u0111o\xE1n qua m\xE0u s\u1EAFc."
+    hook: "D\xE9p tr\u1EAFng l\xE0 b\u1EA1n ch\xE0 lu\xF4n, hay xem ch\u1EA5t li\u1EC7u tr\u01B0\u1EDBc?",
+    story: "Nh\u1EF1a, cao su v\xE0 da kh\xF4ng c\xF9ng c\xE1ch ch\u0103m s\xF3c. G\u1EEDi \u1EA3nh nh\xE3n v\xE0 v\u1EADt li\u1EC7u, \u0111\u1EEBng \u0111\u1EC3 m\xE0u tr\u1EAFng quy\u1EBFt \u0111\u1ECBnh c\xE1ch lau."
   },
   "sakura-pain-gach-lop-phu": {
-    hook: "Ph\xF2ng t\u1EAFm l\u1EA5m t\u1EA5m ch\u01B0a ch\u1EAFc v\xEC b\u1EA1n lau ch\u01B0a k\u1EF9.",
-    story: "G\u1EA1ch men, \u0111\xE1 v\xE0 l\u1EDBp ph\u1EE7 c\xF3 h\u01B0\u1EDBng d\u1EABn kh\xE1c nhau. M\u1ED9t t\u1EA5m \u1EA3nh r\xF5 b\u1EC1 m\u1EB7t gi\xFAp c\xE2u h\u1ECFi c\u1EE5 th\u1EC3 h\u01A1n."
+    hook: "Lau r\u1ED3i v\u1EABn l\u1EA5m t\u1EA5m: b\u1EA1n \u0111ang g\u1EB7p lo\u1EA1i v\u1EBFt b\xE1m n\xE0o?",
+    story: "\u0110\u1EEBng m\u1EB7c \u0111\u1ECBnh m\u1ECDi v\u1EC7t \u0111\u1EC1u l\xE0 b\u1EA9n th\xF4ng th\u01B0\u1EDDng. Ch\u1EE5p r\xF5 b\u1EC1 m\u1EB7t g\u1EA1ch hay \u0111\xE1, r\u1ED3i h\u1ECFi c\xE1ch d\xF9ng ph\xF9 h\u1EE3p."
+  },
+  "sakura-pain-mua-dung-nhu-cau": {
+    hook: "\u0110\u01B0\u1EE3c t\u1EB7ng th\xEAm, nh\u01B0ng c\xF3 ph\u1EA3i th\u1EE9 nh\xE0 m\xECnh c\u1EA7n?",
+    story: "N\xF3i r\xF5 b\u1EC1 m\u1EB7t v\xE0 v\u1EBFt b\xE1m tr\u01B0\u1EDBc. H\u1ECFi \u0111\u1ED9 ph\xF9 h\u1EE3p v\xE0 gi\xE1, \u0111\u1EEBng ch\u1EC9 ch\u1ED1t \u0111\u01A1n v\xEC \u01B0u \u0111\xE3i."
   }
 };
-function painVoiceCopy(angleId, spokenLeadCode, promotion) {
+function painVoiceCopy(angleId, spokenLeadCode, promotion, { queueId } = {}) {
   const story = voicePainStories[angleId.replace(/-voice$/, "")];
   if (!story) return null;
+  const colloquial = {
+    "sakura-102": { angle: "sakura-pain-chia-viec", lines: ["C\xF9ng \u0103n, c\xF9ng d\u1ECDn m\u1EDBi c\xF4ng b\u1EB1ng ch\u1EE9, \u0111\xFAng kh\xF4ng?", "Nh\xE0 m\xECnh c\xF3 ai hay \xF4m h\u1EBFt ph\u1EA7n d\u1ECDn kh\xF4ng?", "Mu\u1ED1n h\u1ECFi Sa cu ra c\xF3 h\u1EE3p b\u1EC1 m\u1EB7t nh\xE0 m\xECnh kh\xF4ng, ch\u1EE5p \u1EA3nh g\u1EEDi shop nha."] },
+    "sakura-103": { angle: "sakura-pain-phong-tro", lines: ["Ph\xF2ng \u0111\xE3 ch\u1EADt, sao chai l\u1ECD c\u1EE9 nhi\u1EC1u th\xEAm v\u1EADy?", "Mua \u0111\xFAng th\u1EE9 m\xECnh c\u1EA7n tr\u01B0\u1EDBc nha.", "Mu\u1ED1n h\u1ECFi Sa cu ra c\xF3 h\u1EE3p ch\u1ED7 c\u1EA7n lau kh\xF4ng, ch\u1EE5p \u1EA3nh g\u1EEDi shop nha."] },
+    "sakura-104": { angle: "sakura-pain-vat-lieu", lines: ["Nh\xECn gi\u1ED1ng nhau, \u0111\xE2u ch\u1EAFc lau gi\u1ED1ng nhau?", "\u0110\xE1, g\u1EA1ch hay g\u1ED7, m\xECnh h\u1ECFi r\xF5 ch\u1EA5t li\u1EC7u tr\u01B0\u1EDBc nha.", "C\u1EA7n h\u1ECFi Sa cu ra c\xF3 h\u1EE3p kh\xF4ng, ch\u1EE5p \u1EA3nh g\u1EEDi shop nha."] },
+    "sakura-105": { angle: "sakura-pain-so-hong", lines: ["V\u1EBFt b\xE1m th\xEC nh\u1ECF, m\xE0 l\u1EE1 h\u1ECFng m\xF3n \u0111\u1ED3 l\u1EA1i ti\u1EBFc, \u0111\xFAng kh\xF4ng?", "M\xECnh xem nh\xE3n ch\u0103m s\xF3c tr\u01B0\u1EDBc nha.", "C\u1EA7n h\u1ECFi Sa cu ra c\xF3 h\u1EE3p kh\xF4ng, ch\u1EE5p \u1EA3nh g\u1EEDi shop nha."] }
+  }[queueId];
+  if (promotion?.voiceHook && colloquial?.angle === angleId.replace(/-voice$/, "")) return {
+    ...story,
+    promoHook: promotion.voiceHook,
+    copyRevision: "promo-first50-colloquial-v7",
+    spokenLeadCodeIncluded: false,
+    script: `${promotion.voiceHook.replace("! ", "!\n")}
+
+${colloquial.lines.join("\n")}`
+  };
+  const conversational = {
+    "sakura-pain-tan-ca": { hook: "Tan ca r\u1ED3i. L\u1EA1i t\u0103ng ca \u1EDF b\u1EBFp h\u1EA3?", story: "Vi\u1EC7c nh\xE0, m\xECnh chia nhau nha. Tr\u01B0\u1EDBc khi ch\u1ECDn n\u01B0\u1EDBc lau, nh\u1EDB xem \u0111\xFAng ch\u1EA5t li\u1EC7u." },
+    "sakura-pain-chia-viec": { hook: "C\xF9ng \u0103n m\u1ED9t b\u1EEFa. Sao m\u1ED9t ng\u01B0\u1EDDi \xF4m h\u1EBFt ph\u1EA7n d\u1ECDn?", story: "Vi\u1EC7c nh\xE0, m\xECnh chia nhau cho r\xF5 nha. Tr\u01B0\u1EDBc khi ch\u1ECDn n\u01B0\u1EDBc lau, nh\u1EDB xem h\u01B0\u1EDBng d\u1EABn c\u1EE7a t\u1EEBng b\u1EC1 m\u1EB7t." },
+    "sakura-pain-phong-tro": { hook: "Ph\xF2ng tr\u1ECD \u0111\xE3 ch\u1EADt. Sao chai l\u1ECD c\u1EE9 nhi\u1EC1u th\xEAm?", story: "Mua \u0111\xFAng th\u1EE9 m\xECnh c\u1EA7n nha. N\xF3i r\xF5 g\xF3c c\u1EA7n lau v\xE0 ch\u1EA5t li\u1EC7u, r\u1ED3i h\u1ECFi s\u1EA3n ph\u1EA9m c\xF3 ph\xF9 h\u1EE3p kh\xF4ng." },
+    "sakura-pain-vat-lieu": { hook: "Nh\xECn gi\u1ED1ng nhau, l\xE0 lau gi\u1ED1ng nhau h\u1EA3?", story: "S\u01A1n g\u1ED7, \u0111\xE1 v\xE0 g\u1EA1ch c\xF3 th\u1EC3 c\u1EA7n c\xE1ch ch\u0103m s\xF3c kh\xE1c nhau. Ch\u1EE5p r\xF5 b\u1EC1 m\u1EB7t, r\u1ED3i h\u1ECFi shop nha." },
+    "sakura-pain-so-hong": { hook: "Mu\u1ED1n s\u1EA1ch v\u1EBFt b\xE1m. Nh\u01B0ng l\u1EA1i s\u1EE3 h\u1ECFng m\xF3n \u0111\u1ED3?", story: "\u0110\u1EEBng \u0111o\xE1n qua qu\u1EA3ng c\xE1o nha. Xem nh\xE3n ch\u0103m s\xF3c, h\u1ECFi \u0111\xFAng ch\u1EA5t li\u1EC7u tr\u01B0\u1EDBc khi ch\u1ECDn n\u01B0\u1EDBc lau." }
+  }[angleId.replace(/-voice$/, "")];
+  if (promotion?.voiceHook && conversational) return { ...story, promoHook: promotion.voiceHook, script: `${promotion.voiceHook.replace("! ", "!\n")}
+
+${conversational.hook}
+${conversational.story}
+
+C\u1EA7n t\u01B0 v\u1EA5n Sa cu ra? Nh\u1EAFn: ${spokenLeadCode}. G\u1EEDi k\xE8m \u1EA3nh b\u1EC1 m\u1EB7t. D\xF9ng theo nh\xE3n.` };
   const opening = promotion?.voiceHook ? promotion.voiceHook + " " : "";
   const closing = promotion?.voiceHook ? "" : "Mua m\u1ED9t, t\u1EB7ng m\u1ED9t, ch\u1EC9 khi mua qua T\xEDch T\xF3c. ";
   return { ...story, promoHook: promotion?.voiceHook ?? null, script: `${opening}${story.hook} ${story.story} C\u1EA7n t\u01B0 v\u1EA5n Sa cu ra? Nh\u1EAFn m\xE3 ${spokenLeadCode}, k\xE8m \u1EA3nh b\u1EC1 m\u1EB7t. ${closing}D\xF9ng theo nh\xE3n.` };
@@ -36782,7 +36814,7 @@ function voiceBrief(state, queueId) {
   const digits = ["kh\xF4ng", "m\u1ED9t", "hai", "ba", "b\u1ED1n", "n\u0103m", "s\xE1u", "b\u1EA3y", "t\xE1m", "ch\xEDn"];
   const spokenLeadCode = q.leadCode.replace(/(\d)/g, (_, digit) => " " + digits[Number(digit)]).toLocaleLowerCase("vi");
   const promotion = q.promotionKey === first50Promotion.key ? first50Promotion : null;
-  const tailored = painVoiceCopy(q.angleId, spokenLeadCode, promotion);
+  const tailored = painVoiceCopy(q.angleId, spokenLeadCode, promotion, { queueId: q.id });
   const script = tailored?.script ?? `${promotion?.voiceHook ?? ""} ${hook} ${story} Mu\u1ED1n h\u1ECFi v\u1EC1 Sa cu ra? Nh\u1EAFn m\xE3 ${spokenLeadCode} k\xE8m v\u1EADt li\u1EC7u c\u1EA7n lau. ${promotion ? "" : "Mua m\u1ED9t, t\u1EB7ng m\u1ED9t, ch\u1EC9 khi mua qua T\xEDch T\xF3c. "}D\xF9ng theo nh\xE3n.`.trim();
   return {
     queueId: q.id,
@@ -36794,7 +36826,8 @@ function voiceBrief(state, queueId) {
     script,
     performance: "Conversational synthetic narration; no impersonation, testimonial or invented outcome.",
     targetSeconds: "20\u201335; verify actual duration after synthesis",
-    copyRevision: promotion ? "promo-first50-v3" : tailored ? "painpoint-v2" : "brief-v1",
+    copyRevision: tailored?.copyRevision ?? (promotion ? "promo-first50-conversational-v6" : tailored ? "painpoint-v3" : "brief-v1"),
+    spokenLeadCodeIncluded: tailored?.spokenLeadCodeIncluded ?? true,
     status: "script_draft",
     attachment: "WAV preview only. Browser photo composer has not been verified to accept custom narration; no upload or format conversion occurs."
   };
@@ -36823,21 +36856,23 @@ async function voiceRuntime(home = voiceHome) {
   if (await hashFile(config2.model) !== config2.modelSha256 || await hashFile(config2.model + ".json") !== config2.configSha256) throw Error("Voice model/config checksum mismatch");
   return config2;
 }
-function voiceProfile(runtime, { voiceName, speed } = {}) {
+function voiceProfile(runtime, { voiceName, speed, referenceStyle } = {}) {
   if (runtime.provider !== "vieneu") {
-    if (voiceName !== void 0 || speed !== void 0) throw Error("Preset selection and speaking speed require the VieNeu provider");
+    if (voiceName !== void 0 || speed !== void 0 || referenceStyle !== void 0) throw Error("Preset selection and speaking speed require the VieNeu provider");
     return { voice: runtime.voice };
   }
   const voice = voiceName ?? runtime.voice, rate = speed ?? runtime.speed;
   if (!runtime.presetVoices?.some((v) => v.name === voice)) throw Error("Unknown Vietnamese preset voice");
   if (!Number.isFinite(rate) || rate < 1 || rate > 2 || !Number.isFinite(runtime.temperature) || runtime.temperature < 0.5 || runtime.temperature > 1) throw Error("Invalid local speaking profile");
-  return { voice, speed: rate, temperature: runtime.temperature };
+  const style = referenceStyle ?? runtime.referenceStyle ?? "preset";
+  if (!["preset", "speaker-only"].includes(style)) throw Error("Unknown preset reference style");
+  return { voice, speed: rate, temperature: runtime.temperature, referenceStyle: style };
 }
-async function renderVoice(state, queueId, script, { home = voiceHome, voiceName, speed } = {}) {
+async function renderVoice(state, queueId, script, { home = voiceHome, voiceName, speed, referenceStyle } = {}) {
   const brief = voiceBrief(state, queueId), runtime = await voiceRuntime(home);
-  const profile = voiceProfile(runtime, { voiceName, speed });
+  const profile = voiceProfile(runtime, { voiceName, speed, referenceStyle });
   if (typeof script !== "string" || script.trim().length < 10 || script.length > 1500) throw Error("Expected a short reviewed script");
-  const digest = createHash2("sha256").update(JSON.stringify({ queueId, script, provider: runtime.provider, ...profile, model: runtime.modelSha256, config: runtime.configSha256, version: runtime.version, renderer: 4 })).digest("hex");
+  const digest = createHash2("sha256").update(JSON.stringify({ queueId, script, provider: runtime.provider, ...profile, model: runtime.modelSha256, config: runtime.configSha256, version: runtime.version, renderer: 5 })).digest("hex");
   const outputDir = path2.join(home, "renders");
   await mkdir2(outputDir, { recursive: true });
   const base = path2.join(outputDir, `${queueId}-${digest.slice(0, 16)}`), receipt = base + ".json";
@@ -36859,7 +36894,7 @@ async function renderVoice(state, queueId, script, { home = voiceHome, voiceName
     await writeFile2(base + ".txt", script, { encoding: "utf8", flag: "w" });
     if (runtime.provider === "vieneu") {
       const helper = fileURLToPath2(new URL("../scripts/voice-vieneu.py", import.meta.url));
-      await run(runtime.python, ["-I", helper, "--config", runtime.configFile, "--input", base + ".txt", "--output", base + ".partial.wav", "--voice", profile.voice, "--speed", String(profile.speed)], { timeout: 3e5, maxBuffer: 2 * 1024 * 1024, windowsHide: true, env: { ...process.env, PYTHONUTF8: "1" } });
+      await run(runtime.python, ["-I", helper, "--config", runtime.configFile, "--input", base + ".txt", "--output", base + ".partial.wav", "--voice", profile.voice, "--speed", String(profile.speed), "--reference-style", profile.referenceStyle], { timeout: 3e5, maxBuffer: 2 * 1024 * 1024, windowsHide: true, env: { ...process.env, PYTHONUTF8: "1" } });
     } else if (runtime.provider === "windows-sapi") {
       const helper = fileURLToPath2(new URL("../scripts/voice-render.ps1", import.meta.url));
       await run(runtime.powershell, ["-NoProfile", "-NonInteractive", "-File", helper, "-InputFile", base + ".txt", "-OutputFile", base + ".partial.wav", "-VoiceName", runtime.voice], { timeout: 12e4, maxBuffer: 1024 * 1024, windowsHide: true });
@@ -36894,7 +36929,7 @@ async function renderVoice(state, queueId, script, { home = voiceHome, voiceName
 }
 
 // src/voice-mcp.mjs
-var server = new McpServer({ name: "sakura-voice-lab", version: "0.2.0" });
+var server = new McpServer({ name: "sakura-voice-lab", version: "0.3.0" });
 var readOnly = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false };
 var result = (value) => ({ content: [{ type: "text", text: JSON.stringify(value, null, 2) }] });
 var safe = (fn) => async (args) => {
@@ -36913,5 +36948,5 @@ server.registerTool("voice_presets", { description: "List configured local Vietn
   return { provider: r.provider, voices: r.presetVoices ?? [{ name: r.voice }], defaultVoice: r.voice, defaultSpeed: r.speed ?? null };
 }));
 server.registerTool("voice_brief", { description: "Prepare a short Vietnamese story narration from one attributed Sakura queue item. Does not generate or post audio.", inputSchema: { queueId: external_exports.string().regex(/^sakura-\d{3}$/) }, annotations: readOnly }, safe(async ({ queueId }) => voiceBrief(await loadState(), queueId)));
-server.registerTool("render_voice", { description: "Render an offline Vietnamese WAV preview from the supplied script. VieNeu supports preset voice selection and 1.0\u20132.0x speed. Never posts or approves pronunciation.", inputSchema: { queueId: external_exports.string().regex(/^sakura-\d{3}$/), script: external_exports.string().min(10).max(1500), voiceName: external_exports.string().min(1).max(80).optional(), speed: external_exports.number().min(1).max(2).optional() }, annotations: { ...readOnly, readOnlyHint: false } }, safe(async ({ queueId, script, voiceName, speed }) => renderVoice(await loadState(), queueId, script, { voiceName, speed })));
+server.registerTool("render_voice", { description: "Render an offline Vietnamese WAV preview. Select a preset, 1.0\u20132.0x speed, and optionally omit preset style reference codes while retaining the built-in speaker embedding. This is an experiment, not a guarantee of natural emphasis. Never posts or approves pronunciation.", inputSchema: { queueId: external_exports.string().regex(/^sakura-\d{3}$/), script: external_exports.string().min(10).max(1500), voiceName: external_exports.string().min(1).max(80).optional(), speed: external_exports.number().min(1).max(2).optional(), referenceStyle: external_exports.enum(["preset", "speaker-only"]).optional() }, annotations: { ...readOnly, readOnlyHint: false } }, safe(async ({ queueId, script, voiceName, speed, referenceStyle }) => renderVoice(await loadState(), queueId, script, { voiceName, speed, referenceStyle })));
 await server.connect(new StdioServerTransport());

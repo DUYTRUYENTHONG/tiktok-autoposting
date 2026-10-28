@@ -23,12 +23,13 @@ export function voiceBrief(state,queueId){
   const digits=['không','một','hai','ba','bốn','năm','sáu','bảy','tám','chín'];
   const spokenLeadCode=q.leadCode.replace(/(\d)/g,(_,digit)=>' '+digits[Number(digit)]).toLocaleLowerCase('vi');
   const promotion=q.promotionKey===first50Promotion.key?first50Promotion:null;
-  const tailored=painVoiceCopy(q.angleId,spokenLeadCode,promotion);
+  const tailored=painVoiceCopy(q.angleId,spokenLeadCode,promotion,{queueId:q.id});
   const script=tailored?.script??`${promotion?.voiceHook??''} ${hook} ${story} Muốn hỏi về Sa cu ra? Nhắn mã ${spokenLeadCode} kèm vật liệu cần lau. ${promotion?'':'Mua một, tặng một, chỉ khi mua qua Tích Tóc. '}Dùng theo nhãn.`.trim();
   return {queueId:q.id,productId:q.productId,angleId:q.angleId,leadCode:q.leadCode,spokenLeadCode,language:'vi-VN',script,
     performance:'Conversational synthetic narration; no impersonation, testimonial or invented outcome.',
     targetSeconds:'20–35; verify actual duration after synthesis',
-    copyRevision:promotion?'promo-first50-v3':tailored?'painpoint-v2':'brief-v1',status:'script_draft',attachment:'WAV preview only. Browser photo composer has not been verified to accept custom narration; no upload or format conversion occurs.'};
+    copyRevision:tailored?.copyRevision??(promotion?'promo-first50-conversational-v6':tailored?'painpoint-v3':'brief-v1'),
+    spokenLeadCodeIncluded:tailored?.spokenLeadCodeIncluded??true,status:'script_draft',attachment:'WAV preview only. Browser photo composer has not been verified to accept custom narration; no upload or format conversion occurs.'};
 }
 export async function voiceRuntime(home=voiceHome){
   const config=JSON.parse((await readFile(path.join(home,'runtime.json'),'utf8')).replace(/^\uFEFF/,''));
@@ -54,15 +55,17 @@ export async function voiceRuntime(home=voiceHome){
   if(await hashFile(config.model)!==config.modelSha256||await hashFile(config.model+'.json')!==config.configSha256)throw Error('Voice model/config checksum mismatch');
   return config;
 }
-export function voiceProfile(runtime,{voiceName,speed}={}){
+export function voiceProfile(runtime,{voiceName,speed,referenceStyle}={}){
   if(runtime.provider!=='vieneu'){
-    if(voiceName!==undefined||speed!==undefined)throw Error('Preset selection and speaking speed require the VieNeu provider');
+    if(voiceName!==undefined||speed!==undefined||referenceStyle!==undefined)throw Error('Preset selection and speaking speed require the VieNeu provider');
     return {voice:runtime.voice};
   }
   const voice=voiceName??runtime.voice,rate=speed??runtime.speed;
   if(!runtime.presetVoices?.some(v=>v.name===voice))throw Error('Unknown Vietnamese preset voice');
   if(!Number.isFinite(rate)||rate<1||rate>2||!Number.isFinite(runtime.temperature)||runtime.temperature<0.5||runtime.temperature>1)throw Error('Invalid local speaking profile');
-  return {voice,speed:rate,temperature:runtime.temperature};
+  const style=referenceStyle??runtime.referenceStyle??'preset';
+  if(!['preset','speaker-only'].includes(style))throw Error('Unknown preset reference style');
+  return {voice,speed:rate,temperature:runtime.temperature,referenceStyle:style};
 }
 export function captionWithVoiceCredit(caption,provider){
   const credits={vieneu:'VieNeu-TTS v3 Turbo — Phạm Nguyễn Ngọc Bảo; codec MOSS — OpenMOSS-Team.',
@@ -72,11 +75,11 @@ export function captionWithVoiceCredit(caption,provider){
   const base=caption.split(marker)[0].replace(/Giọng đọc máy tiếng Việt từ Microsoft Windows\.\s*$/u,'').trim();
   return `${base}${marker}${credits[provider]}`;
 }
-export async function renderVoice(state,queueId,script,{home=voiceHome,voiceName,speed}={}){
+export async function renderVoice(state,queueId,script,{home=voiceHome,voiceName,speed,referenceStyle}={}){
   const brief=voiceBrief(state,queueId),runtime=await voiceRuntime(home);
-  const profile=voiceProfile(runtime,{voiceName,speed});
+  const profile=voiceProfile(runtime,{voiceName,speed,referenceStyle});
   if(typeof script!=='string'||script.trim().length<10||script.length>1500)throw Error('Expected a short reviewed script');
-  const digest=createHash('sha256').update(JSON.stringify({queueId,script,provider:runtime.provider,...profile,model:runtime.modelSha256,config:runtime.configSha256,version:runtime.version,renderer:4})).digest('hex');
+  const digest=createHash('sha256').update(JSON.stringify({queueId,script,provider:runtime.provider,...profile,model:runtime.modelSha256,config:runtime.configSha256,version:runtime.version,renderer:5})).digest('hex');
   const outputDir=path.join(home,'renders');await mkdir(outputDir,{recursive:true});
   const base=path.join(outputDir,`${queueId}-${digest.slice(0,16)}`),receipt=base+'.json';
   try{
@@ -89,7 +92,7 @@ export async function renderVoice(state,queueId,script,{home=voiceHome,voiceName
     await writeFile(base+'.txt',script,{encoding:'utf8',flag:'w'});
     if(runtime.provider==='vieneu'){
       const helper=fileURLToPath(new URL('../scripts/voice-vieneu.py',import.meta.url));
-      await run(runtime.python,['-I',helper,'--config',runtime.configFile,'--input',base+'.txt','--output',base+'.partial.wav','--voice',profile.voice,'--speed',String(profile.speed)],{timeout:300000,maxBuffer:2*1024*1024,windowsHide:true,env:{...process.env,PYTHONUTF8:'1'}});
+      await run(runtime.python,['-I',helper,'--config',runtime.configFile,'--input',base+'.txt','--output',base+'.partial.wav','--voice',profile.voice,'--speed',String(profile.speed),'--reference-style',profile.referenceStyle],{timeout:300000,maxBuffer:2*1024*1024,windowsHide:true,env:{...process.env,PYTHONUTF8:'1'}});
     }else if(runtime.provider==='windows-sapi'){
       const helper=fileURLToPath(new URL('../scripts/voice-render.ps1',import.meta.url));
       await run(runtime.powershell,['-NoProfile','-NonInteractive','-File',helper,'-InputFile',base+'.txt','-OutputFile',base+'.partial.wav','-VoiceName',runtime.voice],{timeout:120000,maxBuffer:1024*1024,windowsHide:true});

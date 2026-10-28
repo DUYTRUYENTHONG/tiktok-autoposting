@@ -10,6 +10,7 @@ parser = argparse.ArgumentParser()
 for field in ['config', 'input', 'output', 'voice']:
     parser.add_argument('--'+field, required=True)
 parser.add_argument('--speed', type=float, required=True)
+parser.add_argument('--reference-style', choices=['preset', 'speaker-only'], default='preset')
 args = parser.parse_args()
 config = json.loads(Path(args.config).read_text(encoding='utf-8-sig'))
 if config.get('provider') != 'vieneu' or args.voice not in [v['name'] for v in config['presetVoices']]:
@@ -32,7 +33,8 @@ from vieneu import Vieneu
 import numpy as np
 import soundfile as sf
 tts = Vieneu(mode='v3turbo', backend='onnx', device='cpu', precision='fp32', threads=4, babble_retries=0)
-audio = np.asarray(tts.infer(text, voice=args.voice, temperature=config['temperature']), dtype=np.float32)
+audio = np.asarray(tts.infer(text, voice=args.voice, temperature=config['temperature'],
+                             use_ref_codes=args.reference_style == 'preset'), dtype=np.float32)
 peak = float(np.max(np.abs(audio)))
 if not np.isfinite(audio).all() or peak == 0:
     raise ValueError('Invalid speech waveform')
@@ -43,4 +45,5 @@ sf.write(str(raw), audio, tts.sample_rate, subtype='PCM_16')
 subprocess.run([config['ffmpeg'], '-hide_banner', '-loglevel', 'error', '-y', '-i', str(raw),
                 '-af', f'atempo={args.speed}', '-ac', '1', '-c:a', 'pcm_s16le', args.output],
                check=True, timeout=60)
-print(json.dumps(dict(provider='vieneu', voice=args.voice, speed=args.speed, offline=True)))
+print(json.dumps(dict(provider='vieneu', voice=args.voice, speed=args.speed,
+                      referenceStyle=args.reference_style, offline=True)))

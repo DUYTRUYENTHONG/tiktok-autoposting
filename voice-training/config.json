@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "upstream": "https://github.com/pnnbao97/VieNeu-TTS",
+  "upstreamRevision": "04044e1b8f822f946bafb2c88b716459f4164152",
+  "sdkVersion": "3.8.3",
+  "baseModel": "pnnbao-ump/VieNeu-TTS-v3-Turbo",
+  "baseRevision": "61b85e3d937fbbacb387714180e8182823512523",
+  "codecModel": "OpenMOSS-Team/MOSS-Audio-Tokenizer-Nano-ONNX",
+  "codecRevision": "ceff0d0749bfb3fa2d61149794ec6feef0d1e1ae",
+  "subfolder": "update",
+  "dataset": {"minClips": 100, "minSeconds": 600, "minSecondsPerClip": 3, "maxSecondsPerClip": 15, "minWords": 3, "maxWords": 100, "minChars": 10, "maxChars": 600, "nearDuplicateRatio": 0.9, "seed": 42},
+  "lora": {"r": 16, "alpha": 32, "dropout": 0.05, "target": "backbone"},
+  "training": {"epochs": 3, "batchSize": 1, "gradientAccumulation": 16, "learningRate": 0.0002, "weightDecay": 0.01, "warmupRatio": 0.05, "maxGradNorm": 1.0, "maxLength": 1024, "textLossWeight": 1.0, "audioLossWeight": 8.0, "earlyStoppingPatience": 2, "minDelta": 0.001, "gradientCheckpointing": true},
+  "dependencies": {"torch": "2.8.0", "transformers": "4.57.6", "peft": "0.14.0", "accelerate": "1.13.0", "pyarrow": "24.0.0", "safetensors": "0.7.0", "sea-g2p": "0.9.1"}
+}

@@ -17,6 +17,7 @@ await updateState(s=>{
   }
   s.campaign.voiceTest??={day:'2026-10-28',count:10,queueIds:Array.from({length:10},(_,i)=>`sakura-${101+i}`),mode:'additional_videos',status:'preparing',approvalSource:'User: Publish10additionaltestvideos'};
   for(const item of s.queue.filter(q=>q.phase==='voice-test'&&!q.receipt)){
+    if(['submitting','needs_review'].includes(item.status))throw Error('Reconcile uncertain voice test before revising copy: '+item.id);
     const story=voicePainStories[item.angleId.replace(/-voice$/,'')];
     if(!story)continue;
     const source=s.queue.find(q=>q.id===item.sourceQueueId),promotion=s.campaign.currentPromotion;
@@ -24,7 +25,7 @@ await updateState(s=>{
     const currentTail=promotion?tail.replaceAll('Mua 1 tặng 1, chỉ áp dụng khi mua qua TikTok.',promotion.text+'.'):tail;
     item.caption=`${promotion?promotion.text+'\n\n':''}${story.hook}\n\n${story.story}\n\n${currentTail}\n\nBản thử lời kể tổng hợp. Nhắn mã “${item.leadCode}” kèm vật liệu và nhu cầu cần vệ sinh.`;
     if(promotion)item.promotionKey=promotion.key;
-    item.voiceCopyRevision=promotion?'promo-first50-v3':'painpoint-v2';
+    item.voiceCopyRevision=promotion?'promo-first50-conversational-v6':'painpoint-v3';
   }
   return s;
 });

@@ -2,7 +2,7 @@
 
 On October28 the user specified: **Mua1tặng1 cho50đơn đầu tiên từTikTok**. This is a limit of50orders, not50customers. There is no verified deadline, remaining count, price, delivery promise or per-customer limit. Do not invent any of them.
 
-New unsubmitted voice tests101–110 and future carousel plans use promotionKey buy1-get1-tiktok-first50. The voice-over starts with “Mua một, tặng một! Chỉ năm mươi đơn đầu tiên từ Tích Tóc.” The next line challenges a familiar assumption: household chores falling on one person, buying the wrong cleaner because of a promotion, or assuming “đa năng” means every surface. These are creative hypotheses, not proven reach results. Never fabricate a customer experience, unsafe demonstration or attack on another brand.
+The current October28 immediate batch—videos101–105 and photo carousels201–210—and future unsubmitted plans use promotionKey buy1-get1-tiktok-first50. Historical106–110 drafts remain deferred. The voice-over starts with “Mua một, tặng một! Chỉ năm mươi đơn đầu tiên từ Tích Tóc.” The next line challenges a familiar assumption: household chores falling on one person, buying the wrong cleaner because of a promotion, or assuming “đa năng” means every surface. These are creative hypotheses, not proven reach results. Never fabricate a customer experience, unsafe demonstration or attack on another brand.
 
 Accepted posts and schedules remain unchanged. Their older offer keys remain intact. The original first post keeps Mua3tặng1; later accepted content keeps the previously authorized TikTok-only Mua1tặng1 wording. The new50-order terms cannot be silently backdated onto those receipts.
 
