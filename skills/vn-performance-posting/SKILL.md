@@ -17,4 +17,6 @@ Use post-specific lead codes or direct reply context for inquiry attribution. Co
 
 Before Schedule/Post validate account, image order, caption, offer, disclosures, audience, timezone and absence of duplicates. Record submitting before the final action. Reconcile uncertain outcomes in TikTok before retrying. Only mark scheduled or published after a corresponding item and timestamp are verified, retaining a local screenshot and receipt. Follow current confirmation requirements at the action.
 
+Studio's description search can reconcile a unique leadCode without paging through future schedules. Return the horizontal view to the post column before saving proof so the cover and timestamp are visible. The date/time inputs are read-only; use the native calendar and time wheel, then verify both displayed values. Keep wheel batches bounded to avoid browser-tool execution timeouts. Await the file chooser and its trigger together, handle both rejections, and inspect an existing draft after a delay instead of starting a second upload.
+
 Refresh the tracker from actual observations. It must show import freshness and distinguish auto-refresh of local files from automatic TikTok ingestion. Count only receipt-verified published posts toward the 100-post goal. Stop and report concrete account, upload, scheduling or connection blockers.

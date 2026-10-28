@@ -64,3 +64,14 @@ test('paid and unknown distributions cannot act as organic controls',()=>{
   }
   const result=analyze(state).angles[0];assert.equal(result.posts,3);assert.equal(result.controlPosts,0);assert.equal(result.signal,'Chưa có đối chứng');
 });
+
+test('different promotions cannot supply an angle baseline or attributed cohort leads',()=>{
+  const state=emptyState();state.angles=[{id:'a',productId:'x',format:'photo',distribution:'organic',promotionKey:'buy1-get1'}];
+  for(let i=0;i<6;i++){
+    state.posts.push({id:`offer${i}`,angleId:i<3?'a':'b',productId:'x',format:'photo',distribution:'organic',promotionKey:i<3?'buy1-get1':'buy3-get1',publishedAt:'2026-10-20T00:00:00Z'});
+    state.snapshots.push({postId:`offer${i}`,observedAt:'2026-10-21T00:00:00Z',views:500,likes:10,comments:0,shares:0,saves:0});
+  }
+  state.posts.push({...state.posts[0],id:'old-offer',promotionKey:'buy3-get1'});
+  state.leadEvents=[{id:'l',postId:'old-offer',status:'qualified'}];
+  const result=analyze(state).angles[0];assert.equal(result.posts,3);assert.equal(result.controlPosts,0);assert.equal(result.observedQualifiedLeads,null);assert.equal(result.signal,'Chưa có đối chứng');
+});

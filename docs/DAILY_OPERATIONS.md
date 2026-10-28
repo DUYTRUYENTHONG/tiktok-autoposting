@@ -12,6 +12,8 @@ The existing recurring follow-up is **Sakura ·20 posts per day**,05:30 preparat
 
 Each daily queue item has a unique leadCode, for example BẾP021. The CTA asks for a surface photo, material and stain type. A direct reply can also establish attribution. An inquiry becomes qualified only after an actual need and material/surface are observed. An order requires real order evidence. Do not create a lead because someone viewed or liked a post.
 
+Starting with sakura-029, every new story requires a fresh reviewed cover. A library cover alone leaves it in needs_generation. After visually inspecting the final image, import a local JSON array of entries with id, absolute destination and visuallyVerified:true using `node scripts/register-covers.mjs <review-manifest.json>`. The importer hashes each image, checks product/story attribution and refuses changes to submitted or uncertain items. It preserves planned times and exports the remaining upload manifest. Replanning uses the stored creativeOverrides instead of replacing fresh covers with library images.
+
 Import pseudonymous events with the existing command:
 
 ```powershell

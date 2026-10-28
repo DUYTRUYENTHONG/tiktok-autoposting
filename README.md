@@ -11,7 +11,7 @@ Vietnamese product carousel planning, TikTok Studio scheduling through computer 
 - Posts19–20 introduce original human-story covers and recommended music. Printed AI wording was removed from the new covers; the platform AI disclosure stays enabled. Music on the existing18 was not changed: Studio's commercial-post edit/Delete restriction requires the TikTok app.
 - Ten content angles, two caption-hook variants each. Paired variants reuse the same verified image set; this is an observational pilot, not a causal A/B test.
 - The daily backlog adds 28 original painpoint/story hypotheses with post-specific inquiry codes. Generated characters are illustrations, not customer testimonials. Reused covers are identified in the private asset manifest; 28 concepts does not mean 28 new image sets.
-- Native photo scheduling, local uploads, commercial disclosure, AI labels and account avatar changes have been verified in the signed-in browser. Scheduling receipts live outside Git. Scheduled does not mean published.
+- Native photo scheduling, local uploads, commercial disclosure, AI labels and account avatar changes have been verified in the signed-in browser. The original October27 19:00 schedule was subsequently verified live. Scheduling receipts live outside Git; other scheduled items still require publication verification.
 
 ## Run the tracker
 
@@ -66,7 +66,9 @@ Built-in image generation produced the account avatar and promotion images. Vide
 
 ## Measurement and posting
 
-Attribute every post to product, angle, variant and immutable platform ID. Import cumulative metric snapshots with observation times; the engine uses the latest snapshot rather than adding repeated totals. It compares posts from the same product/format at comparable 24–72-hour age and reports limited evidence as a signal, not a proven winner. Missing engagement data stays missing.
+Attribute every post to product, angle, variant and immutable platform ID. Import cumulative metric snapshots with observation times; the engine uses the latest snapshot rather than adding repeated totals. It compares the same product, format, distribution and promotion at comparable24–72-hour age; the preserved Mua3tặng1 post cannot act as a control for Mua1tặng1. Limited evidence is a signal, not a proven winner. Missing engagement data stays missing.
+
+Fresh daily covers are registered by product/story after visual QA and remain attached when the unsubmitted plan is refreshed. From sakura-029 onward a library fallback alone is not ready. See the [executed October28 prompt set](prompts/OCTOBER_28_STORIES.md) and [daily operations](docs/DAILY_OPERATIONS.md).
 
 The existing account audience mainly watched durian content. Its historical peak is not proof of cleaner-product demand or posting time. Reassess angles after comparable 24–72-hour observations, accounting for the first post's different promotion, small sample size and content reuse. Daily volume is user-authorized; an angle is not a winner just because it was posted.
 

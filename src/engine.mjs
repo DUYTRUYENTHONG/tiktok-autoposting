@@ -14,10 +14,11 @@ export function validateImport(input, state=emptyState()) {
     timestamp(p.publishedAt);
     requireValue(['video','photo'].includes(p.format),'Định dạng phải là video hoặc photo');
     if(p.distribution!==undefined)requireValue(['organic','paid','unknown'].includes(p.distribution),'Phân phối phải là organic, paid hoặc unknown');
+    if(p.promotionKey!==undefined)requireValue(typeof p.promotionKey==='string'&&p.promotionKey.trim().length>0,'Ưu đãi cần định danh');
     if(p.angleId) requireValue(state.angles.some(a=>a.id===p.angleId && a.productId===p.productId),'Góc nội dung không khớp sản phẩm');
     if(p.productId) requireValue(state.products.some(x=>x.id===p.productId),'Sản phẩm chưa được nhập');
     const previous=posts.get(p.id);
-    if(previous) requireValue(['productId','angleId','format','publishedAt','distribution'].every(k=>previous[k]===p[k]),'Không được thay đổi định danh hoặc cohort của bài đã nhập');
+    if(previous) requireValue(['productId','angleId','format','publishedAt','distribution','promotionKey'].every(k=>previous[k]===p[k]),'Không được thay đổi định danh hoặc cohort của bài đã nhập');
     posts.set(p.id,p);
   }
   for(const s of input.snapshots??[]) {
@@ -94,7 +95,7 @@ export function analyze(state) {
     // Neither format nor paid/organic distribution cohorts are mixed.
     const format=a.format??'video';
     const distribution=a.distribution??'unknown';
-    const sameCohort=p=>p.format===format&&(p.distribution??'unknown')===distribution;
+    const sameCohort=p=>p.format===format&&(p.distribution??'unknown')===distribution&&(p.promotionKey??'unknown')===(a.promotionKey??'unknown');
     const own=aggregate(candidates.filter(sameCohort));
     const control=aggregate(state.posts.filter(p=>p.productId===a.productId&&p.angleId&&p.angleId!==a.id&&sameCohort(p)));
     let signal='Chưa đủ dữ liệu'; let uplift=null;
@@ -105,7 +106,7 @@ export function analyze(state) {
         signal=uplift>=0.2?'Tín hiệu tốt':uplift<=-0.2?'Cần cải thiện':'Tiếp tục thử nghiệm';
       }
     }
-    const postIds=new Set(candidates.map(p=>p.id));
+    const postIds=new Set(candidates.filter(sameCohort).map(p=>p.id));
     const leads=(state.leadEvents??[]).filter(e=>postIds.has(e.postId));
     return {...a,...own,controlPosts:control.posts,uplift,signal,observedQualifiedLeads:leads.length?leads.filter(e=>['qualified','order'].includes(e.status)).length:null};
   });

@@ -6,6 +6,7 @@ User direction: original Vietnamese human-led stories, model effective category 
 
 - [Finish on TikTok](https://ads.tiktok.com/business/it/inspiration/finish-curaebrilla-tiktok-italy?redirected=1): creator-led education and relatable storytelling supported an Italian paid campaign. TikTok reports a six-week controlled geographic sales study. This is paid, foreign-market evidence, not a Vietnamese organic benchmark.
 - [Jif / CrowdSwell](https://crowdswell.com.au/case-jif): the executing agency reports an 18-month mixed creator/seeding/paid-amplification program using family/comedy situations and product demonstration. Its aggregate results do not identify a winning Sakura angle or prove organic uplift.
+- [OMO / MullenLowe Mishra Vietnam](https://www.mullenlowemishra.com/news/work/omo-transforms-laundry-into-a-floral-ritual-via-latest-mullenlowe-mishra-vietnam-spot), published December5,2024 and inspected October27,2026: the executing agency describes a familiar family time-pressure moment supported by music and an emotional story. This page does not report an isolated TikTok organic conversion or lead result. Adapt the structure, not its family identities, fragrance claims, script or promised transformation.
 
 Use the structures as hypotheses: recognizable person → specific everyday moment → question or practical check → authentic product reference → clearly scoped offer → easy next action. Do not copy scripts, faces, customer quotations or reported brand results.
 

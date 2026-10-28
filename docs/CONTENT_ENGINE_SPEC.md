@@ -34,7 +34,7 @@ Tests must prove missing-data handling, no snapshot double counting, attribution
 - Ingest a user-selected folder without uploading it; recurse through product subfolders and skip symlinks/private hidden directories.
 - Build Vietnamese research questions and asset-generation briefs tied to immutable angle IDs and product references; external research retains source, access date, and paid/organic context.
 - Import real per-post snapshots and audience activity through a documented local JSON contract. Deduplicate snapshots and show freshness, missing attribution, and sample size.
-- Compare 24–72-hour observations within product/format cohorts. Flag exploratory signals only after 3 posts and 500 total views; 20% uplift is a configurable operating heuristic, not statistical significance.
+- Compare 24–72-hour observations within product/format/distribution/promotion cohorts. The preserved Mua3tặng1 post is not a control for Mua1tặng1 posts. Flag exploratory signals only after 3 posts and 500 total views; 20% uplift is a configurable operating heuristic, not statistical significance.
 - Prefer measured local audience activity when fresh; otherwise label proposed slots as experiments. No universal best-time claim.
 - Dashboard refreshes local state every 15 seconds and explicitly shows that automated TikTok metrics ingestion and publishing are not connected.
 - Install reusable research/angle/image/video/performance skills in the user's skill directory and ignored DeerFlow custom directory without overwrites.

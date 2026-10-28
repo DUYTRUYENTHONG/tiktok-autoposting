@@ -36689,7 +36689,7 @@ function analyze(state) {
     const candidates = state.posts.filter((p) => p.angleId === a.id && p.productId === a.productId);
     const format = a.format ?? "video";
     const distribution = a.distribution ?? "unknown";
-    const sameCohort = (p) => p.format === format && (p.distribution ?? "unknown") === distribution;
+    const sameCohort = (p) => p.format === format && (p.distribution ?? "unknown") === distribution && (p.promotionKey ?? "unknown") === (a.promotionKey ?? "unknown");
     const own2 = aggregate(candidates.filter(sameCohort));
     const control = aggregate(state.posts.filter((p) => p.productId === a.productId && p.angleId && p.angleId !== a.id && sameCohort(p)));
     let signal = "Ch\u01B0a \u0111\u1EE7 d\u1EEF li\u1EC7u";
@@ -36701,7 +36701,7 @@ function analyze(state) {
         signal = uplift >= 0.2 ? "T\xEDn hi\u1EC7u t\u1ED1t" : uplift <= -0.2 ? "C\u1EA7n c\u1EA3i thi\u1EC7n" : "Ti\u1EBFp t\u1EE5c th\u1EED nghi\u1EC7m";
       }
     }
-    const postIds = new Set(candidates.map((p) => p.id));
+    const postIds = new Set(candidates.filter(sameCohort).map((p) => p.id));
     const leads = (state.leadEvents ?? []).filter((e) => postIds.has(e.postId));
     return { ...a, ...own2, controlPosts: control.posts, uplift, signal, observedQualifiedLeads: leads.length ? leads.filter((e) => ["qualified", "order"].includes(e.status)).length : null };
   });

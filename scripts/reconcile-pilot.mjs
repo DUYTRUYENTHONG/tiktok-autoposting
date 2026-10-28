@@ -26,15 +26,20 @@ await updateState(state=>{
       item.publishMode=r.scheduledVerifiedAt?'scheduled':'now';
       if(item.publishMode==='now')item.publishAt=null;
       item.publishedAt=r.publishedAt;item.location=r.location;
-      if(!state.posts.some(p=>p.id===r.platformId))state.posts.push({id:r.platformId,queueId:item.id,productId:item.productId,angleId:item.angleId,variantId:item.variantId,format:item.format,publishedAt:r.publishedAt,url:r.publicUrl??r.url,distribution:'organic'});
+      const promotionKey=item.promotionKey??(state.campaign.promotionExceptionIds?.includes(item.id)?'buy3-get1':'buy1-get1-tiktok');
+      item.promotionKey=promotionKey;
+      const existing=state.posts.find(p=>p.id===r.platformId);
+      if(!existing)state.posts.push({id:r.platformId,queueId:item.id,productId:item.productId,angleId:item.angleId,variantId:item.variantId,format:item.format,publishedAt:r.publishedAt,url:r.publicUrl??r.url,distribution:'organic',promotionKey});
+      else if(existing.promotionKey===undefined)existing.promotionKey=promotionKey;
+      else if(existing.promotionKey!==promotionKey)throw Error(`Promotion cohort conflict: ${entry.id}`);
     }
   }
-  const verified=state.queue.filter(q=>q.phase==='pilot'&&q.receipt?.scheduledVerifiedAt).length;
-  const published=state.queue.filter(q=>q.phase==='pilot'&&q.receipt?.publishedVerifiedAt).length;
+  const verified=state.queue.filter(q=>q.phase==='pilot'&&q.status==='scheduled'&&q.receipt?.scheduledVerifiedAt).length;
+  const published=state.queue.filter(q=>q.phase==='pilot'&&q.status==='published'&&q.receipt?.publishedVerifiedAt).length;
   state.campaign.scheduleStatus=`${verified} scheduled, ${published} published; pilot20`;
   state.campaign.requestedMode='publish_now';
   state.campaign.location='Vựa Sầu Riêng Cô Ba · 322 Đ. Huỳnh Thị Hai';
-  for(const angle of state.angles.filter(a=>a.productId==='sakura-cleaner-500ml'))angle.distribution='organic';
+  for(const angle of state.angles.filter(a=>a.productId==='sakura-cleaner-500ml')){angle.distribution='organic';angle.promotionKey='buy1-get1-tiktok';}
   return state;
 });
 console.log('Imported verified scheduling receipts; no posts submitted.');
