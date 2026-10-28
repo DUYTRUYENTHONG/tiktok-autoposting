@@ -19,8 +19,12 @@ await updateState(s=>{
   for(const item of s.queue.filter(q=>q.phase==='voice-test'&&!q.receipt)){
     const story=voicePainStories[item.angleId.replace(/-voice$/,'')];
     if(!story)continue;
-    item.caption=item.caption.split(/\n\s*\n/).map((text,index)=>index===0?story.hook:index===1?story.story:text).join('\n\n');
-    item.voiceCopyRevision='painpoint-v2';
+    const source=s.queue.find(q=>q.id===item.sourceQueueId),promotion=s.campaign.currentPromotion;
+    const tail=source.caption.split(/\n\s*\n/).slice(2).join('\n\n').replaceAll(source.leadCode??'__no_lead_code__',item.leadCode);
+    const currentTail=promotion?tail.replaceAll('Mua 1 tặng 1, chỉ áp dụng khi mua qua TikTok.',promotion.text+'.'):tail;
+    item.caption=`${promotion?promotion.text+'\n\n':''}${story.hook}\n\n${story.story}\n\n${currentTail}\n\nBản thử lời kể tổng hợp. Nhắn mã “${item.leadCode}” kèm vật liệu và nhu cầu cần vệ sinh. Giọng đọc máy tiếng Việt từ Microsoft Windows.`;
+    if(promotion)item.promotionKey=promotion.key;
+    item.voiceCopyRevision=promotion?'promo-first50-v3':'painpoint-v2';
   }
   return s;
 });

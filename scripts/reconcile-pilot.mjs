@@ -39,7 +39,7 @@ await updateState(state=>{
   state.campaign.scheduleStatus=`${verified} scheduled, ${published} published; pilot20`;
   state.campaign.requestedMode='publish_now';
   state.campaign.location='Vựa Sầu Riêng Cô Ba · 322 Đ. Huỳnh Thị Hai';
-  for(const angle of state.angles.filter(a=>a.productId==='sakura-cleaner-500ml')){angle.distribution='organic';angle.promotionKey='buy1-get1-tiktok';}
+  for(const angle of state.angles.filter(a=>a.productId==='sakura-cleaner-500ml')){angle.distribution='organic';angle.promotionKey??='buy1-get1-tiktok';}
   return state;
 });
 console.log('Imported verified scheduling receipts; no posts submitted.');

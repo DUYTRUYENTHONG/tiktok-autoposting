@@ -36717,51 +36717,56 @@ function inspectWav(bytes) {
 // src/voice-copy.mjs
 var voicePainStories = {
   "sakura-pain-tan-ca": {
-    hook: "V\u1EC1 t\u1EDBi nh\xE0, ch\u1EC9 mu\u1ED1n ngh\u1EC9\u2026 m\xE0 b\u1EBFp v\u1EABn ch\u1EDD d\u1ECDn?",
+    hook: "T\u1EB7ng th\xEAm m\u1ED9t chai c\u0169ng kh\xF4ng gi\u1EA3i quy\u1EBFt vi\u1EC7c nh\xE0 d\u1ED3n h\u1EBFt l\xEAn b\u1EA1n.",
     story: "\u0110\u1EEBng \xF4m h\u1EBFt m\u1ECDi vi\u1EC7c c\xF9ng l\xFAc. Ch\u1ECDn m\u1ED9t g\xF3c nh\u1ECF, v\xE0 xem \u0111\xF3 l\xE0 v\u1EADt li\u1EC7u g\xEC tr\u01B0\u1EDBc khi ch\u1ECDn dung d\u1ECBch."
   },
   "sakura-pain-chia-viec": {
-    hook: "C\u01A1m th\xEC c\xF9ng \u0103n, sao vi\u1EC7c d\u1ECDn l\u1EA1i d\u1ED3n m\u1ED9t ng\u01B0\u1EDDi?",
+    hook: "\u0102n c\xF9ng nhau m\xE0 m\u1ED9t ng\u01B0\u1EDDi ph\u1EA3i d\u1ECDn: b\u1EA1n th\u1EA5y c\xF4ng b\u1EB1ng kh\xF4ng?",
     story: "Th\u1EED chia nhau t\u1EEBng g\xF3c nh\u1ECF. Th\u1ED1ng nh\u1EA5t xem b\u1EC1 m\u1EB7t v\xE0 h\u01B0\u1EDBng d\u1EABn tr\u01B0\u1EDBc khi b\u1EAFt \u0111\u1EA7u."
   },
   "sakura-pain-phong-tro": {
-    hook: "Ph\xF2ng \u0111\xE3 nh\u1ECF, \u0111\u1ED3 d\u1ECDn nh\xE0 l\u1EA1i chi\u1EBFm c\u1EA3 g\xF3c?",
+    hook: "Ph\xF2ng nh\u1ECF kh\xF4ng c\u1EA7n th\xEAm m\u1ED9t chai n\u01B0\u1EDBc lau sai nhu c\u1EA7u.",
     story: "Tr\u01B0\u1EDBc khi mua th\xEAm m\u1ED9t chai, h\u1ECFi r\xF5 d\xF9ng cho \u0111\xE2u, v\xE0 c\xF3 h\u1EE3p v\u1EADt li\u1EC7u trong ph\xF2ng kh\xF4ng."
   },
   "sakura-pain-vat-lieu": {
-    hook: "Hai m\u1EB7t b\xE0n nh\xECn gi\u1ED1ng nhau\u2026 nh\u01B0ng lau c\xF9ng c\xE1ch \u0111\u01B0\u1EE3c kh\xF4ng?",
+    hook: "Ch\u1EEF \u0111a n\u0103ng kh\xF4ng c\xF3 ngh\u0129a l\xE0 lau \u0111\xE2u c\u0169ng \u0111\u01B0\u1EE3c.",
     story: "S\u01A1n g\u1ED7, \u0111\xE1, v\xE0 g\u1EA1ch c\xF3 th\u1EC3 c\xF3 h\u01B0\u1EDBng d\u1EABn kh\xE1c nhau. \u0110\u1EEBng \u0111\u1EC3 v\u1EBB ngo\xE0i quy\u1EBFt \u0111\u1ECBnh c\xE1ch v\u1EC7 sinh."
   },
   "sakura-pain-so-hong": {
-    hook: "V\u1EBFt b\u1EA9n th\xEC nh\u1ECF, m\xE0 s\u1EE3 lau xong l\u1EA1i h\u1ECFng m\xF3n \u0111\u1ED3?",
+    hook: "\u0110\u1EEBng mua v\u1ED9i, n\u1EBFu b\u1EA1n ch\u01B0a bi\u1EBFt m\xF3n \u0111\u1ED3 l\xE0m b\u1EB1ng g\xEC.",
     story: "Ng\u1EA1i l\xE0 \u0111\xFAng khi ch\u01B0a r\xF5 ch\u1EA5t li\u1EC7u. Xem nh\xE3n ch\u0103m s\xF3c, v\xE0 h\u1ECFi k\u1EF9 tr\u01B0\u1EDBc khi d\xF9ng dung d\u1ECBch."
   },
   "sakura-bep": {
-    hook: "B\u1EBFp v\u1EEBa n\u1EA5u xong, nh\xECn v\u1EBFt b\xE1m \u0111\xE3 th\u1EA5y ng\u1EA1i d\u1ECDn?",
+    hook: "Ch\xE0 m\u1EA1nh h\u01A1n ch\u01B0a ch\u1EAFc l\xE0 d\u1ECDn \u0111\xFAng h\u01A1n.",
     story: "\u0110\u1EE3i b\u1EC1 m\u1EB7t ngu\u1ED9i, nh\u1EADn di\u1EC7n v\u1EADt li\u1EC7u v\xE0 lo\u1EA1i v\u1EBFt b\xE1m. \u0110\u1EEBng ch\u1ECDn n\u01B0\u1EDBc lau ch\u1EC9 v\xEC l\u1EDDi h\u1EE9a s\u1EA1ch m\u1ECDi th\u1EE9."
   },
   "sakura-pain-nham-chai": {
-    hook: "C\xF9ng t\xEAn Sa cu ra\u2026 sao chai n\xE0o c\u0169ng th\u1EA5y kh\xE1c?",
+    hook: "C\xF9ng t\xEAn Sa cu ra kh\xF4ng c\xF3 ngh\u0129a l\xE0 c\xF9ng m\u1ED9t s\u1EA3n ph\u1EA9m.",
     story: "B\u1EA1n \u0111ang t\xECm n\u01B0\u1EDBc lau \u0111a n\u0103ng n\u0103m tr\u0103m mi li l\xEDt. H\xE3y \u0111\u1ED1i chi\u1EBFu \u1EA3nh nh\xE3n, v\xE0 t\xE1ch r\xF5 v\u1EDBi x\u1EA3 v\u1EA3i kh\xF4 tr\u01B0\u1EDBc khi \u0111\u1EB7t."
   },
   "sakura-pain-lop-phu": {
-    hook: "Chi\u1EBFc n\u1ED3i c\xF2n d\xF9ng t\u1ED1t, \u0111\xE2u mu\u1ED1n ch\xE0 m\u1EA1nh r\u1ED3i h\u1ECFng l\u1EDBp ph\u1EE7?",
+    hook: "M\u1ED9t v\u1EBFt b\xE1m c\xF3 \u0111\xE1ng \u0111\u1EC3 b\u1EA1n li\u1EC1u v\u1EDBi l\u1EDBp ph\u1EE7 chi\u1EBFc n\u1ED3i?",
     story: "Nh\xECn m\u1EB7t ngo\xE0i v\xE0 t\xECm \u0111\xFAng h\u01B0\u1EDBng d\u1EABn c\u1EE7a h\xE3ng. Ch\u1EA5t li\u1EC7u v\xE0 t\xECnh tr\u1EA1ng v\u1EBFt b\xE1m c\u1EA7n \u0111\u01B0\u1EE3c h\u1ECFi r\xF5 tr\u01B0\u1EDBc."
   },
   "sakura-pain-dep-chat-lieu": {
-    hook: "D\xE9p s\xE1ng m\xE0u c\xF3 v\u1EBFt b\xE1m\u2026 nh\u01B0ng b\u1EA1n ch\u01B0a ch\u1EAFc ch\u1EA5t li\u1EC7u?",
+    hook: "M\xE0u tr\u1EAFng kh\xF4ng n\xF3i cho b\u1EA1n bi\u1EBFt \u0111\xF4i d\xE9p l\xE0m b\u1EB1ng g\xEC.",
     story: "Nh\u1EF1a, cao su, v\xE0 da kh\xF4ng n\xEAn \u0111\u01B0\u1EE3c coi l\xE0 m\u1ED9t. G\u1EEDi \u1EA3nh nh\xE3n ch\u0103m s\xF3c thay v\xEC \u0111o\xE1n qua m\xE0u s\u1EAFc."
   },
   "sakura-pain-gach-lop-phu": {
-    hook: "Ph\xF2ng t\u1EAFm nh\xECn v\u1EABn l\u1EA5m t\u1EA5m\u2026 lau th\xEAm hay h\u1ECFi l\u1EA1i v\u1EADt li\u1EC7u?",
+    hook: "Ph\xF2ng t\u1EAFm l\u1EA5m t\u1EA5m ch\u01B0a ch\u1EAFc v\xEC b\u1EA1n lau ch\u01B0a k\u1EF9.",
     story: "G\u1EA1ch men, \u0111\xE1 v\xE0 l\u1EDBp ph\u1EE7 c\xF3 h\u01B0\u1EDBng d\u1EABn kh\xE1c nhau. M\u1ED9t t\u1EA5m \u1EA3nh r\xF5 b\u1EC1 m\u1EB7t gi\xFAp c\xE2u h\u1ECFi c\u1EE5 th\u1EC3 h\u01A1n."
   }
 };
-function painVoiceCopy(angleId, spokenLeadCode) {
+function painVoiceCopy(angleId, spokenLeadCode, promotion) {
   const story = voicePainStories[angleId.replace(/-voice$/, "")];
   if (!story) return null;
-  return { ...story, script: `${story.hook} ${story.story} \u0110ang h\u1ECFi v\u1EC1 Sa cu ra? Nh\u1EAFn m\xE3 ${spokenLeadCode}, k\xE8m \u1EA3nh b\u1EC1 m\u1EB7t. Mua m\u1ED9t, t\u1EB7ng m\u1ED9t, ch\u1EC9 khi mua qua T\xEDch T\xF3c. D\xF9ng theo nh\xE3n.` };
+  const opening = promotion?.voiceHook ? promotion.voiceHook + " " : "";
+  const closing = promotion?.voiceHook ? "" : "Mua m\u1ED9t, t\u1EB7ng m\u1ED9t, ch\u1EC9 khi mua qua T\xEDch T\xF3c. ";
+  return { ...story, promoHook: promotion?.voiceHook ?? null, script: `${opening}${story.hook} ${story.story} C\u1EA7n t\u01B0 v\u1EA5n Sa cu ra? Nh\u1EAFn m\xE3 ${spokenLeadCode}, k\xE8m \u1EA3nh b\u1EC1 m\u1EB7t. ${closing}D\xF9ng theo nh\xE3n.` };
 }
+
+// src/promotion.mjs
+var first50Promotion = { key: "buy1-get1-tiktok-first50", text: "Mua 1 t\u1EB7ng 1 cho 50 \u0111\u01A1n \u0111\u1EA7u ti\xEAn t\u1EEB TikTok", voiceHook: "Mua m\u1ED9t, t\u1EB7ng m\u1ED9t! Ch\u1EC9 n\u0103m m\u01B0\u01A1i \u0111\u01A1n \u0111\u1EA7u ti\xEAn t\u1EEB T\xEDch T\xF3c.", maxOrders: 50, unit: "orders", channel: "TikTok", redeemedOrders: null, remainingOrders: null, authorization: "User specified buy1get1 for the first50orders coming from TikTok on2026-10-28" };
 
 // src/voice.mjs
 var run = promisify(execFile);
@@ -36776,8 +36781,9 @@ function voiceBrief(state, queueId) {
   if (!q.leadCode || !story || q.promotionKey === "buy3-get1") throw Error("A current story, lead code and offer are required");
   const digits = ["kh\xF4ng", "m\u1ED9t", "hai", "ba", "b\u1ED1n", "n\u0103m", "s\xE1u", "b\u1EA3y", "t\xE1m", "ch\xEDn"];
   const spokenLeadCode = q.leadCode.replace(/(\d)/g, (_, digit) => " " + digits[Number(digit)]).toLocaleLowerCase("vi");
-  const tailored = painVoiceCopy(q.angleId, spokenLeadCode);
-  const script = tailored?.script ?? `${hook} ${story} Mu\u1ED1n h\u1ECFi v\u1EC1 Sa cu ra? Nh\u1EAFn m\xE3 ${spokenLeadCode} k\xE8m v\u1EADt li\u1EC7u c\u1EA7n lau. Mua m\u1ED9t, t\u1EB7ng m\u1ED9t, ch\u1EC9 khi mua qua T\xEDch T\xF3c. D\xF9ng theo nh\xE3n.`;
+  const promotion = q.promotionKey === first50Promotion.key ? first50Promotion : null;
+  const tailored = painVoiceCopy(q.angleId, spokenLeadCode, promotion);
+  const script = tailored?.script ?? `${promotion?.voiceHook ?? ""} ${hook} ${story} Mu\u1ED1n h\u1ECFi v\u1EC1 Sa cu ra? Nh\u1EAFn m\xE3 ${spokenLeadCode} k\xE8m v\u1EADt li\u1EC7u c\u1EA7n lau. ${promotion ? "" : "Mua m\u1ED9t, t\u1EB7ng m\u1ED9t, ch\u1EC9 khi mua qua T\xEDch T\xF3c. "}D\xF9ng theo nh\xE3n.`.trim();
   return {
     queueId: q.id,
     productId: q.productId,
@@ -36788,7 +36794,7 @@ function voiceBrief(state, queueId) {
     script,
     performance: "Conversational stock narration; no impersonation, testimonial or invented outcome.",
     targetSeconds: "20\u201335; verify actual duration after synthesis",
-    copyRevision: tailored ? "painpoint-v2" : "brief-v1",
+    copyRevision: promotion ? "promo-first50-v3" : tailored ? "painpoint-v2" : "brief-v1",
     status: "script_draft",
     attachment: "WAV preview only. Browser photo composer has not been verified to accept custom narration; no upload or format conversion occurs."
   };

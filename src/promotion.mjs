@@ -1,0 +1,1 @@
+export const first50Promotion={key:'buy1-get1-tiktok-first50',text:'Mua 1 tặng 1 cho 50 đơn đầu tiên từ TikTok',voiceHook:'Mua một, tặng một! Chỉ năm mươi đơn đầu tiên từ Tích Tóc.',maxOrders:50,unit:'orders',channel:'TikTok',redeemedOrders:null,remainingOrders:null,authorization:'User specified buy1get1 for the first50orders coming from TikTok on2026-10-28'};

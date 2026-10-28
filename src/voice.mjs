@@ -8,6 +8,7 @@ import path from 'node:path';
 import {hashFile} from './store.mjs';
 import {inspectWav} from './wav.mjs';
 import {painVoiceCopy} from './voice-copy.mjs';
+import {first50Promotion} from './promotion.mjs';
 
 const run=promisify(execFile);
 export const voiceHome=process.env.TIKTOK_VOICE_HOME??path.join(homedir(),'.codex','data','tiktok-autoposting','voice');
@@ -21,12 +22,13 @@ export function voiceBrief(state,queueId){
   if(!q.leadCode||!story||q.promotionKey==='buy3-get1')throw Error('A current story, lead code and offer are required');
   const digits=['không','một','hai','ba','bốn','năm','sáu','bảy','tám','chín'];
   const spokenLeadCode=q.leadCode.replace(/(\d)/g,(_,digit)=>' '+digits[Number(digit)]).toLocaleLowerCase('vi');
-  const tailored=painVoiceCopy(q.angleId,spokenLeadCode);
-  const script=tailored?.script??`${hook} ${story} Muốn hỏi về Sa cu ra? Nhắn mã ${spokenLeadCode} kèm vật liệu cần lau. Mua một, tặng một, chỉ khi mua qua Tích Tóc. Dùng theo nhãn.`;
+  const promotion=q.promotionKey===first50Promotion.key?first50Promotion:null;
+  const tailored=painVoiceCopy(q.angleId,spokenLeadCode,promotion);
+  const script=tailored?.script??`${promotion?.voiceHook??''} ${hook} ${story} Muốn hỏi về Sa cu ra? Nhắn mã ${spokenLeadCode} kèm vật liệu cần lau. ${promotion?'':'Mua một, tặng một, chỉ khi mua qua Tích Tóc. '}Dùng theo nhãn.`.trim();
   return {queueId:q.id,productId:q.productId,angleId:q.angleId,leadCode:q.leadCode,spokenLeadCode,language:'vi-VN',script,
     performance:'Conversational stock narration; no impersonation, testimonial or invented outcome.',
     targetSeconds:'20–35; verify actual duration after synthesis',
-    copyRevision:tailored?'painpoint-v2':'brief-v1',status:'script_draft',attachment:'WAV preview only. Browser photo composer has not been verified to accept custom narration; no upload or format conversion occurs.'};
+    copyRevision:promotion?'promo-first50-v3':tailored?'painpoint-v2':'brief-v1',status:'script_draft',attachment:'WAV preview only. Browser photo composer has not been verified to accept custom narration; no upload or format conversion occurs.'};
 }
 export async function voiceRuntime(home=voiceHome){
   const config=JSON.parse((await readFile(path.join(home,'runtime.json'),'utf8')).replace(/^\uFEFF/,''));

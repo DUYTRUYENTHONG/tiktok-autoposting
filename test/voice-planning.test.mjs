@@ -16,5 +16,7 @@ test('additional voice tests are idempotent and preserve the accepted photo queu
     const state=JSON.parse(await readFile(file,'utf8'));assert.deepEqual(state.queue.slice(0,10),queue);assert.equal(state.queue.length,20);
     const tests=state.queue.slice(10);assert.equal(new Set(tests.map(q=>q.leadCode)).size,10);assert.ok(tests.every(q=>q.format==='video'&&q.phase==='voice-test'&&!q.receipt&&!q.assetsVerified));
     assert.equal(state.angles.find(a=>a.id===tests[0].angleId).format,'video');
+    const first=tests[0];first.angleId='sakura-pain-tan-ca-voice';state.campaign.currentPromotion={key:'buy1-get1-tiktok-first50',text:'Mua 1 tặng 1 cho 50 đơn đầu tiên từ TikTok'};await saveState(state,file);assert.equal(run().status,0);
+    const limited=JSON.parse(await readFile(file,'utf8'));assert.ok(limited.queue.find(q=>q.id===first.id).caption.startsWith(state.campaign.currentPromotion.text));assert.deepEqual(limited.queue.slice(0,10),queue);
   }finally{await rm(dir,{recursive:true,force:true});}
 });

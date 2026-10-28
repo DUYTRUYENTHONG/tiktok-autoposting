@@ -11,6 +11,10 @@ test('voice brief preserves attribution and remains an unapproved narration draf
   assert.throws(()=>voiceBrief({queue:[{...q,account:'other'}]},q.id));
   assert.throws(()=>voiceBrief({queue:[]},'sakura-999'));
 });
+test('first50 queue narration opens with the current limited offer',()=>{
+  const item={...q,promotionKey:'buy1-get1-tiktok-first50',angleId:'sakura-pain-tan-ca-voice'};
+  const brief=voiceBrief({queue:[item]},item.id);assert.match(brief.script,/^Mua một, tặng một! Chỉ năm mươi đơn đầu tiên/);assert.equal(brief.copyRevision,'promo-first50-v3');
+});
 test('voice runtime rejects corrupted model/config before executing an engine',async()=>{
   const home=await mkdtemp(path.join(tmpdir(),'voice-'));
   try{
