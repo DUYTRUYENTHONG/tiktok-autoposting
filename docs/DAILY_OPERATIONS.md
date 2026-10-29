@@ -1,5 +1,7 @@
 # Daily posting and lead attribution
 
+Latest October29 rule: internal post IDs and inquiry codes stay private. New public images, captions, narration and CTAs omit them, and progress updates describe the content in plain language. The call CTA remains “Gọi số điện thoại trong bio để được tư vấn”; ask for the cleaning need and material/surface. Earlier code-based examples below are historical schemas, not instructions to print codes. Keep existing accepted posts unchanged. Attribute calls only when evidence identifies a post; otherwise leave attribution unknown.
+
 The active KPI is20 unique receipt-verified published posts per Asia/Ho_Chi_Minh day, starting2026-10-27. The first100 remains a cumulative milestone. Scheduled and under-review posts are shown separately. They reserve capacity but do not satisfy the publication KPI.
 
 For the active1,000-post expansion, use the registered immutable500photo/500video plan and [scale progress workflow](SCALE_CAMPAIGN.md). Do not run the legacy daily planner to add extra rows on top of that plan. Preserve accepted reservations, use native five-minute slots, and bind actual reviewed media before submission. Discounts require verified current eligibility; unknown means evergreen/no-discount. The projected calendar extends beyond the current native window, so later posts remain unsubmitted until eligible.
