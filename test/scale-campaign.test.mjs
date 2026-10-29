@@ -16,6 +16,20 @@ const state=()=>({account:'saigomlia',campaign:{},queue:[],posts:[],angles:[]});
 const reserved=(id,format,at,status='scheduled')=>({id:'old-'+id,account:'saigomlia',format,status,receipt:{platformId:String(id),...(status==='scheduled'?{scheduledAt:at,scheduledVerifiedAt:now}:status==='published'?{publishedAt:at,publishedVerifiedAt:now}:{submittedVerifiedAt:at})}});
 const day=at=>at.slice(0,10);
 function assertSpacing(plan){for(const d of plan.days){const all=[...d.reservations.map(r=>Date.parse(r.at)),...plan.items.filter(i=>day(i.proposedPublishAt)===d.day).map(i=>Date.parse(i.proposedPublishAt))].sort((a,b)=>a-b);for(let i=1;i<all.length;i++)assert.ok(all[i]-all[i-1]>=20*60000);}}
+test('private-code policy accepts a call CTA without exposing identifiers and rejects public leaks',async()=>{
+  const folder=await mkdtemp(path.join(tmpdir(),'scale-private-codes-'));
+  try{
+    const s=state();s.campaign.publicPostCodes=false;
+    const item=buildScaleCampaign(s,{now}).items[0],e=await evidenceFor(item,folder);
+    e.publicPostCodes=false;e.caption='Gọi số điện thoại trong bio để được tư vấn. Nói rõ vật liệu và nhu cầu.';
+    const bind=async evidence=>{const h=scalePostHash(item,evidence);return bindScaleCreative(item,{...evidence,visualReview:{...e.visualReview,postHash:h},offerReview:{...e.offerReview,postHash:h}},{state:s,now});};
+    assert.equal((await bind(e)).readiness.ready,true);
+    for(const change of [{caption:e.caption+' Nhắc mã '+item.leadCode},{caption:e.caption+' '+item.id},{spokenScript:'Nhắc mã '+item.leadCode}])assert.ok((await bind({...e,...change})).readiness.blockers.includes('public_internal_identifier'));
+    assert.ok((await bind({...e,caption:' '})).readiness.blockers.includes('caption_missing'));
+    assert.equal(item.leadCode,'BẾP301');
+  }finally{await rm(folder,{recursive:true,force:true});}
+});
+
 test('exactly1000 additional planned intents are500/500 across50empty days, with stable firstBẾP301',()=>{
   const s=state(),before=JSON.stringify(s),plan=buildScaleCampaign(s,{now});
   assert.equal(plan.items.length,1000);assert.deepEqual(plan.counts,{photo:500,video:500,planned:1000,ready:0,scheduled:0,published:0});assert.equal(plan.days.length,50);

@@ -89,11 +89,11 @@ function draftCreative(index,format,leadCode){
   const story=stories[index%stories.length],context=contexts[Math.floor(index/stories.length)%contexts.length],question=questions[Math.floor(index/(stories.length*contexts.length))%questions.length];
   const hook=index===0?'Tan ca rồi… lại tăng ca ở bếp?':`${context}: ${story.hook}`;
   const demo={kind:'product_identity',description:'Authentic Sakura500ml packshot/label closeup and material-question walkthrough; stock is illustrative context only.',efficacyDemoEvidence:null,efficacyDemoAvailable:false,stockIsProductDemo:false};
-  const cta=`Nhắn ${leadCode}, kèm ảnh bề mặt, tên vật liệu và nhu cầu để hỏi shop.`;
+  const cta='Gọi số điện thoại trong bio để được tư vấn. Nói rõ vị trí, vật liệu và nhu cầu.';
   const slides=[{role:'hook',text:hook},{role:'friction',text:index===0?'Việc nhà đâu chỉ của một người.':`${context}. ${question}`},{role:'identity',text:'Nước lau đa năng Sakura · 500 ml. Đối chiếu nhãn thật.'},{role:'material-objection',text:'Đa năng không có nghĩa dùng ở mọi nơi. Xem hướng dẫn của vật liệu.'},{role:'offer-policy',text:'Hỏi thông tin sản phẩm, giá và điều kiện tại thời điểm đặt.'},{role:'cta',text:cta}];
   return {status:'creative_draft',hypothesisStatus:'untested',generativeLLMUsed:false,fineTunedModelUsed:false,sourceHypothesisId:'sakura-pain-'+story.key,
     matrixKey:index===0?'prototype:BẾP301':`${story.key}|${context}|${question}`,scenario:context,question,hook,demo,offerStage:'evergreen_no_discount',cta,
-    slides:format==='photo'?slides:null,videoScript:format==='video'?`${hook}\nTìm hiểu nước lau đa năng Sa cu ra, năm trăm mi li lít. Xem đúng nhãn và vật liệu trước nha. Muốn hỏi sản phẩm có hợp không, chụp ảnh gửi shop nha.`:null,
+    slides:format==='photo'?slides:null,videoScript:format==='video'?`${hook}\nTìm hiểu nước lau đa năng Sa cu ra, năm trăm mi li lít. Xem đúng nhãn và vật liệu trước nha. Gọi số điện thoại trong phần giới thiệu để hỏi nhu cầu, giá và điều kiện mua hiện tại nha.`:null,
     caption:`${hook}\n\nTìm hiểu nước lau đa năng Sakura500ml. ${question} ${cta}\nHỏi giá và điều kiện trước khi đặt. Dùng theo nhãn.\n${scalePolicy.location}. TP.HCM · Online toàn quốc.\nCảnh minh họa, không phải demo Sakura hay lời chứng thực.\n#Sakura #NuocLauDaNang #GocNha #TPHCM`};
 }
 function intentPayload(item){return {id:item.id,campaignId:item.campaignId,account:item.account,productId:item.productId,format:item.format,leadCode:item.leadCode,proposedPublishAt:item.proposedPublishAt,location:item.location,creative:item.creative,promotion:item.promotion};}
@@ -179,7 +179,12 @@ export async function bindScaleCreative(item,evidence,{state={},now=new Date().t
   if(Number(item.proposedPublishAt.slice(14,16))%5!==0||Number(item.proposedPublishAt.slice(17,19))!==0)blockers.push('unsupported_native_five_minute_slot');
   if(Date.parse(item.proposedPublishAt)<Date.parse(now)+30*MINUTE)blockers.push('proposed_time_expired_or_too_near');
   if(evidence.account!==item.account)blockers.push('account_mismatch');if(evidence.location!==item.location)blockers.push('location_mismatch');
-  if(typeof evidence.caption!=='string'||!evidence.caption.includes(item.leadCode))blockers.push('caption_or_lead_code_missing');
+  const privateCodes=state.campaign?.publicPostCodes===false||evidence.publicPostCodes===false;
+  if(privateCodes){
+    if(typeof evidence.caption!=='string'||!evidence.caption.trim())blockers.push('caption_missing');
+    const publicText=[evidence.caption,evidence.spokenScript].filter(x=>typeof x==='string').join(' ').normalize('NFD').replace(/\p{M}/gu,'').toUpperCase();
+    if(/\b(?:ANH|GIONG|BEP)\s*\d{3,}\b|SAKURA[-_](?:SCALE[-_])?\d+/u.test(publicText)||publicText.includes(item.id.toUpperCase()))blockers.push('public_internal_identifier');
+  }else if(typeof evidence.caption!=='string'||!evidence.caption.includes(item.leadCode))blockers.push('caption_or_lead_code_missing');
   if(assets.length!==item.requirements.assetCount||assets.some((a,i)=>a.order!==i+1)||new Set(assets.map(a=>a.sha256)).size!==assets.length)blockers.push('asset_count_order_or_uniqueness_mismatch');
   for(const [i,asset] of assets.entries())await verifyBytes(asset,'asset_'+(i+1),blockers);
   if(evidence.authenticProductReferenceVerified!==true)blockers.push('authentic_product_reference_review_missing');
