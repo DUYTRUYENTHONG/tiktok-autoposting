@@ -1,5 +1,7 @@
 # One-item evergreen scale-video preview
 
+October29 update: new public overlays, captions and narration omit internal IDs and inquiry codes. The v4 renderer prints only the call CTA, and brief validation rejects internal codes in every public text field. Unsubmitted edits with old printed codes must be rebuilt from their exact existing WAV/timing receipts; this preserves pending or accepted listening-review scope. Private filenames and receipts retain stable IDs. Existing accepted posts are unchanged; earlier code-bearing examples below are historical.
+
 [render-scale-video-preview.mjs](../scripts/render-scale-video-preview.mjs) produces **one existing authorized video intent**, not a batch or a TikTok schedule. It reads the private scale plan, verifies its policy/plan/intent checksums, requires the intended account/product, a unique existing inquiry code, `planned` status with no receipt, and `evergreen_no_discount`. It also reads canonical state to stop if that ID is already accepted, scheduled or uncertain. It never writes canonical queue, journals, the scale plan, approvals or scheduling state.
 
 The latest scale instruction permits discounts only while eligibility is verified. There is no verified order ledger. This producer therefore allows **no printed/spoken promotion, discount, countdown or remaining-order assertion**, including material inherited from older previews. Historical accepted posts remain unchanged. Even a future discount-bearing intent is rejected by this evergreen producer.
