@@ -1,5 +1,7 @@
 # TikTok Autoposting agent instructions
 
+- Current campaign scope is maintained in docs/CAMPAIGN_GOAL.md. Ongoing source-linked angle research and original creative testing are part of the goal; docs/ANGLE_RESEARCH_EXPANSION.md contains untested hypotheses, not proven winners. The accepted voice tone is profileB; exact WAV approvals remain separate. Requested ai-video-generation skill is installed globally; external provider generation is not operational merely because the skill is installed.
+
 - October30 music update: vary Vietnamese music on each remaining unsubmitted post. Verify native commercial availability and exposed title/artist/duration; preserve accepted posts. Account recommendations and the generic Trending playlist do not establish a Vietnam national chart rank. If no numeric sound ID is exposed, bind exact native metadata plus separate hash-verified catalogue and composer screenshots; never invent an ID.
 
 - October30 one-day exception: user authorized30 additional posts tonight with five-minute spacing, within40 total accepted/allocated posts for this date only. Use the private dated policy and checked schedule revisions; keep accepted items unchanged. Other dates retain20/day. Local allocations are not TikTok schedules. See docs/SCHEDULE_REVISIONS.md.
