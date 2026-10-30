@@ -1,5 +1,7 @@
 # TikTok Autoposting agent instructions
 
+- October30 one-day exception: user authorized30 additional posts tonight with five-minute spacing, within40 total accepted/allocated posts for this date only. Use the private dated policy and checked schedule revisions; keep accepted items unchanged. Other dates retain20/day. Local allocations are not TikTok schedules. See docs/SCHEDULE_REVISIONS.md.
+
 - October30 Vietnamese editorial rule: use skills/vn-natural-copy/SKILL.md before producing or revising Vietnamese copy. The Vietnamese editor proposes conversational corrections; the reviewer checks spelling, meaning and evidence. Keep natural southern phrasing without forced slang. Do not describe AI review as human certification. Preserve exact approved audio; changed narration needs a new listening review.
 - October30 exact batch approval: the user approved the four presented guest-visit, floor-spots, plastic-tray and car-detail WAV previews with “Use all four narrations.” Hash-bound approvals are saved privately. Their old slots expired; perform an explicit checked time revision before submission, with native music/caption/playback checks still required.
 

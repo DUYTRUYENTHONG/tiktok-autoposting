@@ -96,7 +96,7 @@ function draftCreative(index,format,leadCode){
     slides:format==='photo'?slides:null,videoScript:format==='video'?`${hook}\nTìm hiểu nước lau đa năng Sa cu ra, năm trăm mi li lít. Xem đúng nhãn và vật liệu trước nha. Gọi số điện thoại trong phần giới thiệu để hỏi nhu cầu, giá và điều kiện mua hiện tại nha.`:null,
     caption:`${hook}\n\nTìm hiểu nước lau đa năng Sakura500ml. ${question} ${cta}\nHỏi giá và điều kiện trước khi đặt. Dùng theo nhãn.\n${scalePolicy.location}. TP.HCM · Online toàn quốc.\nCảnh minh họa, không phải demo Sakura hay lời chứng thực.\n#Sakura #NuocLauDaNang #GocNha #TPHCM`};
 }
-function intentPayload(item){return {id:item.id,campaignId:item.campaignId,account:item.account,productId:item.productId,format:item.format,leadCode:item.leadCode,proposedPublishAt:item.proposedPublishAt,location:item.location,creative:item.creative,promotion:item.promotion};}
+function intentPayload(item){return {id:item.id,campaignId:item.campaignId,account:item.account,productId:item.productId,format:item.format,leadCode:item.leadCode,proposedPublishAt:item.scheduleRevision?.originalPublishAt??item.proposedPublishAt,location:item.location,creative:item.creative,promotion:item.promotion};}
 // Explicit revision of an existing artifact: never regenerate identities or copy.
 export function normalizeScaleTimes(original,state,{now=new Date().toISOString()}={}){
   if(!validTime(now)||original.items?.length!==1000||original.items.filter(i=>i.format==='photo').length!==500||original.items.filter(i=>i.format==='video').length!==500)throw Error('Valid original1000-item plan required');
@@ -167,7 +167,7 @@ export function buildScaleCampaign(state,{now=new Date().toISOString(),startDay=
     limitations:['Dates are experimental intent, not TikTok reservations.','Template scenario/question combinations are not1000independently researched or produced creatives.','No authentic Sakura cleaning-efficacy demo exists; only identity/label/material-question walkthroughs are supported.','No ledger proof means evergreen, with no printed/spoken discount.','Existing voice/MCP queue-ID validators need a reviewed scale-ID integration before bulk production.']};
 }
 
-export function scalePostHash(item,evidence){return scaleHash({intentId:item.id,intentHash:item.intentHash,account:evidence.account,format:item.format,publishAt:item.proposedPublishAt,location:evidence.location,caption:evidence.caption,
+export function scalePostHash(item,evidence){return scaleHash({intentId:item.id,intentHash:item.intentHash,...(item.scheduleRevision?{scheduleRevisionHash:scaleHash(item.scheduleRevision)}:{}),account:evidence.account,format:item.format,publishAt:item.proposedPublishAt,location:evidence.location,caption:evidence.caption,
   assets:(evidence.assets??[]).map(a=>({order:a.order,sha256:a.sha256})),voiceSha256:evidence.voice?.sha256??null,spokenScript:evidence.spokenScript??item.creative.videoScript,musicSoundId:evidence.music?.soundId??null,demoKind:evidence.demoKind});}
 async function verifyBytes(asset,label,blockers){if(!asset||!path.isAbsolute(asset.path??'')||!/^[a-f0-9]{64}$/.test(asset.sha256??'')){blockers.push(label+'_path_or_hash_missing');return;}
   try{if(await hashFile(asset.path)!==asset.sha256)blockers.push(label+'_hash_mismatch');}catch{blockers.push(label+'_file_unavailable');}}
@@ -203,7 +203,8 @@ export async function bindScaleCreative(item,evidence,{state={},now=new Date().t
   if(window?.verified!==true||window.account!==item.account||!reviewTime(window.verifiedAt,now)||Date.parse(now)-Date.parse(window.verifiedAt)>24*HOUR||!validTime(window.earliest)||!validTime(window.latest)||Date.parse(item.proposedPublishAt)<Date.parse(window.earliest)||Date.parse(item.proposedPublishAt)>Date.parse(window.latest))blockers.push('actual_native_schedule_window_missing');
   try{const existing=collectScaleReservations(state).filter(r=>r.day===vietnamDay(item.proposedPublishAt));
     if(existing.some(r=>r.queueId===item.id))blockers.push('already_accepted_intent');
-    if(existing.length>=20||existing.filter(r=>r.format===item.format).length>=10||existing.some(r=>Math.abs(Date.parse(r.at)-Date.parse(item.proposedPublishAt))<20*MINUTE))blockers.push('current_quota_or_spacing_conflict');
+    if(item.scheduleRevision){if(existing.length>=40||existing.some(r=>Math.abs(Date.parse(r.at)-Date.parse(item.proposedPublishAt))<5*MINUTE))blockers.push('current_quota_or_spacing_conflict');}
+    else if(existing.length>=20||existing.filter(r=>r.format===item.format).length>=10||existing.some(r=>Math.abs(Date.parse(r.at)-Date.parse(item.proposedPublishAt))<20*MINUTE))blockers.push('current_quota_or_spacing_conflict');
   }catch(error){blockers.push('reconciliation_required: '+error.message);}
   if(item.requirements.voiceRequired){
     const voice=evidence.voice;await verifyBytes(voice,'voice',blockers);
