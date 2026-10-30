@@ -200,7 +200,7 @@ export async function bindScaleCreative(item,evidence,{state={},now=new Date().t
   const music=evidence.music;
   const noId=music?.soundId===null;
   if(noId){
-    if(![music.title,music.artist].every(value=>typeof value==='string'&&value.trim()===value&&value.length>0)||!/^\d{2}:[0-5]\d$/.test(music.duration??'')||music.duration==='00:00'||music.language!=='Vietnamese'||music.identitySource!=='https://www.tiktok.com/tiktokstudio/sound-library')blockers.push('exact_native_music_identity_missing');
+    if(![music.title,music.artist].every(value=>typeof value==='string'&&value.trim()===value&&value.length>0)||!/^\d{2}:[0-5]\d$/.test(music.duration??'')||music.duration==='00:00'||!['Vietnamese','non_vocal'].includes(music.language)||music.identitySource!=='https://www.tiktok.com/tiktokstudio/sound-library')blockers.push('exact_native_music_identity_missing');
     await verifyBytes(music.catalogEvidence,'native_music_catalog_evidence',blockers);
     await verifyBytes(music.selectionEvidence,'native_music_selection_evidence',blockers);
     if(music.catalogEvidence?.path===music.selectionEvidence?.path||music.catalogEvidence?.sha256===music.selectionEvidence?.sha256)blockers.push('distinct_native_music_proofs_required');
