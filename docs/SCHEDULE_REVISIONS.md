@@ -40,3 +40,26 @@ Run `node scripts/scale-progress.mjs revise <intentID> <absolute-revision.json>`
 An accepted, submitting, needs-review, or otherwise registered target cannot be revised. If an unregistered revised slot becomes too close or expires before submission, run the same `revise` command with a new revision JSON and a new eligible time. The original intent hash, account and policy file/hash must match; the prior revision stays in `scheduleRevisionHistory` and the next revision points to its hash. The old slot is released, the latest slot alone reserves capacity, and re-revision does not consume another of the 30 unique revised intents. Any private ready binding is invalidated and must be redone for the new time. A repeated identical slot is rejected.
 
 An uncertain submission elsewhere requires reconciliation before binding; the revision allocation check reserves its timestamp. The bridge checks allocation again at binding and immediately before canonical submission. The policy file's bytes are checked against the journal on every reload. No revision command edits a published/scheduled receipt or the immutable manifest.
+
+## Native music without an exposed numeric ID
+
+Some Vietnamese tracks in Studio's Royalty-free catalogue expose a title, artist, duration and language but no numeric sound ID. For those tracks only, set `music.soundId` to JSON `null` and supply the exact selected-track identity:
+
+```json
+{
+  "soundId": null,
+  "title": "<exact native title>",
+  "artist": "<exact native artist>",
+  "duration": "03:10",
+  "language": "Vietnamese",
+  "identitySource": "https://www.tiktok.com/tiktokstudio/sound-library",
+  "catalogEvidence": {"path": "<absolute catalogue screenshot>", "sha256": "<sha256>"},
+  "selectionEvidence": {"path": "<absolute composer selection screenshot>", "sha256": "<sha256>"},
+  "businessUseVerified": true,
+  "availableInAccount": true,
+  "selectedInUi": true,
+  "verifiedAt": "<actual verification time>"
+}
+```
+
+The catalogue screenshot must show the Vietnamese listing; the composer screenshot must show the selected title, artist and duration. Use `mm:ss` duration as displayed in the composer (for example `03:10` for a catalogue display of `00:03:10`). Both screenshots must be distinct private files with verified bytes. The track's exact identity and both proof hashes enter the post hash. Leave `soundId` null when Studio does not expose one. This records native account availability and selection; it does not assert a chart rank or rights beyond the observed Studio catalogue. Numeric-ID music keeps its existing post-hash format.

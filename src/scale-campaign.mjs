@@ -167,8 +167,9 @@ export function buildScaleCampaign(state,{now=new Date().toISOString(),startDay=
     limitations:['Dates are experimental intent, not TikTok reservations.','Template scenario/question combinations are not1000independently researched or produced creatives.','No authentic Sakura cleaning-efficacy demo exists; only identity/label/material-question walkthroughs are supported.','No ledger proof means evergreen, with no printed/spoken discount.','Existing voice/MCP queue-ID validators need a reviewed scale-ID integration before bulk production.']};
 }
 
+function nativeMusicIdentity(music){return {title:music.title,artist:music.artist,duration:music.duration,language:music.language,identitySource:music.identitySource,catalogEvidenceSha256:music.catalogEvidence?.sha256,selectionEvidenceSha256:music.selectionEvidence?.sha256};}
 export function scalePostHash(item,evidence){return scaleHash({intentId:item.id,intentHash:item.intentHash,...(item.scheduleRevision?{scheduleRevisionHash:scaleHash(item.scheduleRevision)}:{}),account:evidence.account,format:item.format,publishAt:item.proposedPublishAt,location:evidence.location,caption:evidence.caption,
-  assets:(evidence.assets??[]).map(a=>({order:a.order,sha256:a.sha256})),voiceSha256:evidence.voice?.sha256??null,spokenScript:evidence.spokenScript??item.creative.videoScript,musicSoundId:evidence.music?.soundId??null,demoKind:evidence.demoKind});}
+  assets:(evidence.assets??[]).map(a=>({order:a.order,sha256:a.sha256})),voiceSha256:evidence.voice?.sha256??null,spokenScript:evidence.spokenScript??item.creative.videoScript,musicSoundId:evidence.music?.soundId??null,...(evidence.music?.soundId===null?{musicNativeIdentity:nativeMusicIdentity(evidence.music)}:{}),demoKind:evidence.demoKind});}
 async function verifyBytes(asset,label,blockers){if(!asset||!path.isAbsolute(asset.path??'')||!/^[a-f0-9]{64}$/.test(asset.sha256??'')){blockers.push(label+'_path_or_hash_missing');return;}
   try{if(await hashFile(asset.path)!==asset.sha256)blockers.push(label+'_hash_mismatch');}catch{blockers.push(label+'_file_unavailable');}}
 const reviewTime=(value,now)=>validTime(value)&&Date.parse(value)<=Date.parse(now);
@@ -197,7 +198,14 @@ export async function bindScaleCreative(item,evidence,{state={},now=new Date().t
     if(!item.promotion.showDiscount||!promotionEligibility(evidence.orderLedger,item.proposedPublishAt,{now}).showDiscount)blockers.push('discount_not_verified_for_actual_publication_time');
   }
   const music=evidence.music;
-  if(!/^\d+$/.test(music?.soundId??'')||music.businessUseVerified!==true||music.availableInAccount!==true||music.selectedInUi!==true||!reviewTime(music.verifiedAt,now)||Date.parse(now)-Date.parse(music.verifiedAt)>24*HOUR)blockers.push('fresh_native_music_selection_missing');
+  const noId=music?.soundId===null;
+  if(noId){
+    if(![music.title,music.artist].every(value=>typeof value==='string'&&value.trim()===value&&value.length>0)||!/^\d{2}:[0-5]\d$/.test(music.duration??'')||music.duration==='00:00'||music.language!=='Vietnamese'||music.identitySource!=='https://www.tiktok.com/tiktokstudio/sound-library')blockers.push('exact_native_music_identity_missing');
+    await verifyBytes(music.catalogEvidence,'native_music_catalog_evidence',blockers);
+    await verifyBytes(music.selectionEvidence,'native_music_selection_evidence',blockers);
+    if(music.catalogEvidence?.path===music.selectionEvidence?.path||music.catalogEvidence?.sha256===music.selectionEvidence?.sha256)blockers.push('distinct_native_music_proofs_required');
+  }
+  if(!noId&&!/^\d+$/.test(music?.soundId??'')||music?.businessUseVerified!==true||music?.availableInAccount!==true||music?.selectedInUi!==true||!reviewTime(music?.verifiedAt,now)||Date.parse(now)-Date.parse(music.verifiedAt)>24*HOUR)blockers.push('fresh_native_music_selection_missing');
   if([...(state.queue??[]),...(state.posts??[])].some(q=>(q.queueId??q.id)!==item.id&&q.leadCode&&leadKey(q.leadCode)===leadKey(item.leadCode)))blockers.push('lead_code_collision');
   const window=evidence.scheduleWindow;
   if(window?.verified!==true||window.account!==item.account||!reviewTime(window.verifiedAt,now)||Date.parse(now)-Date.parse(window.verifiedAt)>24*HOUR||!validTime(window.earliest)||!validTime(window.latest)||Date.parse(item.proposedPublishAt)<Date.parse(window.earliest)||Date.parse(item.proposedPublishAt)>Date.parse(window.latest))blockers.push('actual_native_schedule_window_missing');
