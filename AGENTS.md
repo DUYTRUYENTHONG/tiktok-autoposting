@@ -1,5 +1,8 @@
 # TikTok Autoposting agent instructions
 
+- October30 Vietnamese editorial rule: use skills/vn-natural-copy/SKILL.md before producing or revising Vietnamese copy. The Vietnamese editor proposes conversational corrections; the reviewer checks spelling, meaning and evidence. Keep natural southern phrasing without forced slang. Do not describe AI review as human certification. Preserve exact approved audio; changed narration needs a new listening review.
+- October30 exact batch approval: the user approved the four presented guest-visit, floor-spots, plastic-tray and car-detail WAV previews with “Use all four narrations.” Hash-bound approvals are saved privately. Their old slots expired; perform an explicit checked time revision before submission, with native music/caption/playback checks still required.
+
 - Keep one owner for this workstream. Do not spawn agents simply for routing.
 - The user chose the internal browser. Use the supported computer-use browser tools and observed UI; keep the sign-in tab available for user handoff.
 - Follow current runtime instructions and applicable browser confirmation rules. Let the user handle authentication challenges. Never weaken safeguards to enable unattended operation.
