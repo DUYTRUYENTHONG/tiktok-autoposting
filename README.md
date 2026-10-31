@@ -4,6 +4,17 @@ Vietnamese product carousel planning, TikTok Studio scheduling through computer 
 
 ## Current operating scope
 
+- Latest priority: **100 videos total**, using supplied footage/images and Vietnamese narration. The user chose **20-minute spacing and carryover**, preserving accepted schedules and the standing30/day capacity. The private proposal prioritizes these videos across October31–November3. A local position is not a rendered file, native schedule or publication. See [video priority](docs/VIDEO_PRIORITY_100.md).
+- The broader rolling window remains October31–November29, up to900daily positions including accepted reservations. Keep the registered immutable1,000-intent500photo/500video source plan. Do not restart its initializer or run the legacy daily planner over it.
+- New content is **evergreen/no discount** until actual publication-time eligibility and remaining-order evidence are verified. Historical accepted offers stay unchanged. Public text has no internal IDs, inbox CTA, invented phone number or clickable-link claim. Use **Gọi số điện thoại trong bio để được tư vấn.**
+- Location: **Vựa Sầu Riêng Cô Ba,322 Đ.HuỳnhThịHai**; offlineTP.HCM and onlineVietnam. Keep AI and own-brand disclosures. Stock/generated scenes are illustrative; they do not demonstrate Sakura efficacy.
+- Local RAG now checks required current evidence before new scale-video production. Vietnamese editorial review, exact narration acceptance, actual encoded playback, native music and posting receipts remain separate. Neither content nor voice has been fine-tuned. [Knowledge limits](docs/KNOWLEDGE_AND_TUNING.md).
+- **Herk Edit Kit** is pinned and its15skills are installed on this machine. The Sakura bridge exports actual footage/audio/ASR into a private editing draft and runs the pinned footage validator. HyperFrames rendering and cloud services are not enabled by that installation. [Editing integration](docs/HERK_EDIT_KIT.md), [production prompt pack](prompts/video-creative-research.vi.md).
+
+## Historical pilot and expansion notes
+
+The dated instructions below explain earlier accepted artifacts. Current rules above and AGENTS.md supersede their old cadence, promotion and inquiry-code wording.
+
 - Latest expansion: **1,000 additional posts:500carousels and500videos**,20/day with10ofeach format including preserved reservations. [Scale campaign operations](docs/SCALE_CAMPAIGN.md) documents the private plan, real readiness gates and receipt-based progress. Current allocation spans October29–December18;1,000 intent rows are not1,000 produced or scheduled posts. New discounts appear only while eligibility is verified; without an order ledger, new media is evergreen/no-discount. The account's photo calendar currently exposes dates through November27, so later dates require rolling preparation and native scheduling.
 
 - Operating KPI: **20 receipt-verified published posts per Vietnam calendar day (UTC+7)**, starting October 27, 2026. This replaces the earlier stop-after-20 pilot restriction. The first 100 remains a cumulative milestone, not a daily limit.

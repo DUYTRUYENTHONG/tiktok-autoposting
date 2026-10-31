@@ -1,5 +1,9 @@
 # TikTok Autoposting agent instructions
 
+- Latest October31 priority:100videos total, including2already accepted that day; user chose keep20-minute spacing and carry over the remainder. Prioritize98new video creatives within standing dailycapacity; preserve accepted photos/videos. See docs/VIDEO_PRIORITY_100.md and the private video-priority manifest. This is not100 native schedules or permission to publish rejected narration.
+
+- Herk Edit Kit is pinned in config/herk-edit-kit.json. Before applying its installed editing skills, read skills/vn-herk-edit/SKILL.md; resolve upstream root-relative resources from the complete private checkout, preserve Sakura RAG/voice/publication gates, and use no AIS brand assets or cloud-provider defaults. Skill installation does not establish a working HyperFrames renderer.
+
 - October31 latest cadence:30posts/day for30days, October31–November29UTC+7,900total positions including accepted reservations, aiming15photos/15videos where preserved items permit. This supersedes20/day text below. Keep the registered immutable source plan; use the private rolling allocation as a proposal only, with checked current-day revisions and actual native horizon verification before submission. See docs/THIRTY_DAY_ROLLOUT.md. Do not apply the October30 exception to new dates.
 
 - Current campaign scope is maintained in docs/CAMPAIGN_GOAL.md. Ongoing source-linked angle research and original creative testing are part of the goal; docs/ANGLE_RESEARCH_EXPANSION.md contains untested hypotheses, not proven winners. The accepted voice tone is profileB; exact WAV approvals remain separate. Requested ai-video-generation skill is installed globally; external provider generation is not operational merely because the skill is installed.

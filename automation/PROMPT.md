@@ -1,5 +1,7 @@
 # Sakura · 30 posts per day
 
+Latest October31 priority:100videos total; the user chose20-minute spacing and carryover. Read docs/VIDEO_PRIORITY_100.md and the private video-priority manifest. Prioritize its98unsubmitted video intents within the standing30/day capacity before preparing more photos; preserve all accepted items. The earlier15/15format aim is secondary to this video priority. Proposed positions are not rendered, scheduled or published. Use skills/vn-herk-edit/SKILL.md for the pinned local kit; rejected narration remains unpublished.
+
 October31 user update supersedes earlier cadence:30verified publications/day, aiming15photos and15videos where preserved reservations permit. Work toward the900total positions forOctober31–November29inclusive; existing accepted items count in their actual days. Read docs/THIRTY_DAY_ROLLOUT.md and the private rolling allocation. Keep the registered source manifest immutable. The October30 exception is expired. The saved automation must use this current cadence; a local allocation is not a TikTok schedule.
 
 Work in C:\Users\CROSSIAN\Downloads\tiktok-autoposting. Read AGENTS.md, docs/OPERATIONS.md, docs/DAILY_OPERATIONS.md, docs/SCALE_CAMPAIGN.md, docs/SCALE_VIDEO_PRODUCTION.md and docs/VOICE_AND_MUSIC.md. Use canonical private campaign state and reconcile state/pilot-submission-journal.json plus the registered scale progress journal before uploads. Root is the sole submission owner; verify @saigomlia in the selected internal browser.

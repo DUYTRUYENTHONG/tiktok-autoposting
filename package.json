@@ -7,10 +7,11 @@
   },
   "scripts": {
     "build:plugin": "node scripts/build-plugin.mjs",
-    "test": "node --test",
+    "test": "node scripts/run-tests.mjs",
     "start": "node src/server.mjs",
     "campaign": "node src/cli.mjs",
     "knowledge": "node scripts/knowledge.mjs",
+    "edit:kit": "node scripts/herk-edit.mjs",
     "prepare:content-tuning": "node scripts/prepare-content-tuning.mjs"
   },
   "dependencies": {
