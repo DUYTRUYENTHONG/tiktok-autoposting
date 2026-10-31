@@ -62,6 +62,7 @@ export function curatedStory(item){
 export function validateBrief(brief,item){
   if(brief.intentId!==item.id||brief.intentHash!==item.intentHash||typeof brief.script!=='string'||brief.script.length<250||brief.script.length>1500
     ||brief.clipIds?.length!==4||new Set(brief.clipIds).size!==4)throw Error('A specific hash-bound story and four reviewed intervals are required');
+  if(brief.openingMode!==undefined&&!['context','identity_to_context'].includes(brief.openingMode))throw Error('Unsupported opening mode');
   for(const key of ['script','headline','tension','decision','identity','questions','price','stockLabel',...['caption','captionQualification'].filter(key=>brief[key]!==undefined)]){
     if(typeof brief[key]!=='string'||!brief[key].trim())throw Error('Missing story text:'+key);assertEvergreen(brief[key]);
     const text=brief[key].normalize('NFD').replace(/\p{M}/gu,'').replaceAll('đ','d').toLowerCase();
@@ -76,6 +77,12 @@ export function validateBrief(brief,item){
 export function publicVideoCopy(brief){
   const caption=brief.caption??`${brief.headline.replaceAll('\n',' ')}\n\nTìm hiểu Sakura500ml. Gọi số điện thoại trong bio để được tư vấn; nêu nhu cầu, vật liệu và lớp phủ nếu biết. Hỏi giá và điều kiện mua hiện tại trước khi chốt.\nTình huống minh họa; không phải thử nghiệm hay lời chứng thực.`;
   return {cta:'Gọi số điện thoại trong bio',caption:captionWithVoiceCredit(caption,'vieneu')};
+}
+export function identityOpeningGraph(mode,source,productInputIndex){
+  if(mode===undefined||mode==='context')return {filters:[],output:source};
+  if(mode!=='identity_to_context'||!/^\w+$/u.test(source)||!Number.isSafeInteger(productInputIndex)||productInputIndex<0)throw Error('Invalid identity opening graph');
+  return {filters:[`[${productInputIndex}:v]trim=duration=0.85,setpts=PTS-STARTPTS,format=rgba,fade=t=out:st=0.65:d=0.2:alpha=1[openingidentity]`,
+    `[${source}][openingidentity]overlay=0:0:eof_action=pass:enable='lt(t,0.85)'[openingstory]`],output:'openingstory'};
 }
 export function wrapStoryCard(text){
   return text.normalize('NFC').split(/\r?\n/u).map(line=>wrapVideoText(line)).join('\n');
@@ -201,7 +208,7 @@ async function main(args){
   const prepared=options['voice-receipt']?validatePreparedVoice(JSON.parse(await readFile(options['voice-receipt'],'utf8')),brief.script,profile):null;
   if(prepared&&(await hashFile(prepared.path)!==prepared.sha256||prepared.modelManifestSha256!==runtime.modelSha256||prepared.runtimeConfigSha256!==await hashFile(runtime.configFile)))throw Error('Prepared narration bytes/runtime changed');
   const helper=path.join(root,'scripts/voice-vieneu.py'),productSha256=await hashFile(productImage),scriptSha256=scaleHash(brief.script),
-    binding={intentId:item.id,intentHash:item.intentHash,planHash:plan.planHash,brief,groundingBindingHash:grounding.bindingHash,scenes,productSha256,profile,voiceModelManifestSha256:runtime.modelSha256,voiceHelperSha256:await hashFile(helper),ffmpegSha256:editing.ffmpegSha256,renderer:'scale-evergreen-preview-v8-fit-product-heading',...(prepared?{preparedVoiceSha256:prepared.sha256}: {})},revision=scaleHash(binding).slice(0,16),
+    binding={intentId:item.id,intentHash:item.intentHash,planHash:plan.planHash,brief,groundingBindingHash:grounding.bindingHash,scenes,productSha256,profile,voiceModelManifestSha256:runtime.modelSha256,voiceHelperSha256:await hashFile(helper),ffmpegSha256:editing.ffmpegSha256,renderer:'scale-evergreen-preview-v9-optional-identity-opening',...(prepared?{preparedVoiceSha256:prepared.sha256}: {})},revision=scaleHash(binding).slice(0,16),
     directory=path.join(root,'state/scale-video-preview',`${item.id}-${revision}`);
   await mkdir(directory,{recursive:true});const resolved=await realpath(directory),privateBase=await realpath(path.join(root,'state/scale-video-preview'));
   if(!resolved.startsWith(privateBase+path.sep))throw Error('Output must remain in the private preview folder');
@@ -233,25 +240,26 @@ async function main(args){
     const cut=path.join(directory,`cut-${index}.mp4`);await run(editing.ffmpeg,['-hide_banner','-loglevel','error','-y','-ss',String(scene.start),'-i',scene.source,'-t','3','-an','-vf',`${framing},pad=1080:1920:0:240:color=0xf8f2ed,setsar=1,fps=30`,'-c:v','libx264','-preset','veryfast','-crf','21','-threads','2','-pix_fmt','yuv420p',cut],{timeout:120000,windowsHide:true});segments.push(cut);
   }
   const packshot=path.join(directory,'identity.mp4');await run(editing.ffmpeg,['-hide_banner','-loglevel','error','-y','-loop','1','-i',productImage,'-t',String(packshotSeconds),'-an','-vf','scale=900:950:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:510:color=0xf8f2ed,setsar=1,fps=30','-c:v','libx264','-preset','veryfast','-crf','20','-threads','2','-pix_fmt','yuv420p',packshot],{timeout:120000,windowsHide:true});segments.push(packshot);
-  const texts={brand:'CHUYỆN NHÀ · HỎI ĐÚNG NHU CẦU',hook:wrapStoryCard(brief.headline),tension:wrapStoryCard(brief.tension),decision:wrapStoryCard(brief.decision),identity:wrapStoryCard(brief.identity),questions:brief.questions,price:brief.price,
+  const identityOpening=brief.openingMode==='identity_to_context';
+  const texts={brand:identityOpening?'SAKURA · 500 ml':'CHUYỆN NHÀ · HỎI ĐÚNG NHU CẦU',hook:wrapStoryCard(brief.headline),tension:wrapStoryCard(brief.tension),decision:wrapStoryCard(brief.decision),identity:wrapStoryCard(brief.identity),questions:brief.questions,price:brief.price,
     stock:brief.stockLabel,identityNote:'Ảnh tham chiếu nhận diện chai · Không kiểm chứng hiệu quả',cta:publicVideoCopy(brief).cta};
   for(const [name,text]of Object.entries(texts)){assertEvergreen(text);await writeFile(path.join(directory,name+'.txt'),text,'utf8');}
   const text=(name,size,y,enable,bold=false,color='0x392343')=>`drawtext=fontfile=${bold?'Arial-Bold.ttf':'Arial.ttf'}:textfile=${name}.txt:expansion=none:fontsize=${size}:fontcolor=${color}:x=(w-tw)/2:y=${y}:line_spacing=12${['cta','stock'].includes(name)?':box=1:boxcolor=0xf8f2ed:boxborderw=12':''}${enable?`:enable='${enable}'`:''}`;
-  const filters=[text('brand',39,66,null,true),text('cta',38,214,null,true),"drawbox=x=45:y=277:w=990:h=220:color=0x392343@0.9:t=fill:enable='lt(t,11)'",text('hook',58,300,'lt(t,3)',true,'white'),text('tension',54,320,'gte(t,3)*lt(t,7)',true,'white'),text('decision',52,300,'gte(t,7)*lt(t,11)',true,'white'),text('stock',29,532,'lt(t,11)'),text('identity',44,290,'gte(t,11)',true),text('questions',42,420,'gte(t,11)*lt(t,18)',true),text('price',43,420,'gte(t,18)',true),text('identityNote',28,1490,'gte(t,11)')];
+  const filters=[text('brand',39,66,null,true),text('cta',38,214,identityOpening?`gte(t,${seconds-4})`:null,true),"drawbox=x=45:y=277:w=990:h=220:color=0x392343@0.9:t=fill:enable='lt(t,11)'",text('hook',58,300,'lt(t,3)',true,'white'),text('tension',54,320,'gte(t,3)*lt(t,7)',true,'white'),text('decision',52,300,'gte(t,7)*lt(t,11)',true,'white'),text('stock',29,532,'lt(t,11)'),text('identity',44,290,'gte(t,11)',true),text('questions',42,420,'gte(t,11)*lt(t,18)',true),text('price',43,420,'gte(t,18)',true),text('identityNote',28,1490,'gte(t,11)')];
   const captions={status:'needs_caption_review',burned:false,reason:'No actual hash-bound timed asset was supplied for this new WAV; no timing fabricated'};
-  const transition=transitionGraph(segments.length),graph=[...transition.filters,`[${transition.output}]${filters.join(',')}[outv]`].join(';');await writeFile(path.join(directory,'filter.txt'),graph,'utf8');
+  const transition=transitionGraph(segments.length),opening=identityOpeningGraph(brief.openingMode,transition.output,segments.length+1),graph=[...transition.filters,...opening.filters,`[${opening.output}]${filters.join(',')}[outv]`].join(';');await writeFile(path.join(directory,'filter.txt'),graph,'utf8');
   const video=path.join(directory,`${item.id}.mp4`);console.log(JSON.stringify({id:item.id,status:'rendering_one_full_video',seconds,captions:captions.status}));
-  await run(editing.ffmpeg,['-hide_banner','-loglevel','error','-y',...segments.flatMap(file=>['-i',file]),'-i',wav,'-filter_complex_threads','1','-filter_complex',graph,'-map','[outv]','-map',`${segments.length}:a:0`,'-c:v','libx264','-preset','veryfast','-crf','20','-threads','2','-pix_fmt','yuv420p','-af','apad','-t',String(seconds),'-c:a','aac','-b:a','192k','-movflags','+faststart',video],{cwd:directory,timeout:180000,maxBuffer:1024*1024,windowsHide:true});
+  await run(editing.ffmpeg,['-hide_banner','-loglevel','error','-y',...segments.flatMap(file=>['-i',file]),'-i',wav,...(identityOpening?['-i',packshot]:[]),'-filter_complex_threads','1','-filter_complex',graph,'-map','[outv]','-map',`${segments.length}:a:0`,'-c:v','libx264','-preset','veryfast','-crf','20','-threads','2','-pix_fmt','yuv420p','-af','apad','-t',String(seconds),'-c:a','aac','-b:a','192k','-movflags','+faststart',video],{cwd:directory,timeout:180000,maxBuffer:1024*1024,windowsHide:true});
   const {stdout}=await run(editing.ffprobe,['-v','error','-show_streams','-show_format','-of','json',video],{timeout:15000,windowsHide:true}),probe=JSON.parse(stdout),v=probe.streams.find(s=>s.codec_type==='video'),a=probe.streams.find(s=>s.codec_type==='audio');
   if(v?.width!==1080||v.height!==1920||v.codec_name!=='h264'||a?.codec_name!=='aac'||Math.abs(Number(probe.format.duration)-seconds)>.2)throw Error('Scale preview technical video QA failed');
   const caption=publicVideoCopy(brief).caption;assertEvergreen(caption);
   const receipt={schemaVersion:1,intentId:item.id,intentHash:item.intentHash,planHash:plan.planHash,sourcePlanFile:path.resolve(options.plan),sourcePlanSha256:await hashFile(options.plan),revision,path:video,sha256:await hashFile(video),seconds,voice,caption,leadCode:item.leadCode,scenes,grounding,
     producerSource:{snapshot:producerSnapshot,sha256:await hashFile(producerSnapshot)},
-    productImage:{path:productImage,sha256:productSha256,role:'user_supplied_product_identity_reference',manufacturerLabelClaimsVerified:false},reviewManifestSha256:await hashFile(reviewFile),editingRuntime:{...editing,ffprobeSha256:await hashFile(editing.ffprobe)},captions,
+    productImage:{path:productImage,sha256:productSha256,role:'user_supplied_product_identity_reference',manufacturerLabelClaimsVerified:false},opening:{mode:brief.openingMode??'context',...(identityOpening?{identityVisibleFromSeconds:0,fadeToContextStartSeconds:.65,fadeDurationSeconds:.2,ctaVisibleFromSeconds:seconds-4,timingScope:'editorial visual timing, not word alignment',performanceValidated:false}:{})},reviewManifestSha256:await hashFile(reviewFile),editingRuntime:{...editing,ffprobeSha256:await hashFile(editing.ffprobe)},captions,
     status:'needs_listening',blockers:['exact_audio_listening_review','final_video_playback_review',captions.status,'music_selection_missing','native_schedule_window_unverified'],musicAdded:false,stockIsProductDemo:false,efficacyDemoEvidence:null,listeningVerified:false,visualPlaybackVerified:false,
     publicationReady:false,published:false,scheduled:false,canonicalQueueModified:false,createdAt:new Date().toISOString()};
   await writeFile(receiptFile,JSON.stringify(receipt,null,2),'utf8');
-  for(const t of [1,5,10,14,Math.min(20,seconds-.5)])await run(editing.ffmpeg,['-hide_banner','-loglevel','error','-y','-ss',String(t),'-i',video,'-frames:v','1','-vf','scale=432:768',path.join(directory,`frame-${t}.jpg`)],{timeout:20000,windowsHide:true});
+  for(const t of [...(identityOpening?[.1,.75,1.1]:[]),1,5,10,14,Math.min(20,seconds-.5)])await run(editing.ffmpeg,['-hide_banner','-loglevel','error','-y','-ss',String(t),'-i',video,'-frames:v','1','-vf','scale=432:768',path.join(directory,`frame-${t}.jpg`)],{timeout:20000,windowsHide:true});
   console.log(JSON.stringify({id:item.id,path:video,sha256:receipt.sha256,wav,voiceSeconds:qa.durationSeconds,seconds,receiptFile,status:receipt.status,captions:captions.status,listeningVerified:false,scheduled:false,published:false}));
   await captionPreview(receipt,directory,editing,options.captions);
 }

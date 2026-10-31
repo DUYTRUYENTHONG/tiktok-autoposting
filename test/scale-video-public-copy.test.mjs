@@ -1,8 +1,19 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {curatedStory,validateBrief,publicVideoCopy,groundVideoBrief,videoGroundingCopy,wrapStoryCard} from '../scripts/render-scale-video-preview.mjs';
+import {curatedStory,validateBrief,publicVideoCopy,groundVideoBrief,videoGroundingCopy,wrapStoryCard,identityOpeningGraph} from '../scripts/render-scale-video-preview.mjs';
 import {buildIndex,hash} from '../src/knowledge/index.mjs';
 import {evergreenRequiredSourceIds} from '../src/knowledge/production-grounding.mjs';
+
+test('optional identity opening preserves the default and validates its selected source',()=>{
+  const item={id:'sakura-scale-10002',intentHash:'fixture',creative:{sourceHypothesisId:'sakura-pain-chia-viec'}},brief=curatedStory(item);
+  assert.equal(validateBrief({...brief,openingMode:'identity_to_context'},item).openingMode,'identity_to_context');
+  assert.throws(()=>validateBrief({...brief,openingMode:'before_after_demo'},item),/opening mode/);
+  assert.deepEqual(identityOpeningGraph(undefined,'joined',6),{filters:[],output:'joined'});
+  const graph=identityOpeningGraph('identity_to_context','joined',6);
+  assert.equal(graph.output,'openingstory');assert.match(graph.filters.join(';'),/\[6:v\]/);assert.match(graph.filters.join(';'),/st=0.65:d=0.2:alpha=1/);assert.match(graph.filters.join(';'),/eof_action=pass/);
+  assert.throws(()=>identityOpeningGraph('identity_to_context','joined',-1),/Invalid/);
+  assert.throws(()=>identityOpeningGraph('identity_to_context','joined;other',6),/Invalid/);
+});
 
 test('video briefs reject internal identifiers in every public text field',()=>{
   const item={id:'sakura-scale-10002',intentHash:'fixture',creative:{sourceHypothesisId:'sakura-pain-chia-viec'}};
