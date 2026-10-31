@@ -5,6 +5,8 @@ description: Create Vietnamese product carousel copy and image-generation prompt
 
 # Carousel sản phẩm tiếng Việt
 
+Latest hook/export rule: no scheduling/status watermarks, blanket “demo này không phải sản phẩm Sakura” wording or internal production labels in new images/hooks. Keep source provenance private and platform disclosures enabled. Use truthful scenes and supported copy that stand without a demo disclaimer. Preserve already accepted media; review unsubmitted image bytes before exporting.
+
 Latest1,000-post expansion is500carousels/500videos at20/day including preserved reservations. For new unsubmitted media, show discounts only while verified eligible; unknown remaining orders means evergreen/no-discount, overriding earlier required offer-first cards. BẾP301 has a reviewed evergreen six-slide variant with discount copy removed from both cover and offer card. Reuse the registered immutable scale plan, create fresh reviewed story assets, respect native five-minute slots and the actual format-specific scheduling horizon, then record a real receipt. A CSV of500photo intents is not500ready carousels.
 
 Inspect each product reference before generating. Preserve exact product identity, bottle geometry, label, volume, colors and intended use. Existing complete carousel images may be reused after visual QA; existing captions/prompts are drafts rather than substantiation of efficacy.

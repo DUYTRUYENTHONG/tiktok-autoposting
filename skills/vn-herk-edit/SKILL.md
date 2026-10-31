@@ -5,6 +5,8 @@ description: Apply pinned Herk Edit Kit storytelling, footage, caption and sound
 
 # Sakura footage edits with Herk Edit Kit
 
+October31 hook/export feedback: omit scheduling/status text, blanket demo disclaimers and internal production labels from customer-facing frames. Keep source provenance in private receipts and platform disclosures enabled. Select honest household context and separate authentic product identity; do not imply a Sakura result or endorsement through the edit. The user rejected the entire first redesign, so the next prototype needs a coherent visual story, readable typography, smooth purposeful transitions and a complete music/mix review rather than another cosmetic variation.
+
 Read `config/herk-edit-kit.json` in the Sakura repository. The complete pinned upstream root is `state/upstream/herk-edit-kit`; verify its actual Git HEAD before using its helpers. Keep the upstream checkout private and intact, including sibling skills, references and licenses. Resolve upstream `docs/`, `scripts/`, `MOTION_PHILOSOPHY.md`, `style-library/` and skill-relative paths from that root, not from Sakura's root or the global skills directory.
 
 For new Sakura product-story edits, read [speech-led story edits](references/story-edits.md). The user rejected the repetitive montage/poster editing direction. Use actual speech and useful visible actions to choose the sequence; review one revised moving example before scaling that visual pattern. Preserve all five recently approved narrations. The old four-fixed-clip compositor remains available for historical comparison; it is not the creative brief for new edits.

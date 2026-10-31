@@ -4,6 +4,7 @@ import {promisify} from 'node:util';
 import path from 'node:path';
 import {hashFile} from './store.mjs';
 import {verifySubtitleReceipt} from './video-subtitles.mjs';
+import {assertConsumerOverlay} from './consumer-overlays.mjs';
 
 const run=promisify(execFile),sha=/^[a-f0-9]{64}$/u;
 export function compileStoryEdit(plan,{intentId,voice,scenes,timing,productSha256}){
@@ -26,7 +27,7 @@ export function compileStoryEdit(plan,{intentId,voice,scenes,timing,productSha25
       const box=shot.crop;if(!Array.isArray(box)||box.length!==4||box.some(x=>!Number.isFinite(x))||box[0]<0||box[1]<0||box[2]<=0||box[3]<=0||box[0]+box[2]>1||box[1]+box[3]>1)throw Error('Product crop must remain inside the authentic reference');
       if(seconds>3)throw Error('Product identity shot is too long for this short-story mode');
     }
-    for(const key of ['graphic','label'])if(shot[key]!==undefined&&(typeof shot[key]!=='string'||shot[key].length>100||/[{}\\]/u.test(shot[key])))throw Error('Use bounded plain overlay text');
+    for(const key of ['graphic','label'])if(shot[key]!==undefined){if(typeof shot[key]!=='string'||shot[key].length>100||/[{}\\]/u.test(shot[key]))throw Error('Use bounded plain overlay text');assertConsumerOverlay(shot[key]);}
     if(shot.captionBottomY!==undefined&&(!Number.isInteger(shot.captionBottomY)||shot.captionBottomY<1120||shot.captionBottomY>1540))throw Error('Caption placement outside the reviewed phone-safe area');
     end=shot.endFrame;return {...shot,seconds,index};
   });

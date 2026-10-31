@@ -6,6 +6,7 @@ import {homedir} from 'node:os';
 import {createHash} from 'node:crypto';
 import {root,hashFile} from '../src/store.mjs';
 import {loadEditingRuntime,wrapVideoText} from '../src/footage-video.mjs';
+import {assertConsumerOverlay} from '../src/consumer-overlays.mjs';
 const run=promisify(execFile),input=process.argv[2];
 if(!input||!path.isAbsolute(input))throw Error('Pass an absolute private carousel brief manifest');
 const brief=JSON.parse(await readFile(input,'utf8'));
@@ -17,10 +18,10 @@ const runtime=await loadEditingRuntime(path.join(root,'state','footage-toolchain
 const selections=[['I001','I039','I006'],['I006','I010','I075'],['I020','I014','I016'],['I067','I075','I073'],['I036','I072','I004'],['I004','I100','I006'],['I070','I067','I073'],['I012','I004','I006'],['I019','I020','I061'],['I077','I073','I006']];
 const product='C:/Users/CROSSIAN/Downloads/nước tẩy đa năng sakura/Sakura_10_Carousel_50_Anh/Sakura_10_Carousel/Anh_tham_chieu/Sakura_nuoc_lau_500ml.jpg',productHash=await hashFile(product);
 const photoSelections=pool.map(i=>({id:i.id,sha256:i.sourceSha256,crop:i.crop3x4.normalizedBox}));
-const digest=createHash('sha256').update(JSON.stringify({brief:brief.briefsHash,photoSelections,selections,productHash,renderer:'photo-layout-v2'})).digest('hex').slice(0,16);
+const digest=createHash('sha256').update(JSON.stringify({brief:brief.briefsHash,photoSelections,selections,productHash,renderer:'photo-layout-v3-no-production-labels'})).digest('hex').slice(0,16);
 const output=path.join(homedir(),'.codex','data','tiktok-autoposting','carousel-footage',`rendered-${digest}`);await mkdir(output,{recursive:true});
 await copyFile('C:/Windows/Fonts/arial.ttf',path.join(output,'font.ttf'));await copyFile('C:/Windows/Fonts/arialbd.ttf',path.join(output,'bold.ttf'));
-const manifest={...brief,renderedAt:new Date().toISOString(),output,renderer:'photo-layout-v2',renderedPosts:[],publication:{authorizedByThisManifest:false,canonicalQueueModified:false,submittedCount:0},visualReviewStatus:'needs_final_review'};
+const manifest={...brief,renderedAt:new Date().toISOString(),output,renderer:'photo-layout-v3-no-production-labels',renderedPosts:[],publication:{authorizedByThisManifest:false,canonicalQueueModified:false,submittedCount:0},visualReviewStatus:'needs_final_review'};
 for(const [postIndex,post] of brief.posts.entries()){
   const slides=[];
   for(const slide of post.slides){
@@ -31,7 +32,8 @@ for(const [postIndex,post] of brief.posts.entries()){
     if(await hashFile(source)!==sourceHash)throw Error('Source image checksum changed');
     const c=image?.crop3x4;
     if(stock&&(![c.x,c.y,c.width,c.height].every(Number.isInteger)||c.width<=0||c.height<=0))throw Error('Reviewed crop missing pixel dimensions');
-    const prefix=`${post.id}-${slide.order}`,texts={heading:wrapVideoText(slide.heading,27),body:slide.body.split('\n').map(part=>wrapVideoText(part,slide.order===1?28:38)).join('\n'),footer:wrapVideoText(stock?'Ảnh minh họa · Không phải thử nghiệm Sakura':slide.footer,54),number:`${slide.order}/4`};
+    const prefix=`${post.id}-${slide.order}`,texts={heading:wrapVideoText(slide.heading,27),body:slide.body.split('\n').map(part=>wrapVideoText(part,slide.order===1?28:38)).join('\n'),footer:wrapVideoText(stock?'':slide.footer,54),number:`${slide.order}/4`};
+    for(const value of Object.values(texts))assertConsumerOverlay(value);
     if(texts.heading.split('\n').length>2||texts.body.split('\n').length>6||texts.footer.split('\n').length>2)throw Error('Text exceeds reviewed layout budget: '+prefix);
     for(const [key,value] of Object.entries(texts))await writeFile(path.join(output,`${prefix}-${key}.txt`),value,'utf8');
     const draw=(name,size,y,{bold=false,color='0x392343'}={})=>`drawtext=fontfile=${bold?'bold.ttf':'font.ttf'}:textfile=${prefix}-${name}.txt:expansion=none:fontsize=${size}:fontcolor=${color}:x=(w-tw)/2:y=${y}:line_spacing=11`;

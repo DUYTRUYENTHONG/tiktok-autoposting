@@ -5,6 +5,8 @@ description: Edit and review Vietnamese marketing captions, carousel text and na
 
 # Biên tập tiếng Việt tự nhiên
 
+For hooks and exported on-image/video copy, reject scheduling/status text and blanket demo/production labels such as “Bài đăng này đã được lên lịch” and “demo này không phải sản phẩm Sakura”. Source notes stay private. Preserve platform disclosures and factual honesty through the actual shots and claims; repeated production disclaimers do not belong in the hook.
+
 Write as a helpful Vietnamese shopkeeper talking to one customer. For Sakura, use warm, everyday southern Vietnamese without forced slang, exaggerated dialect or repeated “nha/nè”. This is editorial review by an AI, not a claim that a human native-speaker checked it.
 
 Read the actual text and its destination: spoken script, on-image text and caption have different space and rhythm. Read an existing rendered image before changing its copy. Preserve brand spelling, volume, factual uncertainty and current commercial terms. Use the campaign's latest dated instructions; old examples do not override them.

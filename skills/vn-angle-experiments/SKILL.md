@@ -5,6 +5,8 @@ description: Design and iterate Vietnamese TikTok content angle experiments with
 
 # Thử nghiệm và nhân rộng góc nội dung
 
+Hook rule from user feedback: consumer hooks contain the actual concern and reason to keep watching. Omit scheduling/status watermarks, blanket demo disclaimers and internal production labels. Keep provenance and experimental IDs private; platform AI/commercial disclosures remain enabled. Use truthful context and supported claims without disguising stock as a Sakura result or customer endorsement.
+
 Start from product facts, research evidence, the audience problem and actual offer. Use persistent angle IDs and separate variants for hook, proof, CTA and format. One experiment should change one main variable. For Sakura distinguish multipurpose cleaner from fabric spray; do not interchange bottle or use cases.
 
 Produce concise Vietnamese hooks, 4–6-slide carousel outlines, captions, disclosure needs and a measurable hypothesis. A volume target is a delivery goal, not evidence of an angle's performance. Use measured results to choose the next mix while respecting the user's authorized cadence; Sakura is currently20 verified publications/day. A queue record must distinguish idea, asset-ready, scheduled and verified-published states. Give each story a post-specific inquiry code and distinguish observed leads from engagement proxies.

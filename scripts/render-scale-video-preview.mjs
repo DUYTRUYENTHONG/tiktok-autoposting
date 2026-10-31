@@ -8,6 +8,7 @@ import {voiceRuntime,voiceHome,voiceProfile,captionWithVoiceCredit} from '../src
 import {inspectWav} from '../src/wav.mjs';
 import {loadReviewedVoice} from '../src/reviewed-voice.mjs';
 import {renderStoryEdit,positionStoryCaptions} from '../src/story-edit.mjs';
+import {assertConsumerOverlay} from '../src/consumer-overlays.mjs';
 import {scalePolicy,scaleHash,containsDiscount} from '../src/scale-campaign.mjs';
 import {createProductionGrounding,checkProductionGrounding} from '../src/knowledge/production-grounding.mjs';
 import {buildIndex,loadIndex} from '../src/knowledge/index.mjs';
@@ -59,20 +60,21 @@ export function curatedStory(item){
     clipIds:['V090','V001','V043','V042'],headline:'Người nấu xong,\nai nhận phần dọn?',
     tension:'“Ủa, còn việc gì nữa hả?”',decision:'Chia việc cho rõ.\nChọn theo đúng nhu cầu.',
     identity:'SAKURA 500ml',questions:'Chụp ảnh bề mặt\nNêu vật liệu / lớp phủ',price:'Hỏi giá và điều kiện mua\ntrước khi chốt',
-    stockLabel:'Cảnh minh họa · Không phải demo Sakura'};
+    stockLabel:''};
 }
 export function validateBrief(brief,item){
   if(brief.intentId!==item.id||brief.intentHash!==item.intentHash||typeof brief.script!=='string'||brief.script.length<250||brief.script.length>1500
     ||brief.clipIds?.length!==4||new Set(brief.clipIds).size!==4)throw Error('A specific hash-bound story and four reviewed intervals are required');
   if(brief.openingMode!==undefined&&!['context','identity_to_context'].includes(brief.openingMode))throw Error('Unsupported opening mode');
   if(brief.contextFraming!==undefined&&!['crop','fit_blur'].includes(brief.contextFraming))throw Error('Unsupported context framing');
-  for(const key of ['script','headline','tension','decision','identity','questions','price','stockLabel',...['caption','captionQualification'].filter(key=>brief[key]!==undefined)]){
+  for(const key of ['script','headline','tension','decision','identity','questions','price',...['caption','captionQualification','stockLabel'].filter(key=>brief[key]!==undefined&&!(key==='stockLabel'&&brief[key]===''))]){
     if(typeof brief[key]!=='string'||!brief[key].trim())throw Error('Missing story text:'+key);assertEvergreen(brief[key]);
     const text=brief[key].normalize('NFD').replace(/\p{M}/gu,'').replaceAll('đ','d').toLowerCase();
     if(/\b(?:anh|giong|bep)\s*\d{3,}\b|sakura[-_](?:scale[-_])?\d+/u.test(text))throw Error('Public story text contains an internal identifier');
     if(/\b(?:inbox|nhan tin|nhan shop|nhan cho shop|gui shop|link trong bio|bam link)\b/u.test(text))throw Error('Public story must follow the call-only CTA policy');
     if(/sach bong|tay sach moi|diet khuan|diet virus|an toan tuyet doi|dung duoc moi|khach hang noi|khach da dung|cam ket|bao dam|chung nhan/.test(text))throw Error('Unsupported efficacy/safety/testimonial copy is outside this identity preview');
   }
+  for(const key of ['script','headline','tension','decision','identity','questions','price'])assertConsumerOverlay(brief[key]);
   if(brief.captionQualification&&!brief.caption?.includes(brief.captionQualification))throw Error('Topic-specific qualification must be retained in the supplied caption');
   if(!/năm trăm|500/iu.test(brief.script)||!/giá/iu.test(brief.script)||!/điều kiện/iu.test(brief.script)||!/bề mặt|vật liệu/iu.test(brief.script))throw Error('Story must cover identity/material questions/current-price inquiry');
   return brief;
@@ -234,7 +236,7 @@ async function main(args){
   }
   if(!reviewed&&prepared&&(await hashFile(prepared.path)!==prepared.sha256||prepared.modelManifestSha256!==runtime.modelSha256||prepared.runtimeConfigSha256!==await hashFile(runtime.configFile)))throw Error('Prepared narration bytes/runtime changed');
   const productSha256=await hashFile(productImage),scriptSha256=scaleHash(brief.script),
-    binding={intentId:item.id,intentHash:item.intentHash,planHash:plan.planHash,brief,groundingBindingHash:grounding.bindingHash,scenes,productSha256,profile,voiceModelManifestSha256:runtime.modelSha256,voiceHelperSha256:await hashFile(helper),ffmpegSha256:editing.ffmpegSha256,renderer:'scale-evergreen-preview-v11-reviewed-voice-import',...(prepared?{preparedVoiceSha256:prepared.sha256}: {}),...(reviewed?{reviewedVoiceProof:reviewed.proof}:{}),...(storyPlan?{storyPlan,storyRendererSha256:await hashFile(path.join(root,'src/story-edit.mjs'))}:{})},revision=scaleHash(binding).slice(0,16),
+    binding={intentId:item.id,intentHash:item.intentHash,planHash:plan.planHash,brief,groundingBindingHash:grounding.bindingHash,scenes,productSha256,profile,voiceModelManifestSha256:runtime.modelSha256,voiceHelperSha256:await hashFile(helper),ffmpegSha256:editing.ffmpegSha256,renderer:'scale-evergreen-preview-v12-no-production-labels',consumerOverlayPolicySha256:await hashFile(path.join(root,'src/consumer-overlays.mjs')),...(prepared?{preparedVoiceSha256:prepared.sha256}: {}),...(reviewed?{reviewedVoiceProof:reviewed.proof}:{}),...(storyPlan?{storyPlan,storyRendererSha256:await hashFile(path.join(root,'src/story-edit.mjs'))}:{})},revision=scaleHash(binding).slice(0,16),
     directory=path.join(root,'state/scale-video-preview',`${item.id}-${revision}`);
   await mkdir(directory,{recursive:true});const resolved=await realpath(directory),privateBase=await realpath(path.join(root,'state/scale-video-preview'));
   if(!resolved.startsWith(privateBase+path.sep))throw Error('Output must remain in the private preview folder');
@@ -276,7 +278,7 @@ async function main(args){
   const packshot=path.join(directory,'identity.mp4');await run(editing.ffmpeg,['-hide_banner','-loglevel','error','-y','-loop','1','-i',productImage,'-t',String(packshotSeconds),'-an','-vf','scale=900:950:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:510:color=0xf8f2ed,setsar=1,fps=30','-c:v','libx264','-preset','veryfast','-crf','20','-threads','2','-pix_fmt','yuv420p',packshot],{timeout:120000,windowsHide:true});segments.push(packshot);
   const identityOpening=brief.openingMode==='identity_to_context';
   const texts={brand:identityOpening?'SAKURA · 500 ml':'CHUYỆN NHÀ · HỎI ĐÚNG NHU CẦU',hook:wrapStoryCard(brief.headline),tension:wrapStoryCard(brief.tension),decision:wrapStoryCard(brief.decision),identity:wrapStoryCard(brief.identity),questions:brief.questions,price:brief.price,
-    stock:brief.stockLabel,identityNote:'Ảnh tham chiếu nhận diện chai · Không kiểm chứng hiệu quả',cta:publicVideoCopy(brief).cta};
+    stock:'',identityNote:'',cta:publicVideoCopy(brief).cta};
   for(const [name,text]of Object.entries(texts)){assertEvergreen(text);await writeFile(path.join(directory,name+'.txt'),text,'utf8');}
   const text=(name,size,y,enable,bold=false,color='0x392343')=>`drawtext=fontfile=${bold?'Arial-Bold.ttf':'Arial.ttf'}:textfile=${name}.txt:expansion=none:fontsize=${size}:fontcolor=${color}:x=(w-tw)/2:y=${y}:line_spacing=12${['cta','stock'].includes(name)?':box=1:boxcolor=0xf8f2ed:boxborderw=12':''}${enable?`:enable='${enable}'`:''}`;
   const filters=[text('brand',39,66,null,true),text('cta',38,214,identityOpening?`gte(t,${seconds-4})`:null,true),"drawbox=x=45:y=277:w=990:h=220:color=0x392343@0.9:t=fill:enable='lt(t,11)'",text('hook',58,300,'lt(t,3)',true,'white'),text('tension',54,320,'gte(t,3)*lt(t,7)',true,'white'),text('decision',52,300,'gte(t,7)*lt(t,11)',true,'white'),text('stock',29,532,'lt(t,11)'),text('identity',44,290,'gte(t,11)',true),text('questions',42,420,'gte(t,11)*lt(t,18)',true),text('price',43,420,'gte(t,18)',true),text('identityNote',28,1490,'gte(t,11)')];

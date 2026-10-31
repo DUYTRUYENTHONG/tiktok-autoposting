@@ -5,6 +5,8 @@ description: Create Vietnamese product stories from reviewed footage and authent
 
 # Video sản phẩm tiếng Việt
 
+Hook/export rule: remove workflow watermarks, scheduling text and blanket demo/production labels from new frames. Keep source provenance private and platform disclosures enabled. The creative itself must stay truthful without those labels: ordinary household actions are context, and actual Sakura application/results need evidence.
+
 Read the current campaign instructions and registered source intent before production. Sakura500ml cleaner and fabric spray are distinct products; match references and claims to the intent's actual product. Keep accepted posts and approved audio intact. Public copy uses the call-only CTA, “Gọi số điện thoại trong bio để được tư vấn,” and asks for the cleaning need and surface/material. Keep internal IDs, inquiry codes and filenames in private manifests. New promotions require actual current eligibility; unknown means evergreen copy.
 
 ## Build the story from usable footage
