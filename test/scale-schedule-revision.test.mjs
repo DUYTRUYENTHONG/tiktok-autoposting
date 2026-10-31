@@ -6,6 +6,23 @@ import path from 'node:path';
 import {buildScaleCampaign,scalePostHash} from '../src/scale-campaign.mjs';
 import {createScaleProgress} from '../src/scale-progress.mjs';
 import {hashFile} from '../src/store.mjs';
+import {tenDayReference} from '../src/ten-day-cadence.mjs';
+
+test('authorized50x10 revisions accept15-minute spacing and reject collisions, out-of-window slots and excess quota',async()=>{
+ const f=await fixture();try{
+  const now='2026-10-31T09:00:00Z',policy={kind:'scale-rolling-policy',account:'saigomlia',startDay:'2026-11-01',endDay:'2026-11-10',dailyTotal:50,targetTotal:500,targetPhoto:50,targetVideo:0,minSpacingMinutes:15,windowStart:'08:00',windowEnd:'22:15',timezone:'Asia/Ho_Chi_Minh',source:'user',verifiedAt:now,policyReference:tenDayReference};
+  await writeFile(f.policyFile,JSON.stringify(policy));const state=await f.readState();state.campaign.rollingGoal={...policy,dailyTarget:50};await writeFile(f.campaignFile,JSON.stringify(state));
+  const b=createScaleProgress({campaignFile:f.campaignFile,journalFile:f.journalFile,now:()=>now}),sha256=await hashFile(f.policyFile),photos=f.plan.items.filter(i=>i.format==='photo'),input=(i,at)=>({...f.revision(photos[i],at),policySha256:sha256});
+  await b.revise(photos[0].id,input(0,'2026-11-01T08:00:00+07:00'));
+  await b.revise(photos[1].id,input(1,'2026-11-01T08:15:00+07:00'));
+  await assert.rejects(b.revise(photos[2].id,input(2,'2026-11-01T08:20:00+07:00')),/spacing/);
+  const video=f.plan.items.find(i=>i.format==='video');await assert.rejects(b.revise(video.id,{...f.revision(video,'2026-11-01T09:00:00+07:00'),policySha256:sha256}),/photo intents only/);
+  for(const at of ['2026-10-31T20:00:00+07:00','2026-11-11T08:00:00+07:00'])await assert.rejects(b.revise(photos[2].id,input(2,at)),/outside/);
+  const full=await f.readState();for(let i=0;i<50;i++)full.queue.push({id:'preserved-'+i,account:'saigomlia',format:'photo',status:'scheduled',receipt:{platformId:String(7700000000000010000n+BigInt(i)),scheduledAt:'2026-11-02T'+String(8+Math.floor(i/4)).padStart(2,'0')+':'+String(i%4*15).padStart(2,'0')+':00+07:00',scheduledVerifiedAt:now}});await writeFile(f.campaignFile,JSON.stringify(full));
+  await assert.rejects(b.revise(photos[2].id,input(2,'2026-11-02T21:00:00+07:00')),/daily cap/);
+  assert.equal((await f.readState()).queue.length,51);assert.equal((await b.status()).items.filter(i=>i.revisionHash).length,2);
+ }finally{await f.cleanup();}
+});
 
 const NOW='2026-10-30T12:00:00Z',DAY='2026-10-30';
 const policyReference='2026-10-30 user: still need30posts more for today; answer Five-minute spacing tonight in call_f551da25c867465c87e34a607f80a12a';

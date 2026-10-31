@@ -5,6 +5,7 @@ import {voiceRuntime} from './voice.mjs';
 import {loadReviewedVoice} from './reviewed-voice.mjs';
 import {vietnamDay} from './daily-kpi.mjs';
 import {painpointStories} from './content-bank.mjs';
+import {rollingLimits} from './ten-day-cadence.mjs';
 
 const HOUR=3600000,DAY=24*HOUR,MINUTE=60000;
 export const scalePolicy=Object.freeze({version:1,campaignId:'sakura-scale-1000-20261029',account:'saigomlia',productId:'sakura-cleaner-500ml',earliestDay:'2026-10-29',total:1000,photo:500,video:500,dailyTotal:20,dailyPhoto:10,dailyVideo:10,minSpacingMinutes:20,windowStart:'08:00',windowEnd:'22:15',timezone:'Asia/Ho_Chi_Minh',location:'Vựa Sầu Riêng Cô Ba, 322 Đ. Huỳnh Thị Hai'});
@@ -182,6 +183,7 @@ export async function bindScaleCreative(item,evidence,{state={},now=new Date().t
   if(Number(item.proposedPublishAt.slice(14,16))%5!==0||Number(item.proposedPublishAt.slice(17,19))!==0)blockers.push('unsupported_native_five_minute_slot');
   if(Date.parse(item.proposedPublishAt)<Date.parse(now)+30*MINUTE)blockers.push('proposed_time_expired_or_too_near');
   if(evidence.account!==item.account)blockers.push('account_mismatch');if(evidence.location!==item.location)blockers.push('location_mismatch');
+  for(const tag of state.campaign?.requiredHashtags??[]){if(typeof tag!=='string'||!/^#[\p{L}\p{N}_]+$/u.test(tag)||!String(evidence.caption??'').split(/\s+/u).includes(tag))blockers.push('required_campaign_hashtag_missing');}
   const privateCodes=state.campaign?.publicPostCodes===false||evidence.publicPostCodes===false;
   if(privateCodes){
     if(typeof evidence.caption!=='string'||!evidence.caption.trim())blockers.push('caption_missing');
@@ -213,7 +215,7 @@ export async function bindScaleCreative(item,evidence,{state={},now=new Date().t
   if(window?.verified!==true||window.account!==item.account||!reviewTime(window.verifiedAt,now)||Date.parse(now)-Date.parse(window.verifiedAt)>24*HOUR||!validTime(window.earliest)||!validTime(window.latest)||Date.parse(item.proposedPublishAt)<Date.parse(window.earliest)||Date.parse(item.proposedPublishAt)>Date.parse(window.latest))blockers.push('actual_native_schedule_window_missing');
   try{const existing=collectScaleReservations(state).filter(r=>r.day===vietnamDay(item.proposedPublishAt));
     if(existing.some(r=>r.queueId===item.id))blockers.push('already_accepted_intent');
-    if(item.scheduleRevision?.policyKind==='scale-rolling-policy'){const cap=state.campaign?.rollingGoal?.dailyTarget===20?20:30;if(existing.length>=cap||existing.some(r=>Math.abs(Date.parse(r.at)-Date.parse(item.proposedPublishAt))<20*MINUTE))blockers.push('current_quota_or_spacing_conflict');}
+    if(item.scheduleRevision?.policyKind==='scale-rolling-policy'){const {cap,spacingMinutes}=rollingLimits(state,item.proposedPublishAt);if(existing.length>=cap||existing.some(r=>Math.abs(Date.parse(r.at)-Date.parse(item.proposedPublishAt))<spacingMinutes*MINUTE))blockers.push('current_quota_or_spacing_conflict');}
     else if(item.scheduleRevision){if(existing.length>=40||existing.some(r=>Math.abs(Date.parse(r.at)-Date.parse(item.proposedPublishAt))<5*MINUTE))blockers.push('current_quota_or_spacing_conflict');}
     else if(existing.length>=20||existing.filter(r=>r.format===item.format).length>=10||existing.some(r=>Math.abs(Date.parse(r.at)-Date.parse(item.proposedPublishAt))<20*MINUTE))blockers.push('current_quota_or_spacing_conflict');
   }catch(error){blockers.push('reconciliation_required: '+error.message);}

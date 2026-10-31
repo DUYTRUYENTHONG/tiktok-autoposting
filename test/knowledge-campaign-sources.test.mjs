@@ -47,7 +47,7 @@ test('actual LangChain evergreen identity, call CTA and latest editorial retriev
     for(const [query,id,copy] of [
       ['Dung tích Sakura?','sakura:identity:500ml',/500 ml/],
       ['CTA gọi số điện thoại trong bio','sakura:policy:call-only-cta',/Gọi số điện thoại trong bio/],
-      ['Chính sách video footage và giọng?','sakura:editorial:footage-video-policy',/20 verified public posts/],
+      ['Chính sách video footage và giọng?','sakura:editorial:footage-video-policy',/50verified native photo-carousel publications\/day/],
       ['Chính sách evergreen','sakura:policy:evergreen',/không in hoặc đọc/],
     ]){const result=await chain.invoke(ask(query));assert.equal(result.mode,'retrieval-and-prompt-only');assert.equal(result.status,'retrieved',query);assert.ok(result.sources.some(s=>s.id===id));assert.match(result.prompt,copy);}
     const identity=sources.find(s=>s.section==='identity');await utimes(path.join(f.dir,'docs','CAMPAIGN_GOAL.md'),new Date(at),new Date(at));
