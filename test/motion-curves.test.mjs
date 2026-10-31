@@ -1,0 +1,3 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {springEase,motionProvenance} from '../src/motion-curves.mjs';
+test('animation spring is deterministic, starts still and settles without drift',()=>{assert.equal(springEase(-1),0);assert.equal(springEase(0),0);const samples=Array.from({length:31},(_,i)=>springEase(i/30));assert.deepEqual(samples,Array.from({length:31},(_,i)=>springEase(i/30)));assert.ok(samples[3]>0&&samples[3]<samples[10]);assert.ok(Math.abs(samples.at(-1)-1)<.001);assert.equal(motionProvenance.scoreEnabled,false);});
+test('motion does not accept invalid physics or an unbounded clock',()=>{for(const args of [[NaN],[Infinity],[.1,0],[.1,170,-1]])assert.throws(()=>springEase(...args),/Finite time/);});

@@ -106,7 +106,8 @@ export function videoGroundingCopy(brief){
 export async function groundVideoBrief(brief,item,options={}){
   const index=options.index??await loadIndex(options.directory);
   if(!options.index&&buildIndex(await campaignSources()).corpusHash!==index.corpusHash)throw Error('Current campaign sources differ from the index; review and rebuild local knowledge before production');
-  const request={...options,index,publicCopy:videoGroundingCopy(brief),account:item.account,productId:item.productId};
+  const publicCopy=videoGroundingCopy(brief);if(options.additionalPublicCopy)publicCopy.animation=options.additionalPublicCopy;
+  const request={...options,index,publicCopy,account:item.account,productId:item.productId};
   const grounding=await createProductionGrounding(request);
   if(grounding.status!=='grounded'||grounding.evidenceCoveragePassed!==true)throw Error('Current production grounding unavailable: '+JSON.stringify(grounding.blockers??grounding.reason??grounding.status));
   const checked=await checkProductionGrounding(grounding,request);

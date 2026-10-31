@@ -1,14 +1,14 @@
 {
   "name": "sakura-content-lab",
-  "version": "0.1.0",
-  "description": "Vietnamese product research, carousel briefs, angle performance and verified posting operations.",
+  "version": "0.2.0",
+  "description": "Vietnamese product research, local JavaScript animation, reviewed voice edits and verified posting operations.",
   "author": { "name": "DUYTRUYENTHONG" },
   "skills": "./skills/",
   "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "Sakura Content Lab",
     "shortDescription": "Nghiên cứu, tạo nội dung và đo hiệu suất TikTok.",
-    "longDescription": "Local Vietnamese content workflows with evidence-linked angles, a 100-post campaign backlog and performance tools. Browser posting remains a separate verified action.",
+    "longDescription": "Local Vietnamese content workflows with evidence-linked angles, JavaScript Canvas animation and performance tools. The current campaign targets20 verified posts/day for50days; local renders are not native schedules. Browser posting remains a separate verified action.",
     "developerName": "DUYTRUYENTHONG",
     "category": "Productivity",
     "capabilities": [],

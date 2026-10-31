@@ -1,0 +1,7 @@
+# Prompt vận hành animation sản phẩm bằng JavaScript
+
+Dùng skill `vn-motion-video` trong bộ Sakura. Từ ảnh và footage người dùng cung cấp, chọn một tình huống đời thường có liên quan đến nhu cầu làm sạch; phân biệt rõ bối cảnh tham khảo với ảnh sản phẩm Sakura thật. Nêu người xem đang ngại điều gì, mở bằng một câu tự nhiên và có lý do xem tiếp, rồi trả lời bằng điều có bằng chứng. Kết thúc bằng “Gọi số điện thoại trong bio để được tư vấn”, nhắc người xem nói rõ chỗ cần lau và chất liệu.
+
+Kiểm tra câu chữ bằng `vn-natural-copy`; lấy dữ kiện sản phẩm và chính sách hiện tại từ RAG. Không gọi góc nội dung là thắng khi chưa có dữ liệu so sánh. Không thêm ưu đãi nếu chưa xác minh điều kiện. Không chèn mã nội bộ, tên file, trạng thái lên lịch hay watermark giải thích quy trình vào hình.
+
+Giữ nguyên WAV đã được nghe duyệt và timing ASR tương ứng. Chọn ảnh/crop rõ nét đã kiểm tra, giữ nhãn Sakura thật và loại crop gây hiểu nhầm thương hiệu khác. Với adapter hiện tại, dùng hai ảnh và tạo một thư mục bản dựng mới. Dùng mốc câu nói thật để chia cảnh; animation chỉ hướng sự chú ý vào ý đang nói. Ghi ý đồ trong DESIGN.md, render MP4 bằng JavaScript Canvas, kiểm tra frame mở đầu, chuyển cảnh, phụ đề, ảnh sản phẩm và CTA; chạy QC chỉ đọc. Xuất video xem thử và báo đúng phần còn chờ review. Nhạc Việt khác nhau cho từng bài được chọn trong thư viện thương mại của tài khoản ở bước TikTok, không tự tải nhạc ngoài hay khẳng định thứ hạng trend chưa kiểm chứng.

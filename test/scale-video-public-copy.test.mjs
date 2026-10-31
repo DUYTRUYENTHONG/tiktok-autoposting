@@ -83,6 +83,9 @@ test('scale video grounds the exact narration, overlays and generated caption an
   ];
   const sources=rows.map(([text,claimFields],i)=>({sourceId:evergreenRequiredSourceIds[i],productId:item.productId,promotionKey:'*',section:'test-fixture',text,claimFields,sourceUri:'test:synthetic-only',sourceHash:hash(text),verified:true,verifiedAt:'2026-10-31T00:00:00Z',validFrom:'2026-10-28T00:00:00Z',validTo:null}));
   const record=await groundVideoBrief(brief,item,{index:buildIndex(sources),asOf});
+  const animated=await groundVideoBrief(brief,item,{index:buildIndex(sources),asOf,additionalPublicCopy:{hook:'Hỏi rõ rồi hẵng chọn.'}});
+  assert.notEqual(animated.publicCopyHash,record.publicCopyHash);assert.notEqual(animated.bindingHash,record.bindingHash);
+  await assert.rejects(groundVideoBrief(brief,item,{index:buildIndex(sources),asOf,additionalPublicCopy:{hook:'Mua1tặng1'}}),/grounding unavailable/);
   assert.equal(record.status,'grounded');assert.equal(record.ready,false);assert.equal(record.scriptHash,hash(brief.script));
   const copy=videoGroundingCopy(brief);assert.equal(copy.caption,publicVideoCopy(brief).caption);assert.equal(copy.questions,brief.questions);
   for(const changed of [{...brief,script:brief.script+' Hỏi rõ rồi hãy chọn.'},{...brief,headline:'Một câu hỏi trước khi chọn.'}]){

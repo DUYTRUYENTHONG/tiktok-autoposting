@@ -6,6 +6,7 @@ import {createHash} from 'node:crypto';
 
 const result=await build({entryPoints:[path.join(root,'src','mcp.mjs')],outfile:path.join(root,'dist','sakura-mcp.mjs'),bundle:true,metafile:true,platform:'node',target:'node22',format:'esm',banner:{js:"import { createRequire as __sakuraCreateRequire } from 'node:module'; const require = __sakuraCreateRequire(import.meta.url);"},legalComments:'eof'});
 const voiceRoot=path.join(root,'plugins','sakura-voice-lab');
+const motionResult=await build({entryPoints:[path.join(root,'src','motion-mcp.mjs')],outfile:path.join(root,'dist','sakura-motion-mcp.mjs'),bundle:true,metafile:true,platform:'node',target:'node22',format:'esm',banner:{js:"import { createRequire as __motionCreateRequire } from 'node:module'; const require = __motionCreateRequire(import.meta.url);"},legalComments:'eof'});
 const voiceResult=await build({entryPoints:[path.join(root,'src','voice-mcp.mjs')],outfile:path.join(voiceRoot,'dist','voice-mcp.mjs'),bundle:true,metafile:true,platform:'node',target:'node22',format:'esm',banner:{js:"import { createRequire as __voiceCreateRequire } from 'node:module'; const require = __voiceCreateRequire(import.meta.url);"},legalComments:'eof'});
 await mkdir(path.join(voiceRoot,'scripts'),{recursive:true});
 await cp(path.join(root,'scripts','voice-render.py'),path.join(voiceRoot,'scripts','voice-render.py'));
@@ -15,7 +16,7 @@ await cp(path.join(root,'skills','vn-voiceover'),path.join(voiceRoot,'skills','v
 await mkdir(path.join(root,'dist','licenses'),{recursive:true});
 // Preserve the full notices of every package whose code enters the bundle.
 const packages=new Set();
-for(const input of new Set([...Object.keys(result.metafile.inputs),...Object.keys(voiceResult.metafile.inputs)])){
+for(const input of new Set([...Object.keys(result.metafile.inputs),...Object.keys(voiceResult.metafile.inputs),...Object.keys(motionResult.metafile.inputs)])){
   const normalized=input.replaceAll('\\','/'),offset=normalized.lastIndexOf('node_modules/');
   if(offset<0)continue;
   const tail=normalized.slice(offset+13).split('/'),count=tail[0].startsWith('@')?2:1;
@@ -39,5 +40,6 @@ for(const relative of [...packages].sort()){
   }
 }
 await writeFile(path.join(root,'dist','licenses','NOTICE.txt'),notices.join('\n')+'\n','utf8');
+for(const name of ['animate-MIT.txt','digitalsamba-video-toolkit-MIT.txt'])await cp(path.join(root,'third-party',name),path.join(root,'dist/licenses',name));
 await cp(path.join(root,'dist','licenses'),path.join(voiceRoot,'dist','licenses'),{recursive:true});
 console.log('Built dist/sakura-mcp.mjs with dependency notices.');

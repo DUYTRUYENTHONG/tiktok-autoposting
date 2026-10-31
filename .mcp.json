@@ -1,5 +1,9 @@
 {
   "mcpServers": {
+    "sakura-motion": {
+      "command": "node",
+      "args": ["${PLUGIN_ROOT}/dist/sakura-motion-mcp.mjs"]
+    },
     "sakura-campaign": {
       "command": "node",
       "args": ["${PLUGIN_ROOT}/dist/sakura-mcp.mjs"]

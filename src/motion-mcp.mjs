@@ -1,0 +1,12 @@
+import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
+import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
+import {z} from 'zod';
+import {motionStatus,inspectMotionReceipt,motionQuality,renderMotionPlan} from './motion-tools.mjs';
+const server=new McpServer({name:'sakura-motion-lab',version:'0.1.0'});
+const read={readOnlyHint:true,destructiveHint:false,idempotentHint:true,openWorldHint:false};
+const reply=fn=>async args=>{try{return {content:[{type:'text',text:JSON.stringify(await fn(args),null,2)}]};}catch(e){return {isError:true,content:[{type:'text',text:e.message}]};}};
+server.registerTool('motion_status',{description:'Read the local JavaScript animation capabilities and pinned toolkit sources. No posting or training.',inputSchema:{},annotations:read},reply(()=>motionStatus()));
+server.registerTool('motion_inspect',{description:'Verify actual MP4 bytes against a private local Canvas render receipt.',inputSchema:{receiptFile:z.string().min(1)},annotations:read},reply(({receiptFile})=>inspectMotionReceipt(receiptFile)));
+server.registerTool('motion_quality',{description:'Measure local video frames and loudness with pinned read-only Digital Samba functions. Does not modify audio/video.',inputSchema:{receiptFile:z.string().min(1)},annotations:read},reply(({receiptFile})=>motionQuality(receiptFile)));
+server.registerTool('motion_render',{description:'Render a reviewed private photo-story plan to a new local MP4. Requires exact voice approval and RAG checks; preserves existing renders. No TikTok, cloud providers or music downloads. On timeout inspect output and lock before any retry.',inputSchema:{planFile:z.string().min(1)},annotations:{readOnlyHint:false,destructiveHint:false,idempotentHint:false,openWorldHint:false}},reply(({planFile})=>renderMotionPlan(planFile)));
+await server.connect(new StdioServerTransport());
