@@ -6,6 +6,7 @@ import {fileURLToPath} from 'node:url';
 import {root,hashFile,loadState} from '../src/store.mjs';
 import {voiceRuntime,voiceHome,voiceProfile,captionWithVoiceCredit} from '../src/voice.mjs';
 import {inspectWav} from '../src/wav.mjs';
+import {loadReviewedVoice} from '../src/reviewed-voice.mjs';
 import {scalePolicy,scaleHash,containsDiscount} from '../src/scale-campaign.mjs';
 import {createProductionGrounding,checkProductionGrounding} from '../src/knowledge/production-grounding.mjs';
 import {buildIndex,loadIndex} from '../src/knowledge/index.mjs';
@@ -190,7 +191,7 @@ async function selfTest(){
 async function main(args){
   if(args.length===1&&args[0]==='--self-test'){await selfTest();return;}
   const options={};
-  for(let i=0;i<args.length;){const key=args[i++]?.replace(/^--/u,'');if(['grounding-only','voice-only'].includes(key)){options[key]=true;continue;}if(!['plan','id','brief','captions','voice-receipt'].includes(key)||!args[i]||args[i].startsWith('--'))throw Error('Use --id EXISTING_SCALE_VIDEO [--plan FILE] [--brief FILE] [--captions RECEIPT] [--voice-receipt RECEIPT] [--grounding-only | --voice-only]');options[key]=args[i++];}
+  for(let i=0;i<args.length;){const key=args[i++]?.replace(/^--/u,'');if(['grounding-only','voice-only'].includes(key)){options[key]=true;continue;}if(!['plan','id','brief','captions','voice-receipt','voice-approval'].includes(key)||!args[i]||args[i].startsWith('--'))throw Error('Use --id EXISTING_SCALE_VIDEO [--plan FILE] [--brief FILE] [--captions RECEIPT] [--voice-receipt RECEIPT] [--voice-approval EXACT_APPROVAL] [--grounding-only | --voice-only]');options[key]=args[i++];}
   if(options['grounding-only']&&options['voice-only'])throw Error('Choose one preparation-only mode');
   const canonical=await loadState();options.plan=registeredPlanFile(canonical,options.plan);
   if(await hashFile(options.plan)!==canonical.campaign.scaleCampaign.manifestSha256)throw Error('Registered scale plan bytes changed');
@@ -213,12 +214,15 @@ async function main(args){
     return {id,source:clip.source,sha256:clip.sourceSha256,sourceUrl:clip.sourceUrl,width:clip.width,height:clip.height,start:range.start,duration:3,cropCenterX:range.cropCenterX??.5,role:'stock_context_not_product_demo'};
   });
   for(const scene of scenes)if(await hashFile(scene.source)!==scene.sha256)throw Error('Footage source changed:'+scene.id);
-  const editing=await loadEditingRuntime(path.join(root,'state/footage-toolchain/runtime.json')),runtime=await voiceRuntime(voiceHome),profile=voiceProfile(runtime);
-  if(runtime.provider!=='vieneu'||profile.voice!=='Thùy Dung'||profile.speed!==1.2||profile.referenceStyle!=='speaker-only'||profile.temperature!==.8)throw Error('Expected existing accepted B profile; no substitution');
-  const prepared=options['voice-receipt']?validatePreparedVoice(JSON.parse(await readFile(options['voice-receipt'],'utf8')),brief.script,profile):null;
-  if(prepared&&(await hashFile(prepared.path)!==prepared.sha256||prepared.modelManifestSha256!==runtime.modelSha256||prepared.runtimeConfigSha256!==await hashFile(runtime.configFile)))throw Error('Prepared narration bytes/runtime changed');
-  const helper=path.join(root,'scripts/voice-vieneu.py'),productSha256=await hashFile(productImage),scriptSha256=scaleHash(brief.script),
-    binding={intentId:item.id,intentHash:item.intentHash,planHash:plan.planHash,brief,groundingBindingHash:grounding.bindingHash,scenes,productSha256,profile,voiceModelManifestSha256:runtime.modelSha256,voiceHelperSha256:await hashFile(helper),ffmpegSha256:editing.ffmpegSha256,renderer:'scale-evergreen-preview-v10-context-framing',...(prepared?{preparedVoiceSha256:prepared.sha256}: {})},revision=scaleHash(binding).slice(0,16),
+  const editing=await loadEditingRuntime(path.join(root,'state/footage-toolchain/runtime.json')),runtime=await voiceRuntime(voiceHome),helper=path.join(root,'scripts/voice-vieneu.py');
+  if(options['voice-approval']&&!options['voice-receipt'])throw Error('Reviewed voice import requires its exact source receipt');
+  const reviewed=options['voice-approval']?await loadReviewedVoice({receiptFile:path.resolve(options['voice-receipt']),approvalFile:path.resolve(options['voice-approval']),script:brief.script,item,runtime,helperFile:helper}):null;
+  const profile=reviewed?.profile??voiceProfile(runtime);
+  if(!reviewed&&(runtime.provider!=='vieneu'||profile.voice!=='Thùy Dung'||profile.speed!==1.2||profile.referenceStyle!=='speaker-only'||profile.temperature!==.8))throw Error('Expected existing accepted B profile; no substitution');
+  const prepared=reviewed?.voice??(options['voice-receipt']?validatePreparedVoice(JSON.parse(await readFile(options['voice-receipt'],'utf8')),brief.script,profile):null);
+  if(!reviewed&&prepared&&(await hashFile(prepared.path)!==prepared.sha256||prepared.modelManifestSha256!==runtime.modelSha256||prepared.runtimeConfigSha256!==await hashFile(runtime.configFile)))throw Error('Prepared narration bytes/runtime changed');
+  const productSha256=await hashFile(productImage),scriptSha256=scaleHash(brief.script),
+    binding={intentId:item.id,intentHash:item.intentHash,planHash:plan.planHash,brief,groundingBindingHash:grounding.bindingHash,scenes,productSha256,profile,voiceModelManifestSha256:runtime.modelSha256,voiceHelperSha256:await hashFile(helper),ffmpegSha256:editing.ffmpegSha256,renderer:'scale-evergreen-preview-v11-reviewed-voice-import',...(prepared?{preparedVoiceSha256:prepared.sha256}: {}),...(reviewed?{reviewedVoiceProof:reviewed.proof}:{})},revision=scaleHash(binding).slice(0,16),
     directory=path.join(root,'state/scale-video-preview',`${item.id}-${revision}`);
   await mkdir(directory,{recursive:true});const resolved=await realpath(directory),privateBase=await realpath(path.join(root,'state/scale-video-preview'));
   if(!resolved.startsWith(privateBase+path.sep))throw Error('Output must remain in the private preview folder');
@@ -228,7 +232,7 @@ async function main(args){
   await writeFile(path.join(directory,'brief.json'),JSON.stringify(brief,null,2),'utf8');await writeFile(path.join(directory,'binding.json'),JSON.stringify(binding,null,2),'utf8');
   await writeFile(path.join(directory,'grounding.json'),JSON.stringify(grounding,null,2),'utf8');
   const producerSnapshot=path.join(directory,'producer-source.mjs');await copyFile(fileURLToPath(import.meta.url),producerSnapshot);
-  const scriptFile=path.join(directory,'script.txt'),wav=path.join(directory,'voice.wav'),voiceReceiptFile=path.join(directory,'voice-receipt.json'),runtimeConfigSha256=await hashFile(runtime.configFile);
+  const scriptFile=path.join(directory,'script.txt'),wav=path.join(directory,'voice.wav'),voiceReceiptFile=path.join(directory,'voice-receipt.json'),runtimeConfigSha256=reviewed?.voice.runtimeConfigSha256??await hashFile(runtime.configFile);
   const cachedVoice=await loadCachedVoice(voiceReceiptFile,{script:brief.script,profile,modelSha256:runtime.modelSha256,runtimeConfigSha256});
   await writeFile(scriptFile,brief.script,'utf8');
   const command=[runtime.python,'-I',helper,'--config',runtime.configFile,'--input',scriptFile,'--output',wav,'--voice',profile.voice,'--speed','1.2','--reference-style','speaker-only'];
@@ -237,8 +241,8 @@ async function main(args){
   if(cachedVoice){workerOutput=JSON.stringify({reused:true,source:cachedVoice.path,sha256:cachedVoice.sha256});}
   else if(prepared){await copyFile(prepared.path,wav);workerOutput=JSON.stringify({reused:true,source:prepared.path,sha256:prepared.sha256});}
   else({stdout:workerOutput}=await run(command[0],command.slice(1),{timeout:300000,maxBuffer:1024*1024,windowsHide:true,env:{...process.env,PYTHONUTF8:'1'}}));
-  const qa=inspectWav(await readFile(wav)),voice=cachedVoice??{path:wav,sha256:await hashFile(wav),script:brief.script,scriptFile,scriptSha256,qa,provider:'vieneu',...profile,status:'rendered_needs_listening',listeningVerified:false,offline:true,
-    command:prepared?null:command,...(prepared?{sourceVoiceReceipt:{path:path.resolve(options['voice-receipt']),sha256:await hashFile(options['voice-receipt']),sourceAudioPath:prepared.path,sourceAudioSha256:prepared.sha256}}:{}),workerOutput:workerOutput.trim(),runtimeConfigSha256:await hashFile(runtime.configFile),modelManifest:runtime.modelManifest,modelManifestSha256:runtime.modelSha256,helperSha256:binding.voiceHelperSha256,attribution:runtime.attribution};
+  const qa=inspectWav(await readFile(wav)),voice=cachedVoice??{path:wav,sha256:await hashFile(wav),script:brief.script,scriptFile,scriptSha256,qa,provider:'vieneu',...profile,status:reviewed?'rendered_exact_listening_verified':'rendered_needs_listening',listeningVerified:Boolean(reviewed),offline:true,
+    command:prepared?null:command,...(prepared?{sourceVoiceReceipt:{path:path.resolve(options['voice-receipt']),sha256:await hashFile(options['voice-receipt']),sourceAudioPath:prepared.path,sourceAudioSha256:prepared.sha256}}:{}),...(reviewed?{reviewedVoiceProof:reviewed.proof,sourceListeningApproval:reviewed.approval}:{}),workerOutput:workerOutput.trim(),runtimeConfigSha256,modelManifest:runtime.modelManifest,modelManifestSha256:runtime.modelSha256,helperSha256:binding.voiceHelperSha256,attribution:runtime.attribution};
   if(!cachedVoice)await writeFile(voiceReceiptFile,JSON.stringify(voice,null,2),'utf8');
   if(qa.durationSeconds<18||qa.durationSeconds>25)throw Error('Narration must be18–25s for the20–25s final video; preserve the chosen speed');
   if(options['voice-only']){console.log(JSON.stringify({id:item.id,status:'rendered_needs_listening',voiceReceiptFile,path:voice.path,sha256:voice.sha256,seconds:qa.durationSeconds,cached:!!cachedVoice,mediaRendered:0,publicationReady:false}));return;}

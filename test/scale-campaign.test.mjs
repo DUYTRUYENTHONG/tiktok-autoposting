@@ -121,6 +121,8 @@ test('readyasset proof rechecks actual reservations and never inherits101listeni
     e.subtitles={path:ass,sha256:await hashFile(ass),audioSha256:e.voice.sha256,scriptSha256:e.voice.scriptSha256};e.music.mixBelowNarrationVerified=true;
     const postHash=scalePostHash(item,e);e.visualReview.postHash=postHash;e.offerReview.postHash=postHash;e.playbackReview={verified:true,postHash,verifiedAt:now};
     const result=await bindScaleCreative(item,e,{state:state(),now});assert.equal(result.readiness.ready,false);assert.ok(result.readiness.blockers.includes('exact_noninherited_voice_listening_missing'));
+    e.voice.referenceStyle='preset';e.voice.reviewedVoiceProof={};
+    const candidate=await bindScaleCreative(item,e,{state:state(),now});assert.ok(candidate.readiness.blockers.includes('reviewed_voice_provenance_mismatch'));assert.ok(candidate.readiness.blockers.includes('voice_profile_or_script_mismatch'));
     const expired=await bindScaleCreative(photo,photoEvidence,{state:state(),now:'2026-10-29T01:05:00Z'});assert.ok(expired.readiness.blockers.includes('proposed_time_expired_or_too_near'));
   }finally{await rm(folder,{recursive:true,force:true});}
 });

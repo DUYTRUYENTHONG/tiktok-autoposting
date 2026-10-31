@@ -1,6 +1,8 @@
 import {createHash} from 'node:crypto';
 import path from 'node:path';
-import {hashFile} from './store.mjs';
+import {hashFile,root} from './store.mjs';
+import {voiceRuntime} from './voice.mjs';
+import {loadReviewedVoice} from './reviewed-voice.mjs';
 import {vietnamDay} from './daily-kpi.mjs';
 import {painpointStories} from './content-bank.mjs';
 
@@ -211,13 +213,23 @@ export async function bindScaleCreative(item,evidence,{state={},now=new Date().t
   if(window?.verified!==true||window.account!==item.account||!reviewTime(window.verifiedAt,now)||Date.parse(now)-Date.parse(window.verifiedAt)>24*HOUR||!validTime(window.earliest)||!validTime(window.latest)||Date.parse(item.proposedPublishAt)<Date.parse(window.earliest)||Date.parse(item.proposedPublishAt)>Date.parse(window.latest))blockers.push('actual_native_schedule_window_missing');
   try{const existing=collectScaleReservations(state).filter(r=>r.day===vietnamDay(item.proposedPublishAt));
     if(existing.some(r=>r.queueId===item.id))blockers.push('already_accepted_intent');
-    if(item.scheduleRevision?.policyKind==='scale-rolling-policy'){if(existing.length>=30||existing.some(r=>Math.abs(Date.parse(r.at)-Date.parse(item.proposedPublishAt))<20*MINUTE))blockers.push('current_quota_or_spacing_conflict');}
+    if(item.scheduleRevision?.policyKind==='scale-rolling-policy'){const cap=state.campaign?.rollingGoal?.dailyTarget===20?20:30;if(existing.length>=cap||existing.some(r=>Math.abs(Date.parse(r.at)-Date.parse(item.proposedPublishAt))<20*MINUTE))blockers.push('current_quota_or_spacing_conflict');}
     else if(item.scheduleRevision){if(existing.length>=40||existing.some(r=>Math.abs(Date.parse(r.at)-Date.parse(item.proposedPublishAt))<5*MINUTE))blockers.push('current_quota_or_spacing_conflict');}
     else if(existing.length>=20||existing.filter(r=>r.format===item.format).length>=10||existing.some(r=>Math.abs(Date.parse(r.at)-Date.parse(item.proposedPublishAt))<20*MINUTE))blockers.push('current_quota_or_spacing_conflict');
   }catch(error){blockers.push('reconciliation_required: '+error.message);}
   if(item.requirements.voiceRequired){
     const voice=evidence.voice;await verifyBytes(voice,'voice',blockers);
-    if(voice?.voice!=='Thùy Dung'||voice?.speed!==1.2||voice?.referenceStyle!=='speaker-only'||voice?.scriptSha256!==scaleHash(spoken))blockers.push('voice_profile_or_script_mismatch');
+    let exactReviewedProfile=false;
+    if(voice?.reviewedVoiceProof){
+      try{
+        const proof=voice.reviewedVoiceProof;
+        if(!path.isAbsolute(proof.sourceReceiptFile??'')||!path.isAbsolute(proof.approvalFile??''))throw Error('Absolute reviewed voice proof required');
+        const reviewed=await loadReviewedVoice({receiptFile:proof.sourceReceiptFile,approvalFile:proof.approvalFile,script:spoken,item,runtime:await voiceRuntime(),helperFile:path.join(root,'scripts','voice-vieneu.py'),now});
+        exactReviewedProfile=reviewed.voice.sha256===voice.sha256&&reviewed.profile.voice===voice.voice&&reviewed.profile.speed===voice.speed&&reviewed.profile.temperature===voice.temperature&&reviewed.profile.referenceStyle===voice.referenceStyle&&reviewed.proof.approvalSha256===proof.approvalSha256&&reviewed.proof.sourceReceiptSha256===proof.sourceReceiptSha256;
+        if(!exactReviewedProfile)blockers.push('reviewed_voice_provenance_mismatch');
+      }catch{blockers.push('reviewed_voice_provenance_mismatch');}
+    }
+    if(voice?.voice!=='Thùy Dung'||voice?.speed!==1.2||voice?.referenceStyle!=='speaker-only'&&!exactReviewedProfile||voice?.scriptSha256!==scaleHash(spoken))blockers.push('voice_profile_or_script_mismatch');
     if(voice?.listeningReview?.verified!==true||voice.listeningReview.queueId!==item.id||voice.listeningReview.audioSha256!==voice.sha256||!reviewTime(voice.listeningReview.verifiedAt,now))blockers.push('exact_noninherited_voice_listening_missing');
     await verifyBytes(evidence.subtitles,'subtitles',blockers);if(evidence.subtitles?.audioSha256!==voice?.sha256||evidence.subtitles?.scriptSha256!==scaleHash(spoken))blockers.push('subtitle_audio_or_script_binding_missing');
     if(evidence.playbackReview?.verified!==true||evidence.playbackReview.postHash!==postHash||!reviewTime(evidence.playbackReview.verifiedAt,now)||music?.mixBelowNarrationVerified!==true)blockers.push('final_playback_or_music_mix_review_missing');

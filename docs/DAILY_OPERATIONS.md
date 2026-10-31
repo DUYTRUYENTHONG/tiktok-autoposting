@@ -2,7 +2,7 @@
 
 Latest October29 rule: internal post IDs and inquiry codes stay private. New public images, captions, narration and CTAs omit them, and progress updates describe the content in plain language. The call CTA remains “Gọi số điện thoại trong bio để được tư vấn”; ask for the cleaning need and material/surface. Earlier code-based examples below are historical schemas, not instructions to print codes. Keep existing accepted posts unchanged. Attribute calls only when evidence identifies a post; otherwise leave attribution unknown.
 
-The current KPI is30 unique receipt-verified published posts per Asia/Ho_Chi_Minh day during October31–November29,2026, aiming15photos/15videos where preserved reservations permit. This supersedes20/day. The first100 remains a cumulative milestone. Scheduled and under-review posts are shown separately. They reserve capacity but do not satisfy the publication KPI. See [30-day rollout](THIRTY_DAY_ROLLOUT.md).
+The current KPI is20 unique receipt-verified published posts per Asia/Ho_Chi_Minh day for50days, October31–December19,2026inclusive. This supersedes30/day for30days. Preserve the100-video priority and accepted reservations; use the existing format mix where those permit. The first100 remains a cumulative milestone. Scheduled and under-review posts reserve capacity but do not satisfy the publication KPI. See [50-day rollout](FIFTY_DAY_ROLLOUT.md).
 
 The dated tracker target is stored as `campaign.dailyTargetSchedule` with fromDay/throughDay/target. `dailyKpi` applies it only within that authorized window; the existing `dailyTarget` remains the fallback for historical/outside-window reporting. A target update does not prepare, schedule or publish content. Check that the tracker HTTP service is actually running before describing its URL as live; a saved trackerUrl is not service-health evidence.
 
@@ -10,7 +10,7 @@ For the active1,000-post expansion, use the registered immutable500photo/500vide
 
 Preserve the nine original schedules. Reconcile the browser submission journal before planning. `node scripts/configure-daily.mjs` prepares today's and tomorrow's remaining experimental slots, excluding existing reservations and uncertain outcomes. It does not upload. Review local plans at http://127.0.0.1:4318/review. If a slot expires, replan only unsubmitted items. Never repeat an uncertain submission.
 
-The existing recurring follow-up is **Sakura · 30 posts per day**,05:30 preparation and22:30 publication review in Vietnam time, attached to the current chat. Its saved app configuration was updated through the automation tool on October31. Its maintained operating prompt is [automation/PROMPT.md](../automation/PROMPT.md). Background publishing has not yet been verified. Keep Codex and the computer available; close task browser tabs after completed actions as requested. Use private campaign.trackerUrl for the currently running dashboard if it differs from the default port.
+The recurring follow-up uses **Sakura · 20 posts per day · 50 days**,05:30 preparation and22:30 publication review in Vietnam time, attached to the current chat. The maintained prompt is [automation/PROMPT.md](../automation/PROMPT.md); verify saved app configuration through the automation tool when changing it. Background publishing has not yet been verified. Keep Codex and the computer available; close task browser tabs after completed actions as requested. A saved campaign.trackerUrl does not establish a running service.
 
 ## Creative and lead measurement
 

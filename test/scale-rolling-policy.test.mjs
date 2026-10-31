@@ -3,13 +3,14 @@ import assert from 'node:assert/strict';
 import {mkdtemp,mkdir,readFile,writeFile,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import path from 'node:path';
-import {buildScaleCampaign,scalePostHash} from '../src/scale-campaign.mjs';
+import {buildScaleCampaign,scalePostHash,bindScaleCreative} from '../src/scale-campaign.mjs';
 import {createScaleProgress} from '../src/scale-progress.mjs';
 import {hashFile} from '../src/store.mjs';
 
 const now='2026-10-31T09:00:00+07:00',day='2026-10-31';
 const oldReference='2026-10-30 user: still need30posts more for today; answer Five-minute spacing tonight in call_f551da25c867465c87e34a607f80a12a';
 const rollingReference='2026-10-31 user: we do need 30 posts per day. schedule it for the next 30 days.';
+const fiftyReference='2026-10-31 user: continue to schedule20posts per day; schedule for50days first; set the goal again.';
 async function fixture(){const dir=await mkdtemp(path.join(tmpdir(),'scale-rolling-')),campaignFile=path.join(dir,'campaign.json'),planFile=path.join(dir,'plan.json'),journalFile=path.join(dir,'progress.json'),policyFile=path.join(dir,'rolling-policy.json'),oldPolicyFile=path.join(dir,'old-policy.json');
   const state={account:'saigomlia',campaign:{publicPostCodes:false},products:[{id:'sakura-cleaner-500ml'}],queue:[{id:'existing',account:'saigomlia',format:'photo',status:'scheduled',receipt:{platformId:'7711000000000000001',scheduledAt:`${day}T10:00:00+07:00`,scheduledVerifiedAt:now}}],posts:[],angles:[]};
   const plan=buildScaleCampaign(state,{now:'2026-10-28T08:00:00Z'});await writeFile(planFile,JSON.stringify(plan));state.campaign.scaleCampaign={campaignId:plan.campaignId,planHash:plan.planHash,manifestFile:planFile,manifestSha256:await hashFile(planFile),counts:plan.counts};await writeFile(campaignFile,JSON.stringify(state));
@@ -38,4 +39,18 @@ test('rolling allocation counts other revised and submitting slots without chang
   await assert.rejects(b.revise(third.id,await f.input(third,`${day}T11:15:00+07:00`)),/spacing/i);assert.deepEqual((await f.readState()).queue[0].receipt,before);
 }finally{await f.cleanup();}});
 test('rolling policy bytes are rechecked on reload and cannot be swapped after binding',async()=>{const f=await fixture();try{const item=f.plan.items[0],b=f.bridge(),revision=await b.revise(item.id,await f.input(item)),r=JSON.parse(await readFile(f.journalFile,'utf8')).records[item.id],effective={...item,proposedPublishAt:revision.effectivePublishAt,scheduleRevision:r.scheduleRevision};assert.equal((await b.bind(item.id,await f.evidence(effective))).status,'ready');await writeFile(f.policyFile,JSON.stringify({...f.policy,minSpacingMinutes:5}));await assert.rejects(b.status(),/checksum/i);await assert.rejects(b.submitting(item.id),/checksum/i);
+}finally{await f.cleanup();}});
+
+test('latest20x50 policy extends local revisions throughDecember19 and blocks the superseded30/day authority',async()=>{const f=await fixture();try{
+ const file=path.join(f.dir,'twenty-fifty.json'),policy={...f.policy,endDay:'2026-12-19',dailyTotal:20,targetTotal:1000,targetPhoto:10,targetVideo:10,policyReference:fiftyReference};await writeFile(file,JSON.stringify(policy));
+ const s=await f.readState();s.campaign.rollingGoal={dailyTarget:20,policyReference:fiftyReference};await writeFile(f.campaignFile,JSON.stringify(s));
+ const b=f.bridge(),item=f.plan.items[0];await assert.rejects(b.revise(item.id,await f.input(item)),/latest registered/);
+ const revised=await b.revise(item.id,await f.input(item,'2026-12-19T11:00:00+07:00',file));assert.equal(revised.effectivePublishAt,'2026-12-19T11:00:00+07:00');assert.equal((await b.status()).items.find(x=>x.id===item.id).effectivePublishAt,revised.effectivePublishAt);
+ await assert.rejects(b.revise(f.plan.items[1].id,await f.input(f.plan.items[1],'2026-12-20T11:00:00+07:00',file)),/outside authorized/);
+}finally{await f.cleanup();}});
+test('latest20x50 cap counts20 accepted reservations and refuses one more without changing them',async()=>{const f=await fixture();try{
+ const file=path.join(f.dir,'twenty-fifty.json'),policy={...f.policy,endDay:'2026-12-19',dailyTotal:20,targetTotal:1000,targetPhoto:10,targetVideo:10,policyReference:fiftyReference};await writeFile(file,JSON.stringify(policy));
+ const s=await f.readState();s.campaign.rollingGoal={dailyTarget:20,policyReference:fiftyReference};for(let i=0;i<19;i++)s.queue.push({id:'kept-'+i,account:'saigomlia',format:'photo',status:'scheduled',receipt:{platformId:String(7720000000000000000n+BigInt(i)),scheduledAt:`${day}T${String(8+Math.floor(i/3)).padStart(2,'0')}:${String(i%3*20).padStart(2,'0')}:00+07:00`,scheduledVerifiedAt:now}});await writeFile(f.campaignFile,JSON.stringify(s));const before=await readFile(f.campaignFile,'utf8');
+ await assert.rejects(f.bridge().revise(f.plan.items[0].id,await f.input(f.plan.items[0],`${day}T20:00:00+07:00`,file)),/daily cap/);assert.equal(await readFile(f.campaignFile,'utf8'),before);
+ const direct={...f.plan.items[0],proposedPublishAt:`${day}T20:00:00+07:00`,scheduleRevision:{policyKind:'scale-rolling-policy',originalPublishAt:f.plan.items[0].proposedPublishAt}};assert.ok((await bindScaleCreative(direct,await f.evidence(direct),{state:s,now})).readiness.blockers.includes('current_quota_or_spacing_conflict'));
 }finally{await f.cleanup();}});

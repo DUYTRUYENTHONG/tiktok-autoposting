@@ -1,5 +1,9 @@
 # TikTok Autoposting agent instructions
 
+- Latest October31 cadence supersedes30/day:20verified publications/day for50days, October31–December19inclusiveUTC+7,1,000daily positions including accepted reservations. Preserve accepted posts and the registered immutable source plan. Use docs/FIFTY_DAY_ROLLOUT.md and the newly registered policy/allocation; do not restart the initializer. Keep the100-video priority within this capacity. Report any intent/asset/native-horizon shortfall instead of duplicating accepted posts.
+
+- October31 voice update: the user approved the exact20.456second reference-code narration in call_b2e961641b2147da96476a7a811dd959. Its private approval binds the full WAV/script/receipt. This permits reuse of that audio for its story, not synthesis approval for later scripts or silent global runtime activation. Preserve old accepted audio/posts and source config/command provenance.
+
 - October31 hook direction: emphasize one meaningful focus phrase in each new opening, state the buyer concern/reason to continue, and earn the promised payoff before CTA. Keep exact-script/hash-bound pause/emphasis directions outside speech; vary mechanisms rather than repeat a hook formula. The separate viet-commerce-tts hook-review CLI checks editorial consistency only, not audible prosody or training. Preserve approved WAVs; train only from consented human recordings after existing gates.
 
 - Gwen-TTS is reviewed as a separate Qwen3 preparation-only backend; see docs/GWEN_TTS.md. Use voice:gwen:prepare for original consented human datasets only. Do not import bundled named-speaker references, reuse VieNeu adapters, treat4GB inference VRAM as a training requirement, download weights, train or activate a voice merely because the exporter exists. RAG review context is not acoustic training data.
@@ -10,7 +14,7 @@
 
 - Herk Edit Kit is pinned in config/herk-edit-kit.json. Before applying its installed editing skills, read skills/vn-herk-edit/SKILL.md; resolve upstream root-relative resources from the complete private checkout, preserve Sakura RAG/voice/publication gates, and use no AIS brand assets or cloud-provider defaults. Skill installation does not establish a working HyperFrames renderer.
 
-- October31 latest cadence:30posts/day for30days, October31–November29UTC+7,900total positions including accepted reservations, aiming15photos/15videos where preserved items permit. This supersedes20/day text below. Keep the registered immutable source plan; use the private rolling allocation as a proposal only, with checked current-day revisions and actual native horizon verification before submission. See docs/THIRTY_DAY_ROLLOUT.md. Do not apply the October30 exception to new dates.
+- Historical, superseded October31 cadence:30posts/day for30days, October31–November29UTC+7,900total positions including accepted reservations, aiming15photos/15videos where preserved items permit. The current20/day,50-day rule at the top supersedes this historical target. Keep the registered immutable source plan; use the private rolling allocation as a proposal only, with checked current-day revisions and actual native horizon verification before submission. See docs/THIRTY_DAY_ROLLOUT.md. Do not apply the October30 exception to new dates.
 
 - Current campaign scope is maintained in docs/CAMPAIGN_GOAL.md. Ongoing source-linked angle research and original creative testing are part of the goal; docs/ANGLE_RESEARCH_EXPANSION.md contains untested hypotheses, not proven winners. The accepted voice tone is profileB; exact WAV approvals remain separate. Requested ai-video-generation skill is installed globally; external provider generation is not operational merely because the skill is installed.
 

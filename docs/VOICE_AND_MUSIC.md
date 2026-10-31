@@ -1,5 +1,7 @@
 # Vietnamese narration and music
 
+October31 update: the user chose the short built-in-reference candidate for clearer words, then approved its exact20.456second full narration with “Use this full narration.” Its private approval binds the full WAV/script/receipt and its story. Import that approved media through the scoped producer option documented in [scale video production](SCALE_VIDEO_PRODUCTION.md); do not transfer approval to later scripts. Effective source settings are Thùy Dung1.2x, temperature0.55, `preset` reference codes. The source command explicitly overrides the archived config's `referenceStyle`; preserve both. The global0.8/speaker-only runtime remains unchanged. No model was trained or downloaded.
+
 The user requested spoken stories and a different suitable trending sound for each carousel. Existing accepted commercial posts remain unchanged: the account's Studio view does not offer sound editing, and the user asked to preserve the original schedules. Do not delete and recreate them to change audio.
 
 ## Sakura Voice Lab

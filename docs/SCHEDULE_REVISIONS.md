@@ -1,5 +1,7 @@
 # Scale schedule revisions
 
+Latest October31 authorization is [20posts/day for50days](FIFTY_DAY_ROLLOUT.md). New rolling revisions may use its separately registered policy throughDecember19; historical30/day policy files/receipts remain immutable. When a current rollingGoal is registered, new allocations must match its policy reference and daily cap. Each revision is checked against its own policy's end date on reload; broad support for the new window does not extend old authority. Native date-window verification still gates actual submission.
+
 The immutable 1,000-intent manifest remains unchanged. A dated revision is an event in the private progress journal. It replaces the effective publish time for one unregistered, unsubmitted intent while retaining its original ID, intent hash, creative draft, and history. A previously ready private binding is discarded, so the actual creative, reviews, native scheduling window and preflight must be bound again to the revised time.
 
 The original override applies only to **October 30, 2026 in Vietnam (UTC+7)** for `@saigomlia`: 30 additional revisions, 40 total accepted/allocated posts, at least five minutes between posts, from 08:00 through 23:55. There is no per-format cap for that date. The October 31 rolling policy below governs the next 30 days. A revised slot must be on a native five-minute boundary and at least 30 minutes ahead of the server clock. Studio must independently show that the selected format and time are actually schedulable.

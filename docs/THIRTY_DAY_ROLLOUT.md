@@ -1,5 +1,7 @@
 # 30 posts daily for 30 days
 
+Historical policy. The later October31 instruction supersedes this target with [20posts/day for50days](FIFTY_DAY_ROLLOUT.md). Preserve already accepted reservations and their original receipts.
+
 User authorization on October31:30posts/day for the next30days. The execution window is October31–November29,2026, inclusive, in UTC+7. Target900total positions, counting already accepted posts within their actual days. Aim for15carousels and15videos per day; preserve accepted items and their actual formats.
 
 This supersedes the previous20/day target. Keep the registered1,000-item source manifest immutable. The new private rolling allocation references unused source intents; it does not reset the initializer, register900new queue entries, or change accepted schedules. Apply checked revisions only as media becomes ready and the actual native format-specific window is verified. The existing revision implementation's dated October30 exception must not be reused as authorization for other dates.
