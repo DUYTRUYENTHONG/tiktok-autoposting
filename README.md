@@ -4,6 +4,8 @@ Vietnamese product carousel planning, TikTok Studio scheduling through computer 
 
 ## Current operating scope
 
+- Voice research: [V-TTS review and correction memory](docs/V_TTS_REVIEW.md). V-TTS is not activated because its current license excludes commercial use without written permission. Sakura Voice Lab0.4 adds exact-profile feedback retrieval; no voice model has been fine-tuned. The [refined adoption prompt](prompts/v-tts-adoption-review.md) and `npm run voice:corrections -- status` are available.
+
 - Latest priority: **100 videos total**, using supplied footage/images and Vietnamese narration. The user chose **20-minute spacing and carryover**, preserving accepted schedules and the standing30/day capacity. The private proposal prioritizes these videos across October31–November3. A local position is not a rendered file, native schedule or publication. See [video priority](docs/VIDEO_PRIORITY_100.md).
 - The broader rolling window remains October31–November29, up to900daily positions including accepted reservations. Keep the registered immutable1,000-intent500photo/500video source plan. Do not restart its initializer or run the legacy daily planner over it.
 - New content is **evergreen/no discount** until actual publication-time eligibility and remaining-order evidence are verified. Historical accepted offers stay unchanged. Public text has no internal IDs, inbox CTA, invented phone number or clickable-link claim. Use **Gọi số điện thoại trong bio để được tư vấn.**

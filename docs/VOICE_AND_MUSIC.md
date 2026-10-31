@@ -4,7 +4,7 @@ The user requested spoken stories and a different suitable trending sound for ea
 
 ## Sakura Voice Lab
 
-The separate local plugin is in [plugins/sakura-voice-lab](../plugins/sakura-voice-lab). Its four MCP tools are voice_status, voice_presets, voice_brief and render_voice. They check local assets, list preset voices, prepare attributed Vietnamese scripts and render WAV previews. Rendering does not post, attach audio, change a schedule, or approve pronunciation.
+The separate local plugin is in [plugins/sakura-voice-lab](../plugins/sakura-voice-lab). Its original tools are voice_status, voice_presets, voice_brief and render_voice. Version0.4 adds read-only voice_provider_review and voice_correction_context; see [V-TTS review and correction memory](V_TTS_REVIEW.md). They check local assets, list preset voices, prepare attributed Vietnamese scripts, render WAV previews and retrieve exact-profile unresolved feedback. Rendering or retrieval does not post, attach audio, change a schedule, approve pronunciation or train a model. A built plugin is not proof that the current chat has reloaded it.
 
 The user rejected both Windows An and the Piper VAIS1000 preview as robotic, requested faster speech, and then chose **our own local system without ElevenLabs**. Sakura Voice Lab0.3 integrates the local [VieNeu-TTS v3 Turbo](https://huggingface.co/pnnbao-ump/VieNeu-TTS-v3-Turbo) backend and its real reference-code selector. The plugin is our integration around existing open-source weights, with upstream attribution retained. It uses the CPU/ONNX backend, built-in presets and pitch-preserving speed adjustment; no cloud speech request or customer voice cloning is exposed.
 

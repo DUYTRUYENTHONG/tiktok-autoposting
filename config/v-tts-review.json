@@ -1,0 +1,26 @@
+{
+  "repository": "https://github.com/tronghieuit/v-tts",
+  "commit": "e22eef3267869375e40a096b376cde94aa41e610",
+  "reviewedAt": "2026-10-31",
+  "status": "blocked_for_commercial_adoption",
+  "license": "CC-BY-NC-4.0",
+  "commercialPermissionEvidence": null,
+  "southernFemalePreset": "SF",
+  "presetMetadataOnly": true,
+  "voiceQualityEvaluated": false,
+  "benchmarkExecuted": false,
+  "upstreamCodeExecuted": false,
+  "additionalModelDownloads": false,
+  "speedMapping": "V-TTS speed is length_scale: 1 / desired rate multiplier; 1.2x would be approximately 0.8333",
+  "zeroShotCloningEnabled": false,
+  "fineTuningAdapterCompatible": false,
+  "trainingExecuted": false,
+  "productionReady": false,
+  "blockers": [
+    "Written commercial permission or a separately verified commercial license is absent",
+    "Naturalness and Southern pronunciation have not been listener-tested",
+    "No reviewed offline dependency/model package or pinned weight checksums",
+    "Existing VieNeu LoRA path does not target V-TTS VITS architecture",
+    "No consented human training corpus; rejected synthetic takes are not training positives"
+  ]
+}

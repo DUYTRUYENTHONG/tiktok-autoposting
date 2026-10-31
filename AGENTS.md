@@ -1,5 +1,7 @@
 # TikTok Autoposting agent instructions
 
+- V-TTS source was reviewed at e22eef3267869375e40a096b376cde94aa41e610; CC-BY-NC4.0 blocks commercial Sakura adoption without written permission. Do not execute its installers, checkpoints, cloning or auto-downloads. See docs/V_TTS_REVIEW.md. Use the original kit's voice:corrections CLI/read-only context tool for exact-profile negative feedback; its private ledger never confers a correction, training or publication approval. Keep this corpus separate from product facts.
+
 - Latest October31 priority:100videos total, including2already accepted that day; user chose keep20-minute spacing and carry over the remainder. Prioritize98new video creatives within standing dailycapacity; preserve accepted photos/videos. See docs/VIDEO_PRIORITY_100.md and the private video-priority manifest. This is not100 native schedules or permission to publish rejected narration.
 
 - Herk Edit Kit is pinned in config/herk-edit-kit.json. Before applying its installed editing skills, read skills/vn-herk-edit/SKILL.md; resolve upstream root-relative resources from the complete private checkout, preserve Sakura RAG/voice/publication gates, and use no AIS brand assets or cloud-provider defaults. Skill installation does not establish a working HyperFrames renderer.

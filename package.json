@@ -12,6 +12,7 @@
     "campaign": "node src/cli.mjs",
     "knowledge": "node scripts/knowledge.mjs",
     "edit:kit": "node scripts/herk-edit.mjs",
+    "voice:corrections": "node scripts/voice-corrections.mjs",
     "prepare:content-tuning": "node scripts/prepare-content-tuning.mjs"
   },
   "dependencies": {
