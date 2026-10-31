@@ -5,6 +5,13 @@ import {vietnamDay,dailyKpi,planDailySlots} from '../src/daily-kpi.mjs';
 test('Vietnam calendar day handles UTC midnight boundary',()=>{
   assert.equal(vietnamDay('2026-10-27T18:00:00Z'),'2026-10-28');
 });
+test('dated30/day target applies only inside the authorized window and rejects malformed policy',()=>{
+  const state={campaign:{dailyTarget:20,dailyTargetSchedule:{fromDay:'2026-10-31',throughDay:'2026-11-29',target:30}},queue:[]};
+  for(const day of ['2026-10-31','2026-11-29'])assert.equal(dailyKpi(state,day).target,30);
+  for(const day of ['2026-10-30','2026-11-30'])assert.equal(dailyKpi(state,day).target,20);
+  assert.equal(dailyKpi(state,'2026-10-31').published,0);
+  state.campaign.dailyTargetSchedule.fromDay='2026-02-31';assert.throws(()=>dailyKpi(state,'2026-10-31'),/dated daily target/);
+});
 test('daily quota counts unique verified publications and preserved schedules separately',()=>{
   const state={campaign:{dailyTarget:20},queue:[
     {id:'a',status:'published',receipt:{platformId:'1',publishedAt:'2026-10-27T09:00:00+07:00',publishedVerifiedAt:'2026-10-27T02:01:00Z'}},

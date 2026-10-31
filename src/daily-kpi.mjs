@@ -5,7 +5,13 @@ export function vietnamDay(value){
   return `${get('year')}-${get('month')}-${get('day')}`;
 }
 export function dailyKpi(state,day=vietnamDay(new Date())){
-  const target=state.campaign?.dailyTarget??20;
+  let target=state.campaign?.dailyTarget??20;
+  const schedule=state.campaign?.dailyTargetSchedule;
+  if(schedule){
+    const validDay=value=>typeof value==='string'&&/^\d{4}-\d{2}-\d{2}$/u.test(value)&&Number.isFinite(Date.parse(value+'T00:00:00Z'))&&new Date(value+'T00:00:00Z').toISOString().slice(0,10)===value;
+    if(!validDay(schedule.fromDay)||!validDay(schedule.throughDay)||schedule.fromDay>schedule.throughDay||!Number.isInteger(schedule.target)||schedule.target<1||schedule.target>100)throw Error('Invalid dated daily target policy');
+    if(day>=schedule.fromDay&&day<=schedule.throughDay)target=schedule.target;
+  }
   const sameDay=value=>value&&Number.isFinite(Date.parse(value))&&vietnamDay(value)===day;
   const published=new Set(),scheduled=new Set(),underReview=new Set();
   for(const q of state.queue??[]){
