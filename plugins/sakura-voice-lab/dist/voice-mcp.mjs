@@ -62612,7 +62612,8 @@ function buildIndex(sources) {
 }
 function requestedFields(query) {
   const text = tokens(query).join(" "), fields = [];
-  if (/\bgia\b|\b(price|cost)\b/.test(text)) fields.push("price");
+  const priceText = text.replace(/\bgia (dinh|dung)\b/g, " ");
+  if (/\bgia\b|\b(price|cost)\b/.test(priceText)) fields.push("price");
   if (/\bcon lai\b|\b(remaining|remain|left|redeemed|redemptions|sold)\b|\bda (ban|doi|nhan)\b/.test(text)) fields.push("remainingOrders");
   if (/\bhan\b|\b(deadline|expires|expiry)\b|\bhet ngay\b/.test(text)) fields.push("deadline");
   if (/\bchung nhan\b|\bcertif/.test(text)) fields.push("certification");

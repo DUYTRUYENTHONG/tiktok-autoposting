@@ -11,6 +11,18 @@ import {assertReviewedEditorial} from '../src/knowledge/campaign-sources.mjs';
 const when='2026-10-28T03:00:00Z';
 const source=(changes={})=>({sourceId:'sku:offer:new',productId:'sku',promotionKey:'new',section:'offer',text:'Ưu đãi mua 1 tặng 1 cho 50 đơn đầu tiên từ TikTok.',sourceUri:'test:fixture',sourceHash:'fixture-hash',verifiedAt:'2026-10-28T01:00:00Z',validFrom:'2026-10-28T00:00:00Z',validTo:null,verified:true,claimFields:['offer','unit'],...changes});
 const ask=(query,changes={})=>({query,productId:'sku',promotionKey:'new',asOf:when,...changes});
+
+test('family and household editorial queries do not request price, but mixed price queries still abstain',()=>{
+  const index=buildIndex([source({sourceId:'sku:editorial',text:'CleanTok gia đình cuối tuần và đồ gia dụng trong nhà.',claimFields:['editorial-context']})]);
+  for(const query of ['CleanTok gia đình cuối tuần','CleanTok gia dinh cuoi tuan','Đồ gia dụng trong nhà']){
+    assert.equal(retrieve(index,ask(query)).status,'retrieved',query);
+  }
+  for(const query of ['Giá Sakura','Gia Sakura','Giá đồ gia dụng','Gia dinh hoi gia Sakura','Price of household cleaner']){
+    const result=retrieve(index,ask(query));
+    assert.equal(result.status,'abstained',query);
+    assert.match(result.reason,/price/,query);
+  }
+});
 test('stable idempotent indexing, conflicting IDs and corrupted metadata fail',async()=>{
   const dir=await mkdtemp(path.join(os.tmpdir(),'knowledge-'));
   try {
