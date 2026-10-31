@@ -10,4 +10,4 @@ The private allocation records planned, accepted-reservation and unfilled positi
 
 All current offer, call-only CTA, authentic product, illustrative footage, natural Vietnamese, platform disclosure and exact narration-review rules remain in force. New evergreen content has no discount without fresh verified eligibility. Select suitable varied Vietnamese tracks in the account and review quiet music under narration. Never infer national chart rank, leads or orders from engagement.
 
-Browser control was unavailable when this policy was prepared. No900-post native scheduling claim is made. The local automation prompt is updated separately from the app's saved automation; without an automation management tool, the saved recurring task has not been changed.
+Browser control returned on October31 and the four carryover posts were verified scheduled. No900-post native scheduling claim is made. The saved recurring task was updated through the app automation tool on October31 to the30/day window and current grounding limits. A saved task does not establish successful unattended background publishing.

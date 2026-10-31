@@ -7,6 +7,9 @@ import {root,hashFile,loadState} from '../src/store.mjs';
 import {voiceRuntime,voiceHome,voiceProfile,captionWithVoiceCredit} from '../src/voice.mjs';
 import {inspectWav} from '../src/wav.mjs';
 import {scalePolicy,scaleHash,containsDiscount} from '../src/scale-campaign.mjs';
+import {createProductionGrounding,checkProductionGrounding} from '../src/knowledge/production-grounding.mjs';
+import {buildIndex,loadIndex} from '../src/knowledge/index.mjs';
+import {campaignSources} from '../src/knowledge/campaign-sources.mjs';
 import {loadEditingRuntime,transitionGraph,wrapVideoText} from '../src/footage-video.mjs';
 import {verifySubtitleReceipt,ensureSubtitleModel,createSubtitleTranscriber,alignSubtitleScript,phraseSubtitlePreview,
   speechActivity,subtitleKey,subtitleSrt,subtitleAss} from '../src/video-subtitles.mjs';
@@ -44,7 +47,7 @@ export function validatePreparedVoice(voice,script,profile){
 export function curatedStory(item){
   if(item.creative.sourceHypothesisId!=='sakura-pain-chia-viec')throw Error('Provide --brief for this different story angle; no automatic bulk copy');
   return {intentId:item.id,intentHash:item.intentHash,author:'Codex session, original one-item story',
-    script:'Người nấu xong, ai nhận phần dọn?\n\nCả nhà vừa đứng lên, một người đã quay lại bếp. Ngoài kia còn hỏi: “Ủa, còn việc gì nữa hả?” Nghe vậy mới thấy mệt, chớ đâu phải vì một cái bàn.\n\nThôi, người gom chén, người cất đồ, việc chia cho rõ. Còn chọn nước lau, mình coi bề mặt trước. Đây là chai Sa cu ra năm trăm mi li.\n\nChụp ảnh chỗ cần lau, ghi tên vật liệu với lớp phủ nếu biết. Nhìn giống nhau, chưa chắc cùng chất liệu. Nhắn shop hỏi giá và điều kiện mua hiện tại. Rõ rồi mình hẵng chốt nha.',
+    script:'Người nấu xong, ai nhận phần dọn?\n\nCả nhà vừa đứng lên, một người đã quay lại bếp. Ngoài kia còn hỏi: “Ủa, còn việc gì nữa hả?” Nghe vậy mới thấy mệt, chớ đâu phải vì một cái bàn.\n\nThôi, người gom chén, người cất đồ, việc chia cho rõ. Còn chọn nước lau, mình coi bề mặt trước. Đây là chai Sa cu ra năm trăm mi li.\n\nChụp ảnh chỗ cần lau, ghi tên vật liệu với lớp phủ nếu biết. Nhìn giống nhau, chưa chắc cùng chất liệu. Gọi số điện thoại trong phần giới thiệu để được tư vấn. Hỏi giá và điều kiện mua hiện tại, rõ rồi mình hẵng chốt nha.',
     clipIds:['V090','V001','V043','V042'],headline:'Người nấu xong,\nai nhận phần dọn?',
     tension:'“Ủa, còn việc gì nữa hả?”',decision:'Chia việc cho rõ.\nChọn theo đúng nhu cầu.',
     identity:'SAKURA 500ml',questions:'Chụp ảnh bề mặt\nNêu vật liệu / lớp phủ',price:'Hỏi giá và điều kiện mua\ntrước khi chốt',
@@ -57,6 +60,7 @@ export function validateBrief(brief,item){
     if(typeof brief[key]!=='string'||!brief[key].trim())throw Error('Missing story text:'+key);assertEvergreen(brief[key]);
     const text=brief[key].normalize('NFD').replace(/\p{M}/gu,'').replaceAll('đ','d').toLowerCase();
     if(/\b(?:anh|giong|bep)\s*\d{3,}\b|sakura[-_](?:scale[-_])?\d+/u.test(text))throw Error('Public story text contains an internal identifier');
+    if(/\b(?:inbox|nhan tin|nhan shop|nhan cho shop|gui shop|link trong bio|bam link)\b/u.test(text))throw Error('Public story must follow the call-only CTA policy');
     if(/sach bong|tay sach moi|diet khuan|diet virus|an toan tuyet doi|dung duoc moi|khach hang noi|khach da dung|cam ket|bao dam|chung nhan/.test(text))throw Error('Unsupported efficacy/safety/testimonial copy is outside this identity preview');
   }
   if(!/năm trăm|500/u.test(brief.script)||!/giá/u.test(brief.script)||!/điều kiện/u.test(brief.script)||!/bề mặt|vật liệu/u.test(brief.script))throw Error('Story must cover identity/material questions/current-price inquiry');
@@ -64,6 +68,19 @@ export function validateBrief(brief,item){
 }
 export function publicVideoCopy(brief){
   return {cta:'Gọi số điện thoại trong bio',caption:captionWithVoiceCredit(`${brief.headline.replaceAll('\n',' ')}\n\nTìm hiểu Sakura500ml. Gọi số điện thoại trong bio để được tư vấn; nêu nhu cầu, vật liệu và lớp phủ nếu biết. Hỏi giá và điều kiện mua hiện tại trước khi chốt.\nTình huống minh họa; không phải thử nghiệm hay lời chứng thực.`, 'vieneu')};
+}
+export function videoGroundingCopy(brief){
+  return Object.fromEntries([...['script','headline','tension','decision','identity','questions','price','stockLabel'].map(key=>[key,brief[key]]),...Object.entries(publicVideoCopy(brief))]);
+}
+export async function groundVideoBrief(brief,item,options={}){
+  const index=options.index??await loadIndex(options.directory);
+  if(!options.index&&buildIndex(await campaignSources()).corpusHash!==index.corpusHash)throw Error('Current campaign sources differ from the index; review and rebuild local knowledge before production');
+  const request={...options,index,publicCopy:videoGroundingCopy(brief),account:item.account,productId:item.productId};
+  const grounding=await createProductionGrounding(request);
+  if(grounding.status!=='grounded'||grounding.evidenceCoveragePassed!==true)throw Error('Current production grounding unavailable: '+JSON.stringify(grounding.blockers??grounding.reason??grounding.status));
+  const checked=await checkProductionGrounding(grounding,request);
+  if(!checked.valid)throw Error('Production grounding validation failed: '+JSON.stringify(checked.blockers));
+  return grounding;
 }
 async function captionPreview(base,directory,editing,existingTimingFile){
   const source={queueId:base.intentId,audioPath:base.voice.path,audioSha256:base.voice.sha256,script:base.voice.script,
@@ -146,7 +163,7 @@ async function selfTest(){
 async function main(args){
   if(args.length===1&&args[0]==='--self-test'){await selfTest();return;}
   const options={};
-  for(let i=0;i<args.length;i+=2){const key=args[i]?.replace(/^--/u,'');if(!['plan','id','brief','captions','voice-receipt'].includes(key)||!args[i+1]||args[i+1].startsWith('--'))throw Error('Use --id EXISTING_SCALE_VIDEO [--plan FILE] [--brief FILE] [--captions RECEIPT] [--voice-receipt RECEIPT]');options[key]=args[i+1];}
+  for(let i=0;i<args.length;){const key=args[i++]?.replace(/^--/u,'');if(key==='grounding-only'){options[key]=true;continue;}if(!['plan','id','brief','captions','voice-receipt'].includes(key)||!args[i]||args[i].startsWith('--'))throw Error('Use --id EXISTING_SCALE_VIDEO [--plan FILE] [--brief FILE] [--captions RECEIPT] [--voice-receipt RECEIPT] [--grounding-only]');options[key]=args[i++];}
   const canonical=await loadState();options.plan=registeredPlanFile(canonical,options.plan);
   if(await hashFile(options.plan)!==canonical.campaign.scaleCampaign.manifestSha256)throw Error('Registered scale plan bytes changed');
   const plan=JSON.parse(await readFile(options.plan,'utf8')),item=validateVideoIntent(plan,options.id??plan.items.find(i=>i.format==='video')?.id);
@@ -154,6 +171,12 @@ async function main(args){
   const old=canonical.queue?.find(q=>q.id===item.id);
   if(old?.receipt||['submitting','needs_review','scheduled','published','under_review'].includes(old?.status))throw Error('Reconcile/preserve an already accepted or uncertain item');
   const brief=validateBrief(options.brief?JSON.parse(await readFile(options.brief,'utf8')):curatedStory(item),item);
+  const grounding=await groundVideoBrief(brief,item);
+  if(options['grounding-only']){
+    const directory=path.join(root,'state','production-grounding');await mkdir(directory,{recursive:true});
+    const file=path.join(directory,`${item.id}-${grounding.bindingHash}.json`);await writeFile(file,JSON.stringify(grounding,null,2),'utf8');
+    console.log(JSON.stringify({id:item.id,status:grounding.status,scope:grounding.scope,groundingFile:file,bindingHash:grounding.bindingHash,publicationReady:false,modelsLoaded:0,mediaRendered:0,canonicalWrites:0}));return;
+  }
   const reviewFile=path.join(root,'state/footage-visual-review.json'),review=JSON.parse(await readFile(reviewFile,'utf8'));
   const scenes=brief.clipIds.map(id=>{
     const clip=review.clips.find(c=>c.id===id),range=review.recommendedRanges.find(r=>r.id===id);
@@ -166,13 +189,13 @@ async function main(args){
   const prepared=options['voice-receipt']?validatePreparedVoice(JSON.parse(await readFile(options['voice-receipt'],'utf8')),brief.script,profile):null;
   if(prepared&&(await hashFile(prepared.path)!==prepared.sha256||prepared.modelManifestSha256!==runtime.modelSha256||prepared.runtimeConfigSha256!==await hashFile(runtime.configFile)))throw Error('Prepared narration bytes/runtime changed');
   const helper=path.join(root,'scripts/voice-vieneu.py'),productSha256=await hashFile(productImage),scriptSha256=scaleHash(brief.script),
-    binding={intentId:item.id,intentHash:item.intentHash,planHash:plan.planHash,brief,scenes,productSha256,profile,voiceModelManifestSha256:runtime.modelSha256,voiceHelperSha256:await hashFile(helper),ffmpegSha256:editing.ffmpegSha256,renderer:'scale-evergreen-preview-v4-private-codes',...(prepared?{preparedVoiceSha256:prepared.sha256}: {})},revision=scaleHash(binding).slice(0,16),
+    binding={intentId:item.id,intentHash:item.intentHash,planHash:plan.planHash,brief,groundingBindingHash:grounding.bindingHash,scenes,productSha256,profile,voiceModelManifestSha256:runtime.modelSha256,voiceHelperSha256:await hashFile(helper),ffmpegSha256:editing.ffmpegSha256,renderer:'scale-evergreen-preview-v5-grounded',...(prepared?{preparedVoiceSha256:prepared.sha256}: {})},revision=scaleHash(binding).slice(0,16),
     directory=path.join(root,'state/scale-video-preview',`${item.id}-${revision}`);
   await mkdir(directory,{recursive:true});const resolved=await realpath(directory),privateBase=await realpath(path.join(root,'state/scale-video-preview'));
   if(!resolved.startsWith(privateBase+path.sep))throw Error('Output must remain in the private preview folder');
   const receiptFile=path.join(directory,'receipt.json');
   let prior;try{prior=JSON.parse(await readFile(receiptFile,'utf8'));}catch(e){if(e.code!=='ENOENT')throw e;}
-  if(prior){if(prior.revision!==revision||await hashFile(prior.path)!==prior.sha256||await hashFile(prior.voice.path)!==prior.voice.sha256)throw Error('Cached preview changed; preserve and inspect');await captionPreview(prior,directory,editing,options.captions);return;}
+  if(prior){if(prior.revision!==revision||await hashFile(prior.path)!==prior.sha256||await hashFile(prior.voice.path)!==prior.voice.sha256)throw Error('Cached preview changed; preserve and inspect');const checked=await checkProductionGrounding(prior.grounding,{publicCopy:videoGroundingCopy(brief),account:item.account,productId:item.productId});if(!checked.valid)throw Error('Cached grounding changed or expired: '+JSON.stringify(checked.blockers));await captionPreview(prior,directory,editing,options.captions);return;}
   await writeFile(path.join(directory,'brief.json'),JSON.stringify(brief,null,2),'utf8');await writeFile(path.join(directory,'binding.json'),JSON.stringify(binding,null,2),'utf8');
   const producerSnapshot=path.join(directory,'producer-source.mjs');await copyFile(fileURLToPath(import.meta.url),producerSnapshot);
   const scriptFile=path.join(directory,'script.txt'),wav=path.join(directory,'voice.wav');await writeFile(scriptFile,brief.script,'utf8');
@@ -205,7 +228,7 @@ async function main(args){
   const {stdout}=await run(editing.ffprobe,['-v','error','-show_streams','-show_format','-of','json',video],{timeout:15000,windowsHide:true}),probe=JSON.parse(stdout),v=probe.streams.find(s=>s.codec_type==='video'),a=probe.streams.find(s=>s.codec_type==='audio');
   if(v?.width!==1080||v.height!==1920||v.codec_name!=='h264'||a?.codec_name!=='aac'||Math.abs(Number(probe.format.duration)-seconds)>.2)throw Error('Scale preview technical video QA failed');
   const caption=publicVideoCopy(brief).caption;assertEvergreen(caption);
-  const receipt={schemaVersion:1,intentId:item.id,intentHash:item.intentHash,planHash:plan.planHash,sourcePlanFile:path.resolve(options.plan),sourcePlanSha256:await hashFile(options.plan),revision,path:video,sha256:await hashFile(video),seconds,voice,caption,leadCode:item.leadCode,scenes,
+  const receipt={schemaVersion:1,intentId:item.id,intentHash:item.intentHash,planHash:plan.planHash,sourcePlanFile:path.resolve(options.plan),sourcePlanSha256:await hashFile(options.plan),revision,path:video,sha256:await hashFile(video),seconds,voice,caption,leadCode:item.leadCode,scenes,grounding,
     producerSource:{snapshot:producerSnapshot,sha256:await hashFile(producerSnapshot)},
     productImage:{path:productImage,sha256:productSha256,role:'user_supplied_product_identity_reference',manufacturerLabelClaimsVerified:false},reviewManifestSha256:await hashFile(reviewFile),editingRuntime:{...editing,ffprobeSha256:await hashFile(editing.ffprobe)},captions,
     status:'needs_listening',blockers:['exact_audio_listening_review','final_video_playback_review',captions.status,'music_selection_missing','native_schedule_window_unverified'],musicAdded:false,stockIsProductDemo:false,efficacyDemoEvidence:null,listeningVerified:false,visualPlaybackVerified:false,

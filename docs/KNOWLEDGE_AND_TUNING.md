@@ -78,11 +78,44 @@ Before production expansion: collect independently reviewed Vietnamese paraphras
 
 ## Integration coverage and limits
 
-RAG has been exercised through the local LangChain query/brief preparation paths. It is **not automatically applied to every narration, wording correction or research action**. The current scale-video preview producer accepts explicit reviewed brief/script fields and does not call the knowledge pipeline. Vietnamese natural-copy review and external research evidence are separate processes; they are not fine-tuning. The current index does not ingest all research ledgers or performance observations.
+RAG has been exercised through the local LangChain query/brief preparation paths. The scale-video preview producer now calls the production-grounding helper after brief validation and before model/media runtimes, and binds the result into its private receipt/cache. Its `--grounding-only` path prepares a private evidence audit without rendering. This is **not automatically applied to every narration, wording correction or research action**. Vietnamese natural-copy review and external research evidence remain separate processes; they are not fine-tuning. The current index does not ingest all research ledgers or performance observations.
 
 Historical footage-test/carousel producers still require the old offer source and first50 promotion key. New runs of those historical paths must remain blocked by evergreen offer abstention; do not restore that source just to satisfy their assumptions. Their templates/renderer need a separately reviewed evergreen migration. Existing accepted assets and exact approved narration stay unchanged. A prompt or corpus hash stored earlier does not prove that a later correction was retrieved against current evidence; per-operation grounding/hash records are still needed for universal enforcement. CTA is presently retrieved lexically/as a general source rather than a dedicated recognized query field, so compound requests need explicit source-coverage review.
 
 Neither content nor voice has a trained adapter. The VieNeu narration engine is a pretrained local voice system with selected conditioning and exact listening approvals, not a newly fine-tuned Sakura voice. No generative content LLM is attached. Retrieval returns source-cited prompts, not model-written answers or factual certification.
+
+## Reusable production grounding
+
+[production-grounding.mjs](../src/knowledge/production-grounding.mjs) provides read-only `createProductionGrounding` and `checkProductionGrounding`. No model, media, queue or browser is loaded or written. Exact-ID coverage uses local BM25 through the genuine LangChain pipeline; it does not need to load E5 or any other embedding model. Five independent retrievals require identity/volume, material questions, call-only CTA, evergreen eligibility policy and editorial/voice policy. A related source cannot substitute for a missing exact ID. Producers may pass `requiredSourceIds: evergreenRequiredSourceIds` explicitly; they cannot drop a required section to obtain a pass.
+
+```javascript
+import {
+  createProductionGrounding, checkProductionGrounding,
+  evergreenRequiredSourceIds,
+} from './src/knowledge/production-grounding.mjs';
+
+// Use the exact final strings, including overlays/caption and spoken script.
+const input = {
+  account: 'saigomlia', productId: 'sakura-cleaner-500ml',
+  publicCopy: {script, headline, caption, cta},
+  requiredSourceIds: evergreenRequiredSourceIds,
+};
+const record = await createProductionGrounding(input);
+if (!record.evidenceCoveragePassed) throw Error(record.blockers.join(', '));
+const checked = await checkProductionGrounding(record, input);
+if (!checked.valid) throw Error(checked.blockers.join(', '));
+// Save the audit only to a private producer artifact; continue other QA gates.
+```
+
+The helper loads the current private index unless the caller explicitly supplies an `index`/`directory` (for example isolated fixtures). Both operations verify index consistency and apply current product/promotion/source-time filters. Missing, stale, future, expired, wrong-product or missing-field evidence abstains. The source age ceiling is168hours and can only be tightened. Historical promotion keys and detected discount/offer copy are rejected by this evergreen-only contract, even if a historical offer section exists. This bounded gate does not interpret every free-form sentence or certify the copy's claims.
+
+Records contain the corpus hash; exact source IDs, hashes, record hashes, snippets and date bases; separate public-copy/script hashes; account/product; `asOf` and `reviewedAt`. `reviewedAt` is an **automated evidence-check timestamp**, not human review. `contentHash` covers exact strings plus account/product/promotion. `bindingHash` additionally covers the corpus/source records and freshness contract but excludes check/review timestamps, so a fresh identical check does not invalidate a media cache. The complete `recordHash` includes audit timestamps. Object field order is canonicalized; actual text, line breaks and array order remain exact. These checksums detect inconsistent artifacts, not an authorized actor rewriting all hashes.
+
+`createProductionGrounding` returns `status:'grounded'|'abstained'` and `evidenceCoveragePassed`. `checkProductionGrounding` returns `{valid, blockers, currentRecord}` after rechecking exact copy against the **current** index. Expected coverage/binding failures return false; callers **must inspect the result**, rather than rely on an exception. Invalid arguments or a corrupt index may throw. A changed script/caption/account/product/corpus/source or newly stale evidence fails checking. Both results retain `scope:'required-source-evidence-coverage-only'`, `ready:false`, `humanReviewed:false`, `generativeLLMUsed:false` and `fineTunedModelUsed:false` where applicable. A pass is not factual/copy/listening approval or posting readiness; exact audio approval, rendered QA, native music and actual submission checks remain separate.
+
+Index consistency alone cannot detect an edited source policy that has not been reindexed. The scale renderer's default production path compares the loaded corpus with the current allowlisted `campaignSources` build and blocks discrepancies pending safe reindexing. Explicit fixture indexes bypass that live-source comparison. Other producers must implement the same freshness boundary before treating a loaded index as current. The helper itself never renews label evidence dates or silently rebuilds policy/index data.
+
+`node --test test/knowledge-production-grounding.test.mjs` covers all five exact IDs, immutable copy/script binding, timestamp-independent cache keys, source freshness/expiry/product filters, historical/unknown offers, missing claim fields, tampering, corrupt/current corpus changes and absence of false readiness. These are synthetic technical fixtures, not product evidence or training examples.
 
 ## Content fine-tuning readiness
 
