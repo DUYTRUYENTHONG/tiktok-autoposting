@@ -69,6 +69,9 @@ export function validateBrief(brief,item){
 export function publicVideoCopy(brief){
   return {cta:'Gọi số điện thoại trong bio',caption:captionWithVoiceCredit(`${brief.headline.replaceAll('\n',' ')}\n\nTìm hiểu Sakura500ml. Gọi số điện thoại trong bio để được tư vấn; nêu nhu cầu, vật liệu và lớp phủ nếu biết. Hỏi giá và điều kiện mua hiện tại trước khi chốt.\nTình huống minh họa; không phải thử nghiệm hay lời chứng thực.`, 'vieneu')};
 }
+export function wrapStoryCard(text){
+  return text.normalize('NFC').split(/\r?\n/u).map(line=>wrapVideoText(line)).join('\n');
+}
 export function videoGroundingCopy(brief){
   return Object.fromEntries([...['script','headline','tension','decision','identity','questions','price','stockLabel'].map(key=>[key,brief[key]]),...Object.entries(publicVideoCopy(brief))]);
 }
@@ -189,7 +192,7 @@ async function main(args){
   const prepared=options['voice-receipt']?validatePreparedVoice(JSON.parse(await readFile(options['voice-receipt'],'utf8')),brief.script,profile):null;
   if(prepared&&(await hashFile(prepared.path)!==prepared.sha256||prepared.modelManifestSha256!==runtime.modelSha256||prepared.runtimeConfigSha256!==await hashFile(runtime.configFile)))throw Error('Prepared narration bytes/runtime changed');
   const helper=path.join(root,'scripts/voice-vieneu.py'),productSha256=await hashFile(productImage),scriptSha256=scaleHash(brief.script),
-    binding={intentId:item.id,intentHash:item.intentHash,planHash:plan.planHash,brief,groundingBindingHash:grounding.bindingHash,scenes,productSha256,profile,voiceModelManifestSha256:runtime.modelSha256,voiceHelperSha256:await hashFile(helper),ffmpegSha256:editing.ffmpegSha256,renderer:'scale-evergreen-preview-v5-grounded',...(prepared?{preparedVoiceSha256:prepared.sha256}: {})},revision=scaleHash(binding).slice(0,16),
+    binding={intentId:item.id,intentHash:item.intentHash,planHash:plan.planHash,brief,groundingBindingHash:grounding.bindingHash,scenes,productSha256,profile,voiceModelManifestSha256:runtime.modelSha256,voiceHelperSha256:await hashFile(helper),ffmpegSha256:editing.ffmpegSha256,renderer:'scale-evergreen-preview-v6-grounded-linebreaks',...(prepared?{preparedVoiceSha256:prepared.sha256}: {})},revision=scaleHash(binding).slice(0,16),
     directory=path.join(root,'state/scale-video-preview',`${item.id}-${revision}`);
   await mkdir(directory,{recursive:true});const resolved=await realpath(directory),privateBase=await realpath(path.join(root,'state/scale-video-preview'));
   if(!resolved.startsWith(privateBase+path.sep))throw Error('Output must remain in the private preview folder');
@@ -216,7 +219,7 @@ async function main(args){
     const cut=path.join(directory,`cut-${index}.mp4`);await run(editing.ffmpeg,['-hide_banner','-loglevel','error','-y','-ss',String(scene.start),'-i',scene.source,'-t','3','-an','-vf',`${framing},pad=1080:1920:0:240:color=0xf8f2ed,setsar=1,fps=30`,'-c:v','libx264','-preset','veryfast','-crf','21','-threads','2','-pix_fmt','yuv420p',cut],{timeout:120000,windowsHide:true});segments.push(cut);
   }
   const packshot=path.join(directory,'identity.mp4');await run(editing.ffmpeg,['-hide_banner','-loglevel','error','-y','-loop','1','-i',productImage,'-t',String(packshotSeconds),'-an','-vf','scale=900:950:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:510:color=0xf8f2ed,setsar=1,fps=30','-c:v','libx264','-preset','veryfast','-crf','20','-threads','2','-pix_fmt','yuv420p',packshot],{timeout:120000,windowsHide:true});segments.push(packshot);
-  const texts={brand:'CHUYỆN NHÀ · HỎI ĐÚNG NHU CẦU',hook:wrapVideoText(brief.headline),tension:wrapVideoText(brief.tension),decision:wrapVideoText(brief.decision),identity:brief.identity,questions:brief.questions,price:brief.price,
+  const texts={brand:'CHUYỆN NHÀ · HỎI ĐÚNG NHU CẦU',hook:wrapStoryCard(brief.headline),tension:wrapStoryCard(brief.tension),decision:wrapStoryCard(brief.decision),identity:brief.identity,questions:brief.questions,price:brief.price,
     stock:brief.stockLabel,identityNote:'Ảnh tham chiếu nhận diện chai · Không kiểm chứng hiệu quả',cta:publicVideoCopy(brief).cta};
   for(const [name,text]of Object.entries(texts)){assertEvergreen(text);await writeFile(path.join(directory,name+'.txt'),text,'utf8');}
   const text=(name,size,y,enable,bold=false,color='0x392343')=>`drawtext=fontfile=${bold?'Arial-Bold.ttf':'Arial.ttf'}:textfile=${name}.txt:expansion=none:fontsize=${size}:fontcolor=${color}:x=(w-tw)/2:y=${y}:line_spacing=12${['cta','stock'].includes(name)?':box=1:boxcolor=0xf8f2ed:boxborderw=12':''}${enable?`:enable='${enable}'`:''}`;

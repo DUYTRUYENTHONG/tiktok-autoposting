@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {curatedStory,validateBrief,publicVideoCopy,groundVideoBrief,videoGroundingCopy} from '../scripts/render-scale-video-preview.mjs';
+import {curatedStory,validateBrief,publicVideoCopy,groundVideoBrief,videoGroundingCopy,wrapStoryCard} from '../scripts/render-scale-video-preview.mjs';
 import {buildIndex,hash} from '../src/knowledge/index.mjs';
 import {evergreenRequiredSourceIds} from '../src/knowledge/production-grounding.mjs';
 
@@ -17,6 +17,15 @@ test('video briefs reject internal identifiers in every public text field',()=>{
   assert.doesNotMatch(copy.cta+' '+copy.caption,/GIỌNG\d|ẢNH\d|BẾP\d|Nhắc mã|sakura-scale-/u);
   assert.doesNotMatch(brief.script,/Nhắn shop/u);
   for(const text of ['Nhắn shop để hỏi giá','Gửi shop ảnh bề mặt','Bấm link trong bio'])assert.throws(()=>validateBrief({...brief,price:text},item),/call-only/);
+});
+
+test('story card wrapping retains deliberate Vietnamese breath-group line breaks',()=>{
+  const headline='Hỏi giá xong,\nkhoan chốt đã.';
+  assert.equal(wrapStoryCard(headline),headline);
+  const longer='Đừng đoán vật liệu của món đồ chỉ qua màu sắc.\nXem nhãn trước.';
+  const wrapped=wrapStoryCard(longer);assert.ok(wrapped.endsWith('\nXem nhãn trước.'));
+  assert.equal(wrapped.split(/\s+/).join(' '),longer.split(/\s+/).join(' '));
+  assert.ok(wrapped.split('\n').every(line=>line.length<=27));
 });
 
 test('scale video grounds the exact narration, overlays and generated caption and stops on missing current CTA evidence',async()=>{
