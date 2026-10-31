@@ -62816,6 +62816,31 @@ var v_tts_review_default = {
   ]
 };
 
+// voice-training/gwen-config.json
+var gwen_config_default = {
+  provider: "gwen-tts",
+  repository: "https://github.com/ggroup-ai-lab/gwen-tts",
+  sourceRevision: "f0f24d8636596dc635323e02f41bee42bb64385e",
+  model: "g-group-ai-lab/gwen-tts-0.6B",
+  modelRevision: "a83e1f08656d48217a83f0ad422d1610d5b5c963",
+  modelCardLicense: "MIT",
+  sourceLicenseMetadata: "MIT in pyproject.toml; no standalone LICENSE file observed",
+  architecture: "Qwen3-TTS-12Hz-0.6B-Base derivative",
+  trainingSource: "https://github.com/QwenLM/Qwen3-TTS",
+  trainingSourceRevision: "022e286b98fbec7e1e916cb940cdf532cd9f488e",
+  trainingSourceLicense: "Apache-2.0",
+  tokenizer: "Qwen/Qwen3-TTS-Tokenizer-12Hz",
+  tokenizerRevision: "7dd38ad4e9bad454aae9cd937d0cd577604fe229",
+  status: "experimental_preparation_only",
+  trainingMethod: "upstream full-parameter single-speaker SFT, not the existing VieNeu LoRA",
+  gwenCheckpointTrainingCompatibilityVerified: false,
+  referenceSpeakerConsentVerified: false,
+  upstreamInferenceExecuted: false,
+  modelWeightsDownloaded: false,
+  trainingExecuted: false,
+  productionReady: false
+};
+
 // src/voice-mcp.mjs
 var server = new McpServer({ name: "sakura-voice-lab", version: "0.4.0" });
 var readOnly = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false };
@@ -62835,7 +62860,7 @@ server.registerTool("voice_presets", { description: "List configured local Vietn
   const r = await voiceRuntime();
   return { provider: r.provider, voices: r.presetVoices ?? [{ name: r.voice }], defaultVoice: r.voice, defaultSpeed: r.speed ?? null };
 }));
-server.registerTool("voice_provider_review", { description: "Read the pinned V-TTS adoption review. It is blocked for commercial use; this tool never imports upstream code, installs dependencies, downloads weights or changes the active voice.", inputSchema: {}, annotations: readOnly }, safe(async () => v_tts_review_default));
+server.registerTool("voice_provider_review", { description: "Read pinned V-TTS or Gwen adoption/preparation status. Never imports upstream code, trains, downloads weights, clones a speaker or changes the active voice.", inputSchema: { provider: external_exports2.enum(["v-tts", "gwen-tts"]).optional() }, annotations: readOnly }, safe(async ({ provider }) => provider === "gwen-tts" ? gwen_config_default : v_tts_review_default));
 server.registerTool("voice_correction_context", { description: "Retrieve source-bound unresolved feedback for an exact local narration profile through LangChain. Returns private negative-review context only, never an approved correction, trained adapter or publication approval.", inputSchema: { receiptFile: external_exports2.string().min(1).max(1500), query: external_exports2.string().min(1).max(1500), topK: external_exports2.number().int().min(1).max(5).optional() }, annotations: readOnly }, safe(voiceCorrectionContext));
 server.registerTool("voice_brief", { description: "Prepare a short Vietnamese story narration from one attributed Sakura queue item. Does not generate or post audio.", inputSchema: { queueId: external_exports2.string().regex(/^sakura-\d{3}$/) }, annotations: readOnly }, safe(async ({ queueId }) => voiceBrief(await loadState(), queueId)));
 server.registerTool("render_voice", { description: "Render an offline Vietnamese WAV preview. Select a preset, 1.0\u20132.0x speed, and optionally omit preset style reference codes while retaining the built-in speaker embedding. This is an experiment, not a guarantee of natural emphasis. Never posts or approves pronunciation.", inputSchema: { queueId: external_exports2.string().regex(/^sakura-\d{3}$/), script: external_exports2.string().min(10).max(1500), voiceName: external_exports2.string().min(1).max(80).optional(), speed: external_exports2.number().min(1).max(2).optional(), referenceStyle: external_exports2.enum(["preset", "speaker-only"]).optional() }, annotations: { ...readOnly, readOnlyHint: false } }, safe(async ({ queueId, script, voiceName, speed, referenceStyle }) => renderVoice(await loadState(), queueId, script, { voiceName, speed, referenceStyle })));

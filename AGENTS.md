@@ -1,5 +1,7 @@
 # TikTok Autoposting agent instructions
 
+- Gwen-TTS is reviewed as a separate Qwen3 preparation-only backend; see docs/GWEN_TTS.md. Use voice:gwen:prepare for original consented human datasets only. Do not import bundled named-speaker references, reuse VieNeu adapters, treat4GB inference VRAM as a training requirement, download weights, train or activate a voice merely because the exporter exists. RAG review context is not acoustic training data.
+
 - V-TTS source was reviewed at e22eef3267869375e40a096b376cde94aa41e610; CC-BY-NC4.0 blocks commercial Sakura adoption without written permission. Do not execute its installers, checkpoints, cloning or auto-downloads. See docs/V_TTS_REVIEW.md. Use the original kit's voice:corrections CLI/read-only context tool for exact-profile negative feedback; its private ledger never confers a correction, training or publication approval. Keep this corpus separate from product facts.
 
 - Latest October31 priority:100videos total, including2already accepted that day; user chose keep20-minute spacing and carry over the remainder. Prioritize98new video creatives within standing dailycapacity; preserve accepted photos/videos. See docs/VIDEO_PRIORITY_100.md and the private video-priority manifest. This is not100 native schedules or permission to publish rejected narration.

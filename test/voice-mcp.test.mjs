@@ -20,6 +20,8 @@ test('isolated voice plugin exposes safe schemas and reports missing runtime ins
     assert.equal(tools.find(t=>t.name==='voice_correction_context').annotations.readOnlyHint,true);
     const review=JSON.parse((await client.callTool({name:'voice_provider_review',arguments:{}})).content[0].text);
     assert.equal(review.license,'CC-BY-NC-4.0');assert.equal(review.productionReady,false);assert.equal(review.upstreamCodeExecuted,false);
+    const gwen=JSON.parse((await client.callTool({name:'voice_provider_review',arguments:{provider:'gwen-tts'}})).content[0].text);
+    assert.equal(gwen.modelCardLicense,'MIT');assert.equal(gwen.trainingExecuted,false);assert.equal(gwen.productionReady,false);
     assert.equal((await client.callTool({name:'voice_correction_context',arguments:{receiptFile:'relative.json',query:'phát âm'}})).isError,true);
     assert.equal((await client.callTool({name:'voice_brief',arguments:{queueId:'../../escape'}})).isError,true);
     assert.equal((await client.callTool({name:'voice_brief',arguments:{queueId:'sakura-999'}})).isError,true);

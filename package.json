@@ -13,6 +13,7 @@
     "knowledge": "node scripts/knowledge.mjs",
     "edit:kit": "node scripts/herk-edit.mjs",
     "voice:corrections": "node scripts/voice-corrections.mjs",
+    "voice:gwen:prepare": "node scripts/prepare-gwen-training.mjs",
     "prepare:content-tuning": "node scripts/prepare-content-tuning.mjs"
   },
   "dependencies": {
