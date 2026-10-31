@@ -1,5 +1,9 @@
 # Chiến dịch carousel10ngày
 
+## Latest conditional-offer authorization
+
+The user confirmed all50customer allowances available and none allocated in call_f019bcdaea2146889425ce39add2622a, then chose conditional scheduled offers in call_297ccc4180d841f88c8587bfadf08034. Availability and conditions are checked when the customer calls. This supersedes older pending/count-at-publication requirements below for this new November1–10 customer campaign only. It is not a future remaining-count guarantee. Use the canonical hash-bound ledger and conditional-contact-check validator; include “Gọi để kiểm tra ưu đãi còn áp dụng không và điều kiện nhận quà.” in every new offer caption. Preserve accepted posts and historical order-campaign gates. Do not fabricate calls, allocations or remaining counts.
+
 Latest user instructions on2026-10-31: focus on native five-image photo carousels, pain-point research, natural Vietnamese marketing copy, voice-over where actually supported, and different suitable music. Stop new video/slideshow/CapCut generation. Target50verified public posts/day for10full Vietnam-calendar days, November1–10,2026:500positions including existing accepted reservations. This supersedes the earlier20/day50-day production goal and the extra50-video route. Accepted posts and immutable source plans stay unchanged.
 
 The user chose50/day with shorter spacing in call_d82047ce29ae414c8c593e085ae320aa. Use a15-minute grid,08:00–20:15UTC+7;50posts span12hours15minutes. Keep30minutes preparation lead, native five-minute selectable times, exact account/location/music/disclosures, and real receipts. Never describe local allocations as native schedules. Do not extend production beyondNovember10without new instructions.
