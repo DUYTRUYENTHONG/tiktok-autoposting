@@ -14,6 +14,8 @@ The existing recurring follow-up is **Sakura · 30 posts per day**,05:30 prepara
 
 ## Creative and lead measurement
 
+Use the [native performance collection workflow](PERFORMANCE_COLLECTION.md) to collect watch time and completion from each post's actual Overview when available. The content table alone omits shares/saves/retention; missing fields are unknown. Keep retention summaries separate from measured three-second retention and import cumulative counters without adding repeated snapshots together.
+
 [src/content-bank.mjs](../src/content-bank.mjs) contains28 original illustrative story hypotheses: after-work kitchen fatigue, shared chores, small rentals, surface compatibility, familiar cookware, footwear, bathroom spots, aging plastic, vehicle trim, washer exterior and offer clarity. These model creator storytelling structure; they are not real customer testimonials or proven Vietnamese organic winners. New image production must preserve the real product reference and be visually checked.
 
 Each daily queue item has a unique leadCode, for example BẾP021. The CTA asks for a surface photo, material and stain type. A direct reply can also establish attribution. An inquiry becomes qualified only after an actual need and material/surface are observed. An order requires real order evidence. Do not create a lead because someone viewed or liked a post.
