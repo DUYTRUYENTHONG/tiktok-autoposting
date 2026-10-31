@@ -5,6 +5,7 @@ import {emptyState,mergeImport,buildBriefs,analyze,recommendSlots} from './engin
 import {root,loadState,saveState,updateState,ingestFolder} from './store.mjs';
 import {prepareSakura} from './sakura.mjs';
 import {dailyKpi,leadSummary} from './daily-kpi.mjs';
+import {hypothesisFamilyReport} from './hypothesis-families.mjs';
 
 const [command,...args]=process.argv.slice(2);
 try{
@@ -34,6 +35,9 @@ try{
     await writeFile(file,JSON.stringify({generatedAt:new Date().toISOString(),briefs},null,2),'utf8');console.log(file);
   }else if(command==='status'){
     const state=await loadState();console.log(JSON.stringify({dailyKpi:dailyKpi(state),leads:leadSummary(state),analysis:analyze(state),schedule:recommendSlots(state)},null,2));
+  }else if(command==='families'){
+    if(args.length)throw Error('families takes no arguments; it reads the canonical published observations');
+    console.log(JSON.stringify(hypothesisFamilyReport(await loadState()),null,2));
   }else if(command==='install-agents'){
     const source=path.join(root,'.codex','agents');const destination=path.join(homedir(),'.codex','agents');
     await mkdir(destination,{recursive:true});
@@ -66,7 +70,7 @@ try{
       }
     }
   }else{
-    console.log('Lệnh: init | sakura <thư-mục> | ingest <thư-mục> --area <khu-vực> | import <json> | brief | status | install-skills <deerflow>');
+    console.log('Lệnh: init | sakura <thư-mục> | ingest <thư-mục> --area <khu-vực> | import <json> | brief | status | families | install-skills <deerflow>');
     if(command)process.exitCode=1;
   }
 }catch(e){console.error(e.message);process.exitCode=1;}

@@ -11,3 +11,9 @@ Import cumulative snapshots through `node src/cli.mjs import ABS_OBSERVATIONS.js
 Compare the same product, native format, promotion and organic/paid distribution at comparable24–72-hour observation ages. Record differences in hook, footage, duration, music and publication context. One post per angle cannot establish a winner. The kit's3-post/500-view thresholds are operating heuristics, not significance tests. Early drop-off supports testing opening relevance or clarity; it does not by itself isolate narration, music, visuals or audience mismatch as the cause.
 
 Calls, qualified inquiries and orders require actual evidence. Leave them unknown when no observation exists. Never turn views, favorites or completion into leads. Preserve accepted posts; improve future unsubmitted creatives rather than deleting or duplicating a post to change its hook or sound. Close the task browser tabs after collection as requested.
+
+## Related story families
+
+`node src/cli.mjs families` reads canonical published observations and follows explicit `sourceHypothesisId`/`sourceAngleId` links to a same-product parent. It preserves individual creative/angle IDs and does not modify accepted posts or the existing angle winner calculation. Unknown parents remain excluded rather than being merged by similar wording.
+
+The report separates product, native format, organic/paid/unknown distribution, promotion and12-hour observation-age bands within24–72hours. Each post contributes only its newest cumulative snapshot within each band. A post can appear in more than one band: never add those band totals. Missing shares/saves keep engagement unknown; incomplete posts do not enter its denominator. The report is descriptive, with no family winner or conversion inference: related stories can differ in narration, music, footage and timing. A CLI report does not make the HTTP tracker live or automatically ingest TikTok metrics.
