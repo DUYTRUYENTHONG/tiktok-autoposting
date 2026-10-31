@@ -20,5 +20,11 @@ test('five-image native adaptation is scoped, hash-bound, ordered and cannot cla
   assert.notEqual(scalePostHash(item,good),scalePostHash(item,{...good,photoStory:{...good.photoStory,voiceOverAttached:true}}));
   assert.notEqual(scalePostHash(item,good),scalePostHash(item,{...good,photoTitle:'Changed public title'}));
   const badTitle=await bindScaleCreative(item,review({...evidence,photoTitle:'Mua 1 tặng 1'}),{state,now});assert.ok(badTitle.readiness.blockers.includes('discount_not_verified_for_actual_publication_time'));
+  const ledgerFile=path.join(dir,'customer-ledger.json'),publishNow=item.proposedPublishAt;
+  await fs.writeFile(ledgerFile,JSON.stringify({campaignId:'sakura-contact-50-november',terms:{unit:'customers',capacity:50,channel:'TikTok-origin contact',startDay:'2026-11-01',endDay:'2026-11-10'},countsVerified:true,countVerifiedAt:publishNow,countSource:{kind:'user-confirmation',reference:'chat:synthetic_test'},remainingCustomers:50,allocatedCustomers:0}));
+  const contactOfferLedger={path:ledgerFile,sha256:await hashFile(ledgerFile)},currentState={...state,campaign:{...state.campaign,currentPromotionBrief:{file:ledgerFile,sha256:contactOfferLedger.sha256}}},offer=review({...evidence,photoTitle:'Mua 1 tặng 1',contactOfferLedger});
+  const current=await bindScaleCreative(item,offer,{state:currentState,now:publishNow});assert.equal(current.readiness.blockers.includes('discount_not_verified_for_actual_publication_time'),false);assert.ok(current.readiness.blockers.includes('proposed_time_expired_or_too_near'));
+  assert.ok((await bindScaleCreative(item,offer,{state:currentState,now})).readiness.blockers.includes('discount_not_verified_for_actual_publication_time'));
+  await fs.writeFile(ledgerFile,'{}');assert.ok((await bindScaleCreative(item,offer,{state:currentState,now:publishNow})).readiness.blockers.includes('contact_offer_ledger_hash_mismatch'));
  }finally{await fs.rm(dir,{recursive:true,force:true});}
 });

@@ -1,4 +1,6 @@
 import {createHash} from 'node:crypto';
+import {readFile} from 'node:fs/promises';
+import {contactPromotionEligibility} from './contact-promotion.mjs';
 import path from 'node:path';
 import {hashFile,root} from './store.mjs';
 import {voiceRuntime} from './voice.mjs';
@@ -203,7 +205,14 @@ export async function bindScaleCreative(item,evidence,{state={},now=new Date().t
   if(offerReview?.verified!==true||offerReview.postHash!==postHash||!reviewTime(offerReview.verifiedAt,now)||typeof offerReview.containsDiscount!=='boolean')blockers.push('bound_offer_content_review_missing');
   const spoken=evidence.spokenScript??item.creative.videoScript??'';
   if(offerReview?.containsDiscount||containsDiscount((evidence.caption??'')+' '+spoken+' '+(evidence.photoTitle??''))){
-    if(!item.promotion.showDiscount||!promotionEligibility(evidence.orderLedger,item.proposedPublishAt,{now}).showDiscount)blockers.push('discount_not_verified_for_actual_publication_time');
+    let contactEligible=false;
+    if(fivePhoto&&evidence.contactOfferLedger){
+      const ledger=evidence.contactOfferLedger,current=state.campaign?.currentPromotionBrief;
+      await verifyBytes(ledger,'contact_offer_ledger',blockers);
+      if(ledger.path!==current?.file||ledger.sha256!==current?.sha256)blockers.push('current_contact_offer_ledger_mismatch');
+      else try{if(await hashFile(ledger.path)===ledger.sha256)contactEligible=contactPromotionEligibility(JSON.parse(await readFile(ledger.path,'utf8')),item.proposedPublishAt,{now}).showDiscount;}catch{blockers.push('contact_offer_ledger_unreadable');}
+    }
+    if(!contactEligible&&(!item.promotion.showDiscount||!promotionEligibility(evidence.orderLedger,item.proposedPublishAt,{now}).showDiscount))blockers.push('discount_not_verified_for_actual_publication_time');
   }
   const music=evidence.music;
   const noId=music?.soundId===null;
