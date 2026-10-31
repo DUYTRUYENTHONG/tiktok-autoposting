@@ -6,6 +6,8 @@ Phiên bản 2026-10-31. Thực thi trong repo Sakura với vn-content-research,
 
 Đọc nhãn Sakura500ml, hướng dẫn hiện tại, sổ nghiên cứu, số liệu thật và danh mục footage. Chỉ lấy sự kiện được nguồn hỗ trợ. Với mỗi quan sát, trả về URL, thời điểm truy cập có múi giờ, địa lý, ngữ cảnh hãng/quảng cáo/organic, số liệu và kỳ đo nếu lộ ra, điều chưa biết và câu hỏi khách hàng cần kiểm tra. Không biến hướng dẫn của hãng khác thành công dụng Sakura. Không dùng đoạn trích tìm kiếm thay cho trang đã mở. Tách quan sát khỏi suy luận và giả thuyết. Không chép bình luận riêng tư hoặc tên khách hàng. Chỉ gọi góc thắng khi có kết quả so sánh đủ điều kiện.
 
+Xác minh vai trò của đoạn chữ trên trang: FAQ do nhà bán soạn, nhãn chọn trong biểu mẫu đánh giá và số sao tổng không phải lời khách. Chỉ nhận một câu hỏi/bình luận khi thấy đúng nội dung từng mục đã đăng và sản phẩm liên quan; phần thân không truy cập được là thiếu bằng chứng. So tên/chai/loại sản phẩm, không ghép các mặt hàng chỉ vì cùng chữSakura hoặc500ml.
+
 ## 2. Góc nội dung và ba mở đầu
 
 Từ nguồn đã đọc, đề xuất câu chuyện khác nhau về quyết định mua và việc nhà: một người ôm hết việc; chọn vì giá mà chưa biết vật liệu; nhầm vết bám với đổi màu; không biết nên bắt đầu từ đâu; một chai có thay mọi loại nước lau không; xem nhãn trước khi chọn. Mỗi góc có ba cơ chế mở đầu thật sự khác nhau: nhận ra tình huống, câu hỏi quyết định, hoặc cho thấy vấn đề chưa giải quyết. Nêu câu hỏi giữ người xem, điều nhìn thấy trong ba giây đầu, câu trả lời được trả trước CTA, cảnh nguồn và giới hạn bằng chứng. Không chỉ thay vài từ trên cùng một ảnh. Không dựng lời chứng thực hay kết quả tẩy sạch.

@@ -59,4 +59,6 @@ Cảnh tái hiện/stock/generated: “Nhân vật và tình huống chỉ để
 
 ## Phần còn thiếu
 
+Cập nhật31/10: [nghiên cứu câu hỏi trước khi mua](BUYER_QUESTION_RESEARCH.md) bổ sung quan sát từ trang tiếng Việt và hai hướng kịch bản về khoản thanh toán/thông tin chai thực tế. Tùy chọn biểu mẫu đánh giá và FAQ do nhà bán viết được tách rõ khỏi lời khách; chưa có câu hỏi Sakura được xác minh. Chỉ mục nghiên cứu riêng không thay sự kiện/chính sách sản xuất.
+
 Chưa có tỷ lệ tìm kiếm, mẫu bình luận Việt, trích dẫn khách đã được xác minh, case paid được phân tích hoặc kết quả organic cho 12 hướng mới. Vì vậy không gọi chúng là “nỗi đau phổ biến”, “khách đều hỏi” hay “winning ads”. Bước tiếp theo có tính phân biệt: thu câu hỏi công khai nguyên văn kèm URL/ngày/ngữ cảnh hoặc câu hỏi cuộc gọi có sự đồng ý; duyệt nhãn/tư liệu thật; tạo một cohort nhỏ đủ so sánh. Tài liệu này không tạo media, tốn credit nhà cung cấp, đăng bài hoặc sửa dữ liệu chuẩn.
