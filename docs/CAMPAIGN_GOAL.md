@@ -2,6 +2,8 @@
 
 Operate the Vietnamese Sakura 500 ml content workflow for @saigomlia: develop original natural Vietnamese stories and footage edits, test evidence-backed pain-point hypotheses, and expand only angles supported by comparable results.
 
+Latest dated batch addition:50additional CapCut Seedance1.0Fast videos requested on October31, with free benefits only,20-minute spacing and carryover. Existing posts are excluded from that batch. See [the50-video batch](CAPCUT_FIFTY.md); proposed capacity and unknown free eligibility are not native generation/scheduling receipts. Preserve the future20/day rollout.
+
 - First milestone:100 unique verified public publications. The broader registered immutable plan contains1,000 additional intents,500photos and500videos; intent is not a platform schedule.
 - October31 update:20 verified public posts per Vietnam calendar day for50days, from2026-10-31through2026-12-19inclusive:1,000total daily positions including accepted reservations. Keep the immutable source campaign and100-video priority within that capacity; preserve accepted photos. This supersedes30/day for30days. Use the existing format mix where priority and reservations permit. Report missing source intents/assets and native-horizon limits rather than adding duplicate posts. A local allocation is not a TikTok schedule. See [video priority](VIDEO_PRIORITY_100.md) and [50-day rollout](FIFTY_DAY_ROLLOUT.md).
 - October30 exception:30 additional items tonight, up to40 accepted/allocated items that day, at least five minutes apart. Native eligibility,30-minute preparation lead and existing reservations remain required.
