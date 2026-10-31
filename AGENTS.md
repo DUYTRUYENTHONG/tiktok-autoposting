@@ -1,5 +1,7 @@
 # TikTok Autoposting agent instructions
 
+- October31 latest cadence:30posts/day for30days, October31–November29UTC+7,900total positions including accepted reservations, aiming15photos/15videos where preserved items permit. This supersedes20/day text below. Keep the registered immutable source plan; use the private rolling allocation as a proposal only, with checked current-day revisions and actual native horizon verification before submission. See docs/THIRTY_DAY_ROLLOUT.md. Do not apply the October30 exception to new dates.
+
 - Current campaign scope is maintained in docs/CAMPAIGN_GOAL.md. Ongoing source-linked angle research and original creative testing are part of the goal; docs/ANGLE_RESEARCH_EXPANSION.md contains untested hypotheses, not proven winners. The accepted voice tone is profileB; exact WAV approvals remain separate. Requested ai-video-generation skill is installed globally; external provider generation is not operational merely because the skill is installed.
 
 - October30 music update: vary Vietnamese music on each remaining unsubmitted post. Verify native commercial availability and exposed title/artist/duration; preserve accepted posts. Account recommendations and the generic Trending playlist do not establish a Vietnam national chart rank. If no numeric sound ID is exposed, bind exact native metadata plus separate hash-verified catalogue and composer screenshots; never invent an ID.

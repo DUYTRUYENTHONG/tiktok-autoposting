@@ -1,4 +1,6 @@
-# Sakura · 20 posts per day
+# Sakura · 30 posts per day
+
+October31 user update supersedes earlier cadence:30verified publications/day, aiming15photos and15videos where preserved reservations permit. Work toward the900total positions forOctober31–November29inclusive; existing accepted items count in their actual days. Read docs/THIRTY_DAY_ROLLOUT.md and the private rolling allocation. Keep the registered source manifest immutable. The October30 exception is expired. This local prompt edit does not establish that the saved app automation has been updated.
 
 Work in C:\Users\CROSSIAN\Downloads\tiktok-autoposting. Read AGENTS.md, docs/OPERATIONS.md, docs/DAILY_OPERATIONS.md, docs/SCALE_CAMPAIGN.md, docs/SCALE_VIDEO_PRODUCTION.md and docs/VOICE_AND_MUSIC.md. Use canonical private campaign state and reconcile state/pilot-submission-journal.json plus the registered scale progress journal before uploads. Root is the sole submission owner; verify @saigomlia in the selected internal browser.
 
