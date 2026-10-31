@@ -1,5 +1,7 @@
 # Daily posting and lead attribution
 
+Check `campaign.pendingAnimationReview` before uploading an animation. Its exact native-draft receipt identifies the current private review item and selected music. Reopen that draft after its edit/mix review; do not upload a duplicate, inherit a new audio approval or count a private draft toward daily publications/reservations. The approved narration remains unchanged. An elapsed source slot still needs an explicit checked revision before submission.
+
 Latest October29 rule: internal post IDs and inquiry codes stay private. New public images, captions, narration and CTAs omit them, and progress updates describe the content in plain language. The call CTA remains “Gọi số điện thoại trong bio để được tư vấn”; ask for the cleaning need and material/surface. Earlier code-based examples below are historical schemas, not instructions to print codes. Keep existing accepted posts unchanged. Attribute calls only when evidence identifies a post; otherwise leave attribution unknown.
 
 The current KPI is20 unique receipt-verified published posts per Asia/Ho_Chi_Minh day for50days, October31–December19,2026inclusive. This supersedes30/day for30days. Preserve the100-video priority and accepted reservations; use the existing format mix where those permit. The first100 remains a cumulative milestone. Scheduled and under-review posts reserve capacity but do not satisfy the publication KPI. See [50-day rollout](FIFTY_DAY_ROLLOUT.md).
