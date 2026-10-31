@@ -5,7 +5,7 @@ import {voiceRuntime} from './voice.mjs';
 import {loadReviewedVoice} from './reviewed-voice.mjs';
 import {vietnamDay} from './daily-kpi.mjs';
 import {painpointStories} from './content-bank.mjs';
-import {rollingLimits} from './ten-day-cadence.mjs';
+import {rollingLimits,tenDayReference} from './ten-day-cadence.mjs';
 
 const HOUR=3600000,DAY=24*HOUR,MINUTE=60000;
 export const scalePolicy=Object.freeze({version:1,campaignId:'sakura-scale-1000-20261029',account:'saigomlia',productId:'sakura-cleaner-500ml',earliestDay:'2026-10-29',total:1000,photo:500,video:500,dailyTotal:20,dailyPhoto:10,dailyVideo:10,minSpacingMinutes:20,windowStart:'08:00',windowEnd:'22:15',timezone:'Asia/Ho_Chi_Minh',location:'Vựa Sầu Riêng Cô Ba, 322 Đ. Huỳnh Thị Hai'});
@@ -172,7 +172,7 @@ export function buildScaleCampaign(state,{now=new Date().toISOString(),startDay=
 
 function nativeMusicIdentity(music){return {title:music.title,artist:music.artist,duration:music.duration,language:music.language,identitySource:music.identitySource,catalogEvidenceSha256:music.catalogEvidence?.sha256,selectionEvidenceSha256:music.selectionEvidence?.sha256};}
 export function scalePostHash(item,evidence){return scaleHash({intentId:item.id,intentHash:item.intentHash,...(item.scheduleRevision?{scheduleRevisionHash:scaleHash(item.scheduleRevision)}:{}),account:evidence.account,format:item.format,publishAt:item.proposedPublishAt,location:evidence.location,caption:evidence.caption,
-  assets:(evidence.assets??[]).map(a=>({order:a.order,sha256:a.sha256})),voiceSha256:evidence.voice?.sha256??null,spokenScript:evidence.spokenScript??item.creative.videoScript,musicSoundId:evidence.music?.soundId??null,...(evidence.music?.soundId===null?{musicNativeIdentity:nativeMusicIdentity(evidence.music)}:{}),demoKind:evidence.demoKind});}
+  assets:(evidence.assets??[]).map(a=>({order:a.order,sha256:a.sha256})),...(evidence.photoStory?{photoStory:evidence.photoStory,photoTitle:evidence.photoTitle}:{}),voiceSha256:evidence.voice?.sha256??null,spokenScript:evidence.spokenScript??item.creative.videoScript,musicSoundId:evidence.music?.soundId??null,...(evidence.music?.soundId===null?{musicNativeIdentity:nativeMusicIdentity(evidence.music)}:{}),demoKind:evidence.demoKind});}
 async function verifyBytes(asset,label,blockers){if(!asset||!path.isAbsolute(asset.path??'')||!/^[a-f0-9]{64}$/.test(asset.sha256??'')){blockers.push(label+'_path_or_hash_missing');return;}
   try{if(await hashFile(asset.path)!==asset.sha256)blockers.push(label+'_hash_mismatch');}catch{blockers.push(label+'_file_unavailable');}}
 const reviewTime=(value,now)=>validTime(value)&&Date.parse(value)<=Date.parse(now);
@@ -187,10 +187,14 @@ export async function bindScaleCreative(item,evidence,{state={},now=new Date().t
   const privateCodes=state.campaign?.publicPostCodes===false||evidence.publicPostCodes===false;
   if(privateCodes){
     if(typeof evidence.caption!=='string'||!evidence.caption.trim())blockers.push('caption_missing');
-    const publicText=[evidence.caption,evidence.spokenScript].filter(x=>typeof x==='string').join(' ').normalize('NFD').replace(/\p{M}/gu,'').toUpperCase();
+    const publicText=[evidence.caption,evidence.spokenScript,evidence.photoTitle].filter(x=>typeof x==='string').join(' ').normalize('NFD').replace(/\p{M}/gu,'').toUpperCase();
     if(/\b(?:ANH|GIONG|BEP)\s*\d{3,}\b|SAKURA[-_](?:SCALE[-_])?\d+/u.test(publicText)||publicText.includes(item.id.toUpperCase()))blockers.push('public_internal_identifier');
   }else if(typeof evidence.caption!=='string'||!evidence.caption.includes(item.leadCode))blockers.push('caption_or_lead_code_missing');
-  if(assets.length!==item.requirements.assetCount||assets.some((a,i)=>a.order!==i+1)||new Set(assets.map(a=>a.sha256)).size!==assets.length)blockers.push('asset_count_order_or_uniqueness_mismatch');
+  const story=evidence.photoStory,fivePhoto=story?.adapter==='native-five-photo-v1'&&story.sourceIntentHash===item.intentHash&&story.assetCount===5&&story.voiceOverAttached===false&&item.format==='photo'&&item.scheduleRevision?.policyReference===tenDayReference&&state.campaign?.rollingGoal?.policyReference===tenDayReference;
+  if(story&&!fivePhoto)blockers.push('unapproved_photo_story_adaptation');
+  if(fivePhoto&&(typeof evidence.photoTitle!=='string'||!evidence.photoTitle.trim()||[...evidence.photoTitle].length>90))blockers.push('native_photo_title_missing_or_too_long');
+  if(fivePhoto&&(evidence.voice||evidence.spokenScript!==''))blockers.push('native_photo_narration_must_remain_separate');
+  if(assets.length!==(fivePhoto?5:item.requirements.assetCount)||assets.some((a,i)=>a.order!==i+1)||new Set(assets.map(a=>a.sha256)).size!==assets.length)blockers.push('asset_count_order_or_uniqueness_mismatch');
   for(const [i,asset] of assets.entries())await verifyBytes(asset,'asset_'+(i+1),blockers);
   if(evidence.authenticProductReferenceVerified!==true)blockers.push('authentic_product_reference_review_missing');
   if(evidence.demoKind!=='product_identity')blockers.push('missing_authentic_efficacy_demo_evidence');
@@ -198,7 +202,7 @@ export async function bindScaleCreative(item,evidence,{state={},now=new Date().t
   const offerReview=evidence.offerReview;
   if(offerReview?.verified!==true||offerReview.postHash!==postHash||!reviewTime(offerReview.verifiedAt,now)||typeof offerReview.containsDiscount!=='boolean')blockers.push('bound_offer_content_review_missing');
   const spoken=evidence.spokenScript??item.creative.videoScript??'';
-  if(offerReview?.containsDiscount||containsDiscount((evidence.caption??'')+' '+spoken)){
+  if(offerReview?.containsDiscount||containsDiscount((evidence.caption??'')+' '+spoken+' '+(evidence.photoTitle??''))){
     if(!item.promotion.showDiscount||!promotionEligibility(evidence.orderLedger,item.proposedPublishAt,{now}).showDiscount)blockers.push('discount_not_verified_for_actual_publication_time');
   }
   const music=evidence.music;
