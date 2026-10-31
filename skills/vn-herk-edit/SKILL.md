@@ -20,3 +20,7 @@ Before any new edit, record DESIGN.md: audience/pain, hook/open-loop/payoff, exa
 Select varied suitable Vietnamese music through the account's native commercial library; record its exposed identity. National trend rank and rights beyond the observed catalogue require separate evidence. Keep music below narration. Do not export TikTok audio or reuse other creators' videos. Accepted posts remain unchanged; publishing stays with the sole browser owner and normal receipt checks.
 
 Upstream AIS branding is excluded from Sakura output. Retain upstream MIT, pipeline and Apache notices. HyperFrames, GSAP, fonts and embedded media have their own terms. Missing prescribed helpers such as `qa-tokens`, `qa-legibility` or `qa-seamjump` are not installed checks. HyperFrames dependencies/browser rendering are separate from installing skills; use the established FFmpeg renderer until an actual optional runtime is provisioned and verified.
+
+## Footage variation after user feedback
+
+The user requested different footage on October31. For each new revision, compare ordered source IDs and hashes with the preceding draft and record the delta in DESIGN.md. Reordering the same shots is not fresh footage. Select for the actual story first: do not use unrelated car, device or spray-bottle footage just to vary the image. Inspect new intervals when the compatible reviewed pool is exhausted. Preserve accepted posts, exact approved narration and source history. Report how many sources actually changed; never claim previously used stock is globally new.
