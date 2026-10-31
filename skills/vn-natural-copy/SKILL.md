@@ -16,6 +16,14 @@ Read the actual text and its destination: spoken script, on-image text and capti
 
 For spoken copy, use complete conversational clauses and natural breath groups. Do not make narration read hashtags, private codes or long legal-style captions. For images, use one main message per card and short readable lines. For captions, add information instead of copying the full hook twice.
 
+## Natural persuasion for product stories
+
+Begin with a concrete moment the customer can recognize, then give one useful answer before the CTA. Shared chores, preparing a place for guests and deciding what a small home needs are different stories; do not reuse the same material-question checklist as every body. Make the product transition sound spoken: “Còn nước lau, mình chọn theo chỗ cần dùng” is clearer than “mình dành cho một quyết định riêng.” Prefer “chọn đúng nhu cầu trước khi mua” to abstract sales language.
+
+Explain why the customer would call: ask whether the product suits the actual surface, what the current price is, and what the buying conditions are. These remain questions, not promises of suitability or savings. Keep one clear call action. Preserve qualifications necessary to avoid misleading the viewer; place topic-specific detail in the reviewed caption where appropriate instead of repeatedly reading every disclaimer aloud. Caption edits must not silently drop those qualifications.
+
+Write three genuinely different hook mechanisms and choose by the story's useful payoff, not by loudness or manufactured controversy. Natural, helpful and persuasive are editorial judgments until real viewing and qualified-call evidence exists. Use the current Herk storytelling direction in `docs/VIETNAMESE_SCRIPT_DIRECTION.md` when working in the Sakura repo. Preserve the selected voice setting and exact accepted WAVs; new wording creates a new listening candidate.
+
 Useful corrections, applied in context rather than as automatic replacements:
 
 - “Nhìn giống, lau giống được sao?” → “Nhìn giống nhau, có lau cùng một cách được không?”

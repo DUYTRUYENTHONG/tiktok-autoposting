@@ -44,6 +44,12 @@ export function validatePreparedVoice(voice,script,profile){
     ||!path.isAbsolute(voice.path??'')||!/^[a-f0-9]{64}$/u.test(voice.sha256??''))throw Error('Prepared narration does not match this exact script/profile');
   return voice;
 }
+export async function loadCachedVoice(file,{script,profile,modelSha256,runtimeConfigSha256}){
+  let voice;try{voice=JSON.parse(await readFile(file,'utf8'));}catch(error){if(error.code==='ENOENT')return null;throw error;}
+  validatePreparedVoice(voice,script,profile);
+  if(voice.modelManifestSha256!==modelSha256||voice.runtimeConfigSha256!==runtimeConfigSha256||await hashFile(voice.path)!==voice.sha256||(await readFile(voice.scriptFile,'utf8'))!==script)throw Error('Cached narration bytes/script/runtime changed; preserve and inspect');
+  return voice;
+}
 export function curatedStory(item){
   if(item.creative.sourceHypothesisId!=='sakura-pain-chia-viec')throw Error('Provide --brief for this different story angle; no automatic bulk copy');
   return {intentId:item.id,intentHash:item.intentHash,author:'Codex session, original one-item story',
@@ -56,18 +62,20 @@ export function curatedStory(item){
 export function validateBrief(brief,item){
   if(brief.intentId!==item.id||brief.intentHash!==item.intentHash||typeof brief.script!=='string'||brief.script.length<250||brief.script.length>1500
     ||brief.clipIds?.length!==4||new Set(brief.clipIds).size!==4)throw Error('A specific hash-bound story and four reviewed intervals are required');
-  for(const key of ['script','headline','tension','decision','identity','questions','price','stockLabel']){
+  for(const key of ['script','headline','tension','decision','identity','questions','price','stockLabel',...['caption','captionQualification'].filter(key=>brief[key]!==undefined)]){
     if(typeof brief[key]!=='string'||!brief[key].trim())throw Error('Missing story text:'+key);assertEvergreen(brief[key]);
     const text=brief[key].normalize('NFD').replace(/\p{M}/gu,'').replaceAll('đ','d').toLowerCase();
     if(/\b(?:anh|giong|bep)\s*\d{3,}\b|sakura[-_](?:scale[-_])?\d+/u.test(text))throw Error('Public story text contains an internal identifier');
     if(/\b(?:inbox|nhan tin|nhan shop|nhan cho shop|gui shop|link trong bio|bam link)\b/u.test(text))throw Error('Public story must follow the call-only CTA policy');
     if(/sach bong|tay sach moi|diet khuan|diet virus|an toan tuyet doi|dung duoc moi|khach hang noi|khach da dung|cam ket|bao dam|chung nhan/.test(text))throw Error('Unsupported efficacy/safety/testimonial copy is outside this identity preview');
   }
-  if(!/năm trăm|500/u.test(brief.script)||!/giá/u.test(brief.script)||!/điều kiện/u.test(brief.script)||!/bề mặt|vật liệu/u.test(brief.script))throw Error('Story must cover identity/material questions/current-price inquiry');
+  if(brief.captionQualification&&!brief.caption?.includes(brief.captionQualification))throw Error('Topic-specific qualification must be retained in the supplied caption');
+  if(!/năm trăm|500/iu.test(brief.script)||!/giá/iu.test(brief.script)||!/điều kiện/iu.test(brief.script)||!/bề mặt|vật liệu/iu.test(brief.script))throw Error('Story must cover identity/material questions/current-price inquiry');
   return brief;
 }
 export function publicVideoCopy(brief){
-  return {cta:'Gọi số điện thoại trong bio',caption:captionWithVoiceCredit(`${brief.headline.replaceAll('\n',' ')}\n\nTìm hiểu Sakura500ml. Gọi số điện thoại trong bio để được tư vấn; nêu nhu cầu, vật liệu và lớp phủ nếu biết. Hỏi giá và điều kiện mua hiện tại trước khi chốt.\nTình huống minh họa; không phải thử nghiệm hay lời chứng thực.`, 'vieneu')};
+  const caption=brief.caption??`${brief.headline.replaceAll('\n',' ')}\n\nTìm hiểu Sakura500ml. Gọi số điện thoại trong bio để được tư vấn; nêu nhu cầu, vật liệu và lớp phủ nếu biết. Hỏi giá và điều kiện mua hiện tại trước khi chốt.\nTình huống minh họa; không phải thử nghiệm hay lời chứng thực.`;
+  return {cta:'Gọi số điện thoại trong bio',caption:captionWithVoiceCredit(caption,'vieneu')};
 }
 export function wrapStoryCard(text){
   return text.normalize('NFC').split(/\r?\n/u).map(line=>wrapVideoText(line)).join('\n');
@@ -166,7 +174,8 @@ async function selfTest(){
 async function main(args){
   if(args.length===1&&args[0]==='--self-test'){await selfTest();return;}
   const options={};
-  for(let i=0;i<args.length;){const key=args[i++]?.replace(/^--/u,'');if(key==='grounding-only'){options[key]=true;continue;}if(!['plan','id','brief','captions','voice-receipt'].includes(key)||!args[i]||args[i].startsWith('--'))throw Error('Use --id EXISTING_SCALE_VIDEO [--plan FILE] [--brief FILE] [--captions RECEIPT] [--voice-receipt RECEIPT] [--grounding-only]');options[key]=args[i++];}
+  for(let i=0;i<args.length;){const key=args[i++]?.replace(/^--/u,'');if(['grounding-only','voice-only'].includes(key)){options[key]=true;continue;}if(!['plan','id','brief','captions','voice-receipt'].includes(key)||!args[i]||args[i].startsWith('--'))throw Error('Use --id EXISTING_SCALE_VIDEO [--plan FILE] [--brief FILE] [--captions RECEIPT] [--voice-receipt RECEIPT] [--grounding-only | --voice-only]');options[key]=args[i++];}
+  if(options['grounding-only']&&options['voice-only'])throw Error('Choose one preparation-only mode');
   const canonical=await loadState();options.plan=registeredPlanFile(canonical,options.plan);
   if(await hashFile(options.plan)!==canonical.campaign.scaleCampaign.manifestSha256)throw Error('Registered scale plan bytes changed');
   const plan=JSON.parse(await readFile(options.plan,'utf8')),item=validateVideoIntent(plan,options.id??plan.items.find(i=>i.format==='video')?.id);
@@ -192,25 +201,30 @@ async function main(args){
   const prepared=options['voice-receipt']?validatePreparedVoice(JSON.parse(await readFile(options['voice-receipt'],'utf8')),brief.script,profile):null;
   if(prepared&&(await hashFile(prepared.path)!==prepared.sha256||prepared.modelManifestSha256!==runtime.modelSha256||prepared.runtimeConfigSha256!==await hashFile(runtime.configFile)))throw Error('Prepared narration bytes/runtime changed');
   const helper=path.join(root,'scripts/voice-vieneu.py'),productSha256=await hashFile(productImage),scriptSha256=scaleHash(brief.script),
-    binding={intentId:item.id,intentHash:item.intentHash,planHash:plan.planHash,brief,groundingBindingHash:grounding.bindingHash,scenes,productSha256,profile,voiceModelManifestSha256:runtime.modelSha256,voiceHelperSha256:await hashFile(helper),ffmpegSha256:editing.ffmpegSha256,renderer:'scale-evergreen-preview-v6-grounded-linebreaks',...(prepared?{preparedVoiceSha256:prepared.sha256}: {})},revision=scaleHash(binding).slice(0,16),
+    binding={intentId:item.id,intentHash:item.intentHash,planHash:plan.planHash,brief,groundingBindingHash:grounding.bindingHash,scenes,productSha256,profile,voiceModelManifestSha256:runtime.modelSha256,voiceHelperSha256:await hashFile(helper),ffmpegSha256:editing.ffmpegSha256,renderer:'scale-evergreen-preview-v7-voice-first',...(prepared?{preparedVoiceSha256:prepared.sha256}: {})},revision=scaleHash(binding).slice(0,16),
     directory=path.join(root,'state/scale-video-preview',`${item.id}-${revision}`);
   await mkdir(directory,{recursive:true});const resolved=await realpath(directory),privateBase=await realpath(path.join(root,'state/scale-video-preview'));
   if(!resolved.startsWith(privateBase+path.sep))throw Error('Output must remain in the private preview folder');
   const receiptFile=path.join(directory,'receipt.json');
   let prior;try{prior=JSON.parse(await readFile(receiptFile,'utf8'));}catch(e){if(e.code!=='ENOENT')throw e;}
-  if(prior){if(prior.revision!==revision||await hashFile(prior.path)!==prior.sha256||await hashFile(prior.voice.path)!==prior.voice.sha256)throw Error('Cached preview changed; preserve and inspect');const checked=await checkProductionGrounding(prior.grounding,{publicCopy:videoGroundingCopy(brief),account:item.account,productId:item.productId});if(!checked.valid)throw Error('Cached grounding changed or expired: '+JSON.stringify(checked.blockers));await captionPreview(prior,directory,editing,options.captions);return;}
+  if(prior){if(prior.revision!==revision||await hashFile(prior.path)!==prior.sha256||await hashFile(prior.voice.path)!==prior.voice.sha256)throw Error('Cached preview changed; preserve and inspect');const checked=await checkProductionGrounding(prior.grounding,{publicCopy:videoGroundingCopy(brief),account:item.account,productId:item.productId});if(!checked.valid)throw Error('Cached grounding changed or expired: '+JSON.stringify(checked.blockers));if(options['voice-only']){console.log(JSON.stringify({id:item.id,status:'rendered_needs_listening',voiceReceiptFile:path.join(directory,'voice-receipt.json'),path:prior.voice.path,sha256:prior.voice.sha256,seconds:prior.voice.qa.durationSeconds,cached:true,mediaRendered:0,publicationReady:false}));return;}await captionPreview(prior,directory,editing,options.captions);return;}
   await writeFile(path.join(directory,'brief.json'),JSON.stringify(brief,null,2),'utf8');await writeFile(path.join(directory,'binding.json'),JSON.stringify(binding,null,2),'utf8');
+  await writeFile(path.join(directory,'grounding.json'),JSON.stringify(grounding,null,2),'utf8');
   const producerSnapshot=path.join(directory,'producer-source.mjs');await copyFile(fileURLToPath(import.meta.url),producerSnapshot);
-  const scriptFile=path.join(directory,'script.txt'),wav=path.join(directory,'voice.wav');await writeFile(scriptFile,brief.script,'utf8');
+  const scriptFile=path.join(directory,'script.txt'),wav=path.join(directory,'voice.wav'),voiceReceiptFile=path.join(directory,'voice-receipt.json'),runtimeConfigSha256=await hashFile(runtime.configFile);
+  const cachedVoice=await loadCachedVoice(voiceReceiptFile,{script:brief.script,profile,modelSha256:runtime.modelSha256,runtimeConfigSha256});
+  await writeFile(scriptFile,brief.script,'utf8');
   const command=[runtime.python,'-I',helper,'--config',runtime.configFile,'--input',scriptFile,'--output',wav,'--voice',profile.voice,'--speed','1.2','--reference-style','speaker-only'];
-  console.log(JSON.stringify({id:item.id,status:prepared?'reusing_exact_prepared_narration':'rendering_one_new_evergreen_voice',words:brief.script.split(/\s+/u).length,output:directory}));
+  console.log(JSON.stringify({id:item.id,status:cachedVoice||prepared?'reusing_exact_prepared_narration':'rendering_one_new_evergreen_voice',words:brief.script.split(/\s+/u).length,output:directory}));
   let workerOutput;
-  if(prepared){await copyFile(prepared.path,wav);workerOutput=JSON.stringify({reused:true,source:prepared.path,sha256:prepared.sha256});}
+  if(cachedVoice){workerOutput=JSON.stringify({reused:true,source:cachedVoice.path,sha256:cachedVoice.sha256});}
+  else if(prepared){await copyFile(prepared.path,wav);workerOutput=JSON.stringify({reused:true,source:prepared.path,sha256:prepared.sha256});}
   else({stdout:workerOutput}=await run(command[0],command.slice(1),{timeout:300000,maxBuffer:1024*1024,windowsHide:true,env:{...process.env,PYTHONUTF8:'1'}}));
-  const qa=inspectWav(await readFile(wav)),voice={path:wav,sha256:await hashFile(wav),script:brief.script,scriptFile,scriptSha256,qa,provider:'vieneu',...profile,status:'rendered_needs_listening',listeningVerified:false,offline:true,
+  const qa=inspectWav(await readFile(wav)),voice=cachedVoice??{path:wav,sha256:await hashFile(wav),script:brief.script,scriptFile,scriptSha256,qa,provider:'vieneu',...profile,status:'rendered_needs_listening',listeningVerified:false,offline:true,
     command:prepared?null:command,...(prepared?{sourceVoiceReceipt:{path:path.resolve(options['voice-receipt']),sha256:await hashFile(options['voice-receipt']),sourceAudioPath:prepared.path,sourceAudioSha256:prepared.sha256}}:{}),workerOutput:workerOutput.trim(),runtimeConfigSha256:await hashFile(runtime.configFile),modelManifest:runtime.modelManifest,modelManifestSha256:runtime.modelSha256,helperSha256:binding.voiceHelperSha256,attribution:runtime.attribution};
-  await writeFile(path.join(directory,'voice-receipt.json'),JSON.stringify(voice,null,2),'utf8');
+  if(!cachedVoice)await writeFile(voiceReceiptFile,JSON.stringify(voice,null,2),'utf8');
   if(qa.durationSeconds<18||qa.durationSeconds>25)throw Error('Narration must be18–25s for the20–25s final video; preserve the chosen speed');
+  if(options['voice-only']){console.log(JSON.stringify({id:item.id,status:'rendered_needs_listening',voiceReceiptFile,path:voice.path,sha256:voice.sha256,seconds:qa.durationSeconds,cached:!!cachedVoice,mediaRendered:0,publicationReady:false}));return;}
   const seconds=Math.max(20,Math.min(25,Math.ceil(qa.durationSeconds+.8))),stockSeconds=11,packshotSeconds=seconds-stockSeconds;
   await copyFile('C:/Windows/Fonts/arial.ttf',path.join(directory,'Arial.ttf'));await copyFile('C:/Windows/Fonts/arialbd.ttf',path.join(directory,'Arial-Bold.ttf'));
   const segments=[];

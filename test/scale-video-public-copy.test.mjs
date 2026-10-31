@@ -28,6 +28,23 @@ test('story card wrapping retains deliberate Vietnamese breath-group line breaks
   assert.ok(wrapped.split('\n').every(line=>line.length<=27));
 });
 
+test('natural sentence-start capitalization does not reject required Vietnamese story facts',()=>{
+  const item={id:'sakura-scale-10002',intentHash:'fixture',creative:{sourceHypothesisId:'sakura-pain-chia-viec'}};
+  const brief=curatedStory(item);
+  brief.script='Năm trăm mi li là dung tích của chai Sa cu ra này. Bề mặt bạn muốn lau là kính hay gỗ có lớp phủ? Mình xem nhãn và hướng dẫn chăm sóc trước khi chọn sản phẩm. Gọi số điện thoại trong phần giới thiệu để được tư vấn. Giá bao nhiêu, mình hỏi shop trước nhé. Điều kiện mua cũng cần hỏi cho rõ.';
+  assert.equal(validateBrief(brief,item),brief);
+});
+
+test('a supplied reviewed caption retains topic-specific qualifications and passes the same public-copy checks',()=>{
+  const item={id:'sakura-scale-10002',intentHash:'fixture',creative:{sourceHypothesisId:'sakura-pain-chia-viec'}},brief=curatedStory(item);
+  brief.captionQualification='Chưa xác minh độ phù hợp với bề mặt này.';
+  brief.caption='Cùng chia việc nhà. '+brief.captionQualification+' Gọi số điện thoại trong bio để được tư vấn.';
+  assert.equal(validateBrief(brief,item),brief);assert.ok(publicVideoCopy(brief).caption.startsWith(brief.caption));
+  assert.throws(()=>validateBrief({...brief,caption:'Gọi số điện thoại trong bio để được tư vấn.'},item),/qualification/);
+  assert.throws(()=>validateBrief({...brief,caption:brief.caption+' Nhắn shop.'},item),/call-only/);
+  assert.throws(()=>validateBrief({...brief,caption:brief.caption+' Mua một tặng một.'},item),/Evergreen/);
+});
+
 test('scale video grounds the exact narration, overlays and generated caption and stops on missing current CTA evidence',async()=>{
   const item={id:'sakura-scale-10002',intentHash:'fixture',account:'saigomlia',productId:'sakura-cleaner-500ml',creative:{sourceHypothesisId:'sakura-pain-chia-viec'}};
   const brief=validateBrief(curatedStory(item),item),asOf='2026-10-31T01:00:00Z';
