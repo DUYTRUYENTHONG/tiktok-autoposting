@@ -1,5 +1,7 @@
 # TikTok Autoposting agent instructions
 
+- October31 hook direction: emphasize one meaningful focus phrase in each new opening, state the buyer concern/reason to continue, and earn the promised payoff before CTA. Keep exact-script/hash-bound pause/emphasis directions outside speech; vary mechanisms rather than repeat a hook formula. The separate viet-commerce-tts hook-review CLI checks editorial consistency only, not audible prosody or training. Preserve approved WAVs; train only from consented human recordings after existing gates.
+
 - Gwen-TTS is reviewed as a separate Qwen3 preparation-only backend; see docs/GWEN_TTS.md. Use voice:gwen:prepare for original consented human datasets only. Do not import bundled named-speaker references, reuse VieNeu adapters, treat4GB inference VRAM as a training requirement, download weights, train or activate a voice merely because the exporter exists. RAG review context is not acoustic training data.
 
 - V-TTS source was reviewed at e22eef3267869375e40a096b376cde94aa41e610; CC-BY-NC4.0 blocks commercial Sakura adoption without written permission. Do not execute its installers, checkpoints, cloning or auto-downloads. See docs/V_TTS_REVIEW.md. Use the original kit's voice:corrections CLI/read-only context tool for exact-profile negative feedback; its private ledger never confers a correction, training or publication approval. Keep this corpus separate from product facts.
