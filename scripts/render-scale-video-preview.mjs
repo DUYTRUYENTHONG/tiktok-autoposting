@@ -7,6 +7,7 @@ import {root,hashFile,loadState} from '../src/store.mjs';
 import {voiceRuntime,voiceHome,voiceProfile,captionWithVoiceCredit} from '../src/voice.mjs';
 import {inspectWav} from '../src/wav.mjs';
 import {loadReviewedVoice} from '../src/reviewed-voice.mjs';
+import {renderStoryEdit,positionStoryCaptions} from '../src/story-edit.mjs';
 import {scalePolicy,scaleHash,containsDiscount} from '../src/scale-campaign.mjs';
 import {createProductionGrounding,checkProductionGrounding} from '../src/knowledge/production-grounding.mjs';
 import {buildIndex,loadIndex} from '../src/knowledge/index.mjs';
@@ -142,10 +143,12 @@ async function captionPreview(base,directory,editing,existingTimingFile){
   }
   await verifySubtitleReceipt(timed,source);
   if(!timed.usable){console.log(JSON.stringify({id:base.intentId,path:base.path,status:'needs_listening',captions:'needs_caption_review',timingReceipt:timed.receiptFile,coverage:timed.coverage,reason:'Actual anchors were inadequate; no uniform timing or invented captions'}));return;}
-  const displayAliases={'Sa cu ra':'Sakura'},ass=(await readFile(timed.assFile,'utf8')).replaceAll('\\pos(540,1620)','\\pos(540,1330)').replaceAll('Sa cu ra','Sakura');assertEvergreen(ass);
+  const captionBottomY=base.storyEdit?null:1330,rawAss=await readFile(timed.assFile,'utf8');
+  const positioned=base.storyEdit?positionStoryCaptions(rawAss,JSON.parse(await readFile(timed.alignmentFile,'utf8')).cues,base.storyEdit.plan):{ass:rawAss.replaceAll('\\pos(540,1620)','\\pos(540,1330)'),placements:null};
+  const displayAliases={'Sa cu ra':'Sakura'},ass=positioned.ass.replaceAll('Sa cu ra','Sakura');assertEvergreen(ass);
   const digest=scaleHash({video:base.sha256,ass:scaleHash(ass),audio:source.audioSha256,renderer:'scale-caption-burn-v1'}).slice(0,16),folder=path.join(directory,'captioned-'+digest);await mkdir(folder,{recursive:true});
   const receiptFile=path.join(folder,'receipt.json');
-  try{const previous=JSON.parse(await readFile(receiptFile,'utf8'));if(await hashFile(previous.path)!==previous.sha256||previous.voice.sha256!==source.audioSha256)throw Error('Captioned preview changed');console.log(JSON.stringify({id:base.intentId,path:previous.path,receiptFile,cached:true,status:'needs_listening'}));return;}catch(e){if(e.code!=='ENOENT')throw e;}
+  try{const previous=JSON.parse(await readFile(receiptFile,'utf8'));if(await hashFile(previous.path)!==previous.sha256||previous.voice.sha256!==source.audioSha256)throw Error('Captioned preview changed');console.log(JSON.stringify({id:base.intentId,path:previous.path,sha256:previous.sha256,receiptFile,cached:true,status:previous.status,seconds:previous.seconds,listeningVerified:previous.listeningVerified===true,published:false,scheduled:false}));return;}catch(e){if(e.code!=='ENOENT')throw e;}
   const assFile=path.join(folder,'voice.ass');await writeFile(assFile,ass,'utf8');await copyFile('C:/Windows/Fonts/arial.ttf',path.join(folder,'Arial.ttf'));
   const video=path.join(folder,`${base.intentId}-captioned.mp4`);
   const captionSnapshot=path.join(folder,'caption-producer-source.mjs');await copyFile(fileURLToPath(import.meta.url),captionSnapshot);
@@ -154,13 +157,14 @@ async function captionPreview(base,directory,editing,existingTimingFile){
   if(v?.width!==1080||v.height!==1920||v.codec_name!=='h264'||a?.codec_name!=='aac'||Math.abs(Number(probe.format.duration)-base.seconds)>.2)throw Error('Captioned scale technical QA failed');
   const sourceAudioHash=await run(editing.ffmpeg,['-hide_banner','-loglevel','error','-i',base.path,'-map','0:a:0','-c:a','copy','-f','hash','-hash','sha256','pipe:1'],{timeout:20000,windowsHide:true}),outputAudioHash=await run(editing.ffmpeg,['-hide_banner','-loglevel','error','-i',video,'-map','0:a:0','-c:a','copy','-f','hash','-hash','sha256','pipe:1'],{timeout:20000,windowsHide:true});
   if(sourceAudioHash.stdout.trim()!==outputAudioHash.stdout.trim())throw Error('Caption burn changed the source audio stream');
-  const receipt={...base,path:video,sha256:await hashFile(video),sourceIntermediate:{path:base.path,sha256:base.sha256},sourceAudioStreamHash:sourceAudioHash.stdout.trim(),audioStreamCopied:true,
+  const audioApproved=base.voice?.listeningVerified===true;
+  const receipt={...base,path:video,sha256:await hashFile(video),sourceIntermediate:{path:base.path,sha256:base.sha256},sourceAudioStreamHash:sourceAudioHash.stdout.trim(),audioStreamCopied:true,listeningVerified:audioApproved,
     captionProducerSource:{snapshot:captionSnapshot,sha256:await hashFile(captionSnapshot)},
-    captions:{status:'needs_caption_playback_review',burned:true,receiptFile:timed.receiptFile,receiptSha256:await hashFile(timed.receiptFile),srtFile:timed.srtFile,srtSha256:timed.srtSha256,assFile,assSha256:await hashFile(assFile),displayAliases,captionBottomY:1330,coverage:timed.coverage,confidence:timed.alignmentConfidence,lowConfidencePhrases:timed.lowConfidencePhrases,timingMethod:timed.timingMethod,preciseWordAlignment:false,playbackVerified:false},
-    blockers:['exact_audio_listening_review','final_caption_playback_review','music_selection_missing','native_schedule_window_unverified'],status:'needs_listening',publicationReady:false,createdAt:new Date().toISOString()};
+    captions:{status:'needs_caption_playback_review',burned:true,receiptFile:timed.receiptFile,receiptSha256:await hashFile(timed.receiptFile),srtFile:timed.srtFile,srtSha256:timed.srtSha256,assFile,assSha256:await hashFile(assFile),displayAliases,captionBottomY,phrasePlacements:positioned.placements,coverage:timed.coverage,confidence:timed.alignmentConfidence,lowConfidencePhrases:timed.lowConfidencePhrases,timingMethod:timed.timingMethod,preciseWordAlignment:false,playbackVerified:false},
+    blockers:[...(!audioApproved?['exact_audio_listening_review']:[]),'final_caption_playback_review','music_selection_missing','native_schedule_window_unverified'],status:audioApproved?'needs_final_playback_review':'needs_listening',publicationReady:false,createdAt:new Date().toISOString()};
   await writeFile(receiptFile,JSON.stringify(receipt,null,2),'utf8');
   for(const t of [1,5,10,14,Math.min(20,base.seconds-.5)])await run(editing.ffmpeg,['-hide_banner','-loglevel','error','-y','-ss',String(t),'-i',video,'-frames:v','1','-vf','scale=432:768',path.join(folder,`frame-${t}.jpg`)],{timeout:20000,windowsHide:true});
-  console.log(JSON.stringify({id:base.intentId,path:video,sha256:receipt.sha256,receiptFile,wav:source.audioPath,seconds:base.seconds,captions:receipt.captions.status,srtFile:timed.srtFile,assFile,coverage:timed.coverage,audioStreamCopied:true,status:'needs_listening',published:false,scheduled:false}));
+  console.log(JSON.stringify({id:base.intentId,path:video,sha256:receipt.sha256,receiptFile,wav:source.audioPath,seconds:base.seconds,captions:receipt.captions.status,srtFile:timed.srtFile,assFile,coverage:timed.coverage,audioStreamCopied:true,status:receipt.status,published:false,scheduled:false}));
 }
 async function selfTest(){
   const assert=(await import('node:assert/strict')).default;
@@ -191,7 +195,7 @@ async function selfTest(){
 async function main(args){
   if(args.length===1&&args[0]==='--self-test'){await selfTest();return;}
   const options={};
-  for(let i=0;i<args.length;){const key=args[i++]?.replace(/^--/u,'');if(['grounding-only','voice-only'].includes(key)){options[key]=true;continue;}if(!['plan','id','brief','captions','voice-receipt','voice-approval'].includes(key)||!args[i]||args[i].startsWith('--'))throw Error('Use --id EXISTING_SCALE_VIDEO [--plan FILE] [--brief FILE] [--captions RECEIPT] [--voice-receipt RECEIPT] [--voice-approval EXACT_APPROVAL] [--grounding-only | --voice-only]');options[key]=args[i++];}
+  for(let i=0;i<args.length;){const key=args[i++]?.replace(/^--/u,'');if(['grounding-only','voice-only'].includes(key)){options[key]=true;continue;}if(!['plan','id','brief','captions','voice-receipt','voice-approval','edit-plan'].includes(key)||!args[i]||args[i].startsWith('--'))throw Error('Use --id EXISTING_SCALE_VIDEO [--plan FILE] [--brief FILE] [--captions RECEIPT] [--voice-receipt RECEIPT] [--voice-approval EXACT_APPROVAL] [--edit-plan STORY_PLAN] [--grounding-only | --voice-only]');options[key]=args[i++];}
   if(options['grounding-only']&&options['voice-only'])throw Error('Choose one preparation-only mode');
   const canonical=await loadState();options.plan=registeredPlanFile(canonical,options.plan);
   if(await hashFile(options.plan)!==canonical.campaign.scaleCampaign.manifestSha256)throw Error('Registered scale plan bytes changed');
@@ -211,7 +215,7 @@ async function main(args){
     const clip=review.clips.find(c=>c.id===id),range=review.recommendedRanges.find(r=>r.id===id);
     if(!clip?.allowedForRootNeutralPool||!clip.catalogHashMatches||!clip.intervalContactSheet?.visuallyInspected||!range?.intervalFrameReviewVerified||range.end-range.start<2.99||range.end>clip.duration)throw Error('A visually reviewed3s interval is required:'+id);
     if(clip.requiredContextFraming&&clip.requiredContextFraming!==(brief.contextFraming??'crop')||range.requiredContextFraming&&range.requiredContextFraming!==(brief.contextFraming??'crop'))throw Error('Reviewed source requires its approved framing:'+id);
-    return {id,source:clip.source,sha256:clip.sourceSha256,sourceUrl:clip.sourceUrl,width:clip.width,height:clip.height,start:range.start,duration:3,cropCenterX:range.cropCenterX??.5,role:'stock_context_not_product_demo'};
+    return {id,source:clip.source,sha256:clip.sourceSha256,sourceUrl:clip.sourceUrl,width:clip.width,height:clip.height,start:range.start,duration:3,cropCenterX:range.cropCenterX??.5,requiredContextFraming:clip.requiredContextFraming??range.requiredContextFraming??null,role:'stock_context_not_product_demo'};
   });
   for(const scene of scenes)if(await hashFile(scene.source)!==scene.sha256)throw Error('Footage source changed:'+scene.id);
   const editing=await loadEditingRuntime(path.join(root,'state/footage-toolchain/runtime.json')),runtime=await voiceRuntime(voiceHome),helper=path.join(root,'scripts/voice-vieneu.py');
@@ -220,9 +224,17 @@ async function main(args){
   const profile=reviewed?.profile??voiceProfile(runtime);
   if(!reviewed&&(runtime.provider!=='vieneu'||profile.voice!=='Thùy Dung'||profile.speed!==1.2||profile.referenceStyle!=='speaker-only'||profile.temperature!==.8))throw Error('Expected existing accepted B profile; no substitution');
   const prepared=reviewed?.voice??(options['voice-receipt']?validatePreparedVoice(JSON.parse(await readFile(options['voice-receipt'],'utf8')),brief.script,profile):null);
+  const storyPlan=options['edit-plan']?JSON.parse(await readFile(options['edit-plan'],'utf8')):null;
+  if(storyPlan&&(!reviewed||options['voice-only']||storyPlan.intentId!==item.id))throw Error('Story editing requires this exact approved narration and intent');
+  let storyBaseline;
+  if(storyPlan){
+    storyBaseline=JSON.parse(await readFile(storyPlan.baselineReceiptFile,'utf8'));
+    if(await hashFile(storyPlan.baselineReceiptFile)!==storyPlan.baselineReceiptSha256||storyBaseline.intentId!==item.id||storyBaseline.voice.sha256!==prepared.sha256||storyBaseline.voice.scriptSha256!==prepared.scriptSha256||await hashFile(storyBaseline.path)!==storyBaseline.sha256||await hashFile(storyPlan.timingReceiptFile)!==storyPlan.timingReceiptSha256)throw Error('Visual edit source evidence changed or uses a different narration');
+    for(const shot of storyPlan.shots??[]){for(const field of ['graphic','label'])if(shot[field])validateBrief({...brief,headline:shot[field]},item);if(shot.framingEvidence&&await hashFile(shot.framingEvidence.path)!==shot.framingEvidence.sha256)throw Error('Framing review bytes changed');}
+  }
   if(!reviewed&&prepared&&(await hashFile(prepared.path)!==prepared.sha256||prepared.modelManifestSha256!==runtime.modelSha256||prepared.runtimeConfigSha256!==await hashFile(runtime.configFile)))throw Error('Prepared narration bytes/runtime changed');
   const productSha256=await hashFile(productImage),scriptSha256=scaleHash(brief.script),
-    binding={intentId:item.id,intentHash:item.intentHash,planHash:plan.planHash,brief,groundingBindingHash:grounding.bindingHash,scenes,productSha256,profile,voiceModelManifestSha256:runtime.modelSha256,voiceHelperSha256:await hashFile(helper),ffmpegSha256:editing.ffmpegSha256,renderer:'scale-evergreen-preview-v11-reviewed-voice-import',...(prepared?{preparedVoiceSha256:prepared.sha256}: {}),...(reviewed?{reviewedVoiceProof:reviewed.proof}:{})},revision=scaleHash(binding).slice(0,16),
+    binding={intentId:item.id,intentHash:item.intentHash,planHash:plan.planHash,brief,groundingBindingHash:grounding.bindingHash,scenes,productSha256,profile,voiceModelManifestSha256:runtime.modelSha256,voiceHelperSha256:await hashFile(helper),ffmpegSha256:editing.ffmpegSha256,renderer:'scale-evergreen-preview-v11-reviewed-voice-import',...(prepared?{preparedVoiceSha256:prepared.sha256}: {}),...(reviewed?{reviewedVoiceProof:reviewed.proof}:{}),...(storyPlan?{storyPlan,storyRendererSha256:await hashFile(path.join(root,'src/story-edit.mjs'))}:{})},revision=scaleHash(binding).slice(0,16),
     directory=path.join(root,'state/scale-video-preview',`${item.id}-${revision}`);
   await mkdir(directory,{recursive:true});const resolved=await realpath(directory),privateBase=await realpath(path.join(root,'state/scale-video-preview'));
   if(!resolved.startsWith(privateBase+path.sep))throw Error('Output must remain in the private preview folder');
@@ -246,6 +258,14 @@ async function main(args){
   if(!cachedVoice)await writeFile(voiceReceiptFile,JSON.stringify(voice,null,2),'utf8');
   if(qa.durationSeconds<18||qa.durationSeconds>25)throw Error('Narration must be18–25s for the20–25s final video; preserve the chosen speed');
   if(options['voice-only']){console.log(JSON.stringify({id:item.id,status:'rendered_needs_listening',voiceReceiptFile,path:voice.path,sha256:voice.sha256,seconds:qa.durationSeconds,cached:!!cachedVoice,mediaRendered:0,publicationReady:false}));return;}
+  if(storyPlan){
+    const moduleSnapshot=path.join(directory,'story-producer-source.mjs');await copyFile(path.join(root,'src/story-edit.mjs'),moduleSnapshot);
+    if(await hashFile(moduleSnapshot)!==binding.storyRendererSha256)throw Error('Story renderer changed during production');
+    const result=await renderStoryEdit({plan:storyPlan,voice,scenes,productImage,directory,editing,baselineAudioVideo:storyBaseline.path,baselineAudioVideoSha256:storyBaseline.sha256});
+    if(await hashFile(path.join(root,'src/story-edit.mjs'))!==binding.storyRendererSha256)throw Error('Story renderer changed during production; preserve output for review');
+    const receipt={schemaVersion:1,intentId:item.id,intentHash:item.intentHash,planHash:plan.planHash,sourcePlanFile:path.resolve(options.plan),sourcePlanSha256:await hashFile(options.plan),revision,...result,voice,caption:publicVideoCopy(brief).caption,leadCode:item.leadCode,scenes,grounding,producerSource:{snapshot:producerSnapshot,sha256:await hashFile(producerSnapshot)},storyProducerSource:{snapshot:moduleSnapshot,sha256:await hashFile(moduleSnapshot)},contextFraming:'fit_blur',productImage:{path:productImage,sha256:productSha256,role:'user_supplied_product_identity_reference',manufacturerLabelClaimsVerified:false},reviewManifestSha256:await hashFile(reviewFile),editingRuntime:editing,captions:{status:'needs_caption_review',burned:false},status:'needs_final_visual_playback_review',blockers:['final_video_playback_review','music_selection_missing','native_schedule_window_unverified'],musicAdded:false,stockIsProductDemo:false,efficacyDemoEvidence:null,listeningVerified:true,visualPlaybackVerified:false,publicationReady:false,published:false,scheduled:false,canonicalQueueModified:false,createdAt:new Date().toISOString()};
+    await writeFile(receiptFile,JSON.stringify(receipt,null,2));await captionPreview(receipt,directory,editing,options.captions??storyPlan.timingReceiptFile);return;
+  }
   const seconds=Math.max(20,Math.min(25,Math.ceil(qa.durationSeconds+.8))),stockSeconds=11,packshotSeconds=seconds-stockSeconds;
   await copyFile('C:/Windows/Fonts/arial.ttf',path.join(directory,'Arial.ttf'));await copyFile('C:/Windows/Fonts/arialbd.ttf',path.join(directory,'Arial-Bold.ttf'));
   const segments=[];

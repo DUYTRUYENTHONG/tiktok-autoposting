@@ -1,5 +1,15 @@
 # One-item evergreen scale-video preview
 
+## Speech-led edit correction ·31October2026
+
+The user rejected the repetitive fixed montage and long poster ending. New unsubmitted story edits may use `--edit-plan FILE` with an exact approved voice import and its original caption receipt. See the [editing skill reference](../skills/vn-herk-edit/references/story-edits.md). Preserve historical accepted media and the old render as a comparison; do not treat the template described below as the brief for every story.
+
+The plan binds the existing intent, actual WAV/script, timing, source footage, authentic reference and same-narration baseline. Frame-bound shots follow actual phrase anchors. Reviewed portrait or source-region framing requires hash-bound contact evidence and cannot override a source's full-scene requirement. Captions can move by shot to protect the visible action without changing speech text or times. Source evidence is rechecked before cache reuse. Rendering records its module snapshot and refuses source drift during production.
+
+The one-corner prototype uses nine shots over20.8seconds. Authentic product identity appears in two short crops totaling4.533seconds; the opening and ending use moving household context. The baseline AAC narration is copied unchanged, verified by packet hashes; the caption pass separately checks audio copying. This is a local quality prototype, with no music added, native schedule, new model or efficacy demonstration. Actual framing/cut inspection, final playback, native music mix and publication checks remain separate. The user's five exact narration approvals stay valid for their unchanged audio.
+
+## Historical baseline and optional opening experiment
+
 The optional brief field `openingMode: "identity_to_context"` is a visual experiment for new unsubmitted media. It shows the authentic product reference from0s, fades into the existing contextual shot over0.65–0.85s, identifies Sakura500ml in the top line and shows the call CTA in the closing four seconds. The rest of the context/identity sequence and exact prepared narration remain intact. These are editorial overlay times, not word-alignment claims. The default remains `context`; unknown modes are rejected. The selected mode and renderer revision enter the private cache key, and opening timing is retained in the receipt. Accepted posts are not rerendered or altered.
 
 Review actual opening frames at0.1/0.75/1.1seconds, the encoded transition, caption legibility and final playback before publication. Native early-drop-off observations motivate this test but do not prove its effectiveness or identify audio as the cause. Use exact prepared WAV/timing receipts for visual-only changes; this option does not grant listening approval or synthesize a new voice.
