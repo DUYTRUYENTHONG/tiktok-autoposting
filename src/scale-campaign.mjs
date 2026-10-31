@@ -210,7 +210,7 @@ export async function bindScaleCreative(item,evidence,{state={},now=new Date().t
       const ledger=evidence.contactOfferLedger,current=state.campaign?.currentPromotionBrief;
       await verifyBytes(ledger,'contact_offer_ledger',blockers);
       if(ledger.path!==current?.file||ledger.sha256!==current?.sha256)blockers.push('current_contact_offer_ledger_mismatch');
-      else try{if(await hashFile(ledger.path)===ledger.sha256)contactEligible=contactPromotionEligibility(JSON.parse(await readFile(ledger.path,'utf8')),item.proposedPublishAt,{now}).showDiscount;}catch{blockers.push('contact_offer_ledger_unreadable');}
+      else try{if(await hashFile(ledger.path)===ledger.sha256){const eligibility=contactPromotionEligibility(JSON.parse(await readFile(ledger.path,'utf8')),item.proposedPublishAt,{now});contactEligible=eligibility.showDiscount;if(eligibility.mode==='conditional-scheduled-offer'&&(!String(evidence.caption??'').includes('Gọi để kiểm tra ưu đãi còn áp dụng không và điều kiện nhận quà.')||offerReview?.containsRemainingCountClaim!==false||offerReview?.conditionalOfferDisclosureVerified!==true)){contactEligible=false;blockers.push('conditional_offer_disclosure_missing');}}}catch{blockers.push('contact_offer_ledger_unreadable');}
     }
     if(!contactEligible&&(!item.promotion.showDiscount||!promotionEligibility(evidence.orderLedger,item.proposedPublishAt,{now}).showDiscount))blockers.push('discount_not_verified_for_actual_publication_time');
   }
