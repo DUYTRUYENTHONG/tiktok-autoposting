@@ -211,7 +211,8 @@ export async function bindScaleCreative(item,evidence,{state={},now=new Date().t
   if(window?.verified!==true||window.account!==item.account||!reviewTime(window.verifiedAt,now)||Date.parse(now)-Date.parse(window.verifiedAt)>24*HOUR||!validTime(window.earliest)||!validTime(window.latest)||Date.parse(item.proposedPublishAt)<Date.parse(window.earliest)||Date.parse(item.proposedPublishAt)>Date.parse(window.latest))blockers.push('actual_native_schedule_window_missing');
   try{const existing=collectScaleReservations(state).filter(r=>r.day===vietnamDay(item.proposedPublishAt));
     if(existing.some(r=>r.queueId===item.id))blockers.push('already_accepted_intent');
-    if(item.scheduleRevision){if(existing.length>=40||existing.some(r=>Math.abs(Date.parse(r.at)-Date.parse(item.proposedPublishAt))<5*MINUTE))blockers.push('current_quota_or_spacing_conflict');}
+    if(item.scheduleRevision?.policyKind==='scale-rolling-policy'){if(existing.length>=30||existing.some(r=>Math.abs(Date.parse(r.at)-Date.parse(item.proposedPublishAt))<20*MINUTE))blockers.push('current_quota_or_spacing_conflict');}
+    else if(item.scheduleRevision){if(existing.length>=40||existing.some(r=>Math.abs(Date.parse(r.at)-Date.parse(item.proposedPublishAt))<5*MINUTE))blockers.push('current_quota_or_spacing_conflict');}
     else if(existing.length>=20||existing.filter(r=>r.format===item.format).length>=10||existing.some(r=>Math.abs(Date.parse(r.at)-Date.parse(item.proposedPublishAt))<20*MINUTE))blockers.push('current_quota_or_spacing_conflict');
   }catch(error){blockers.push('reconciliation_required: '+error.message);}
   if(item.requirements.voiceRequired){

@@ -1,8 +1,8 @@
-# October 30 schedule revisions
+# Scale schedule revisions
 
 The immutable 1,000-intent manifest remains unchanged. A dated revision is an event in the private progress journal. It replaces the effective publish time for one unregistered, unsubmitted intent while retaining its original ID, intent hash, creative draft, and history. A previously ready private binding is discarded, so the actual creative, reviews, native scheduling window and preflight must be bound again to the revised time.
 
-This override applies only to **October 30, 2026 in Vietnam (UTC+7)** for `@saigomlia`: 30 additional revisions, 40 total accepted/allocated posts, at least five minutes between posts, from 08:00 through 23:55. There is no per-format cap for these dated revisions. All other dates keep the immutable plan's existing policy. A revised slot must be on a native five-minute boundary and at least 30 minutes ahead of the server clock. Studio must independently show that the selected format and time are actually schedulable.
+The original override applies only to **October 30, 2026 in Vietnam (UTC+7)** for `@saigomlia`: 30 additional revisions, 40 total accepted/allocated posts, at least five minutes between posts, from 08:00 through 23:55. There is no per-format cap for that date. The October 31 rolling policy below governs the next 30 days. A revised slot must be on a native five-minute boundary and at least 30 minutes ahead of the server clock. Studio must independently show that the selected format and time are actually schedulable.
 
 The policy attestation is a private JSON file outside the Git checkout:
 
@@ -40,6 +40,34 @@ Run `node scripts/scale-progress.mjs revise <intentID> <absolute-revision.json>`
 An accepted, submitting, needs-review, or otherwise registered target cannot be revised. If an unregistered revised slot becomes too close or expires before submission, run the same `revise` command with a new revision JSON and a new eligible time. The original intent hash, account and policy file/hash must match; the prior revision stays in `scheduleRevisionHistory` and the next revision points to its hash. The old slot is released, the latest slot alone reserves capacity, and re-revision does not consume another of the 30 unique revised intents. Any private ready binding is invalidated and must be redone for the new time. A repeated identical slot is rejected.
 
 An uncertain submission elsewhere requires reconciliation before binding; the revision allocation check reserves its timestamp. The bridge checks allocation again at binding and immediately before canonical submission. The policy file's bytes are checked against the journal on every reload. No revision command edits a published/scheduled receipt or the immutable manifest.
+
+## October 31–November 29 rolling policy
+
+The user's October 31 instruction was: “we do need 30 posts per day. schedule it for the next 30 days.” The Vietnam-calendar window is October 31 through November 29, 2026 inclusive: up to 30 accepted/allocated positions per day and 900 across the window, **including existing accepted reservations**. Aim for 15 photos and 15 videos daily where preserved reservations allow; that is an operational target, not an extra hard quota. Each new slot needs 20-minute spacing, a native five-minute grid, 08:00–22:15 local time, and at least 30 minutes' lead from the server clock.
+
+The private attestation lives outside Git and is bound by its SHA-256:
+
+```json
+{
+  "kind": "scale-rolling-policy",
+  "account": "saigomlia",
+  "startDay": "2026-10-31",
+  "endDay": "2026-11-29",
+  "dailyTotal": 30,
+  "targetTotal": 900,
+  "targetPhoto": 15,
+  "targetVideo": 15,
+  "minSpacingMinutes": 20,
+  "windowStart": "08:00",
+  "windowEnd": "22:15",
+  "timezone": "Asia/Ho_Chi_Minh",
+  "source": "user",
+  "verifiedAt": "<actual October 31 verification time>",
+  "policyReference": "2026-10-31 user: we do need 30 posts per day. schedule it for the next 30 days."
+}
+```
+
+Use the same `revise <intentID> <absolute-revision.json>` command and revision JSON fields shown above, with this rolling policy file and hash. The revision is written only for an unregistered, unsubmitted source intent. The original 1,000-row manifest and existing accepted receipts remain unchanged. An unsubmitted October 30 revision may migrate: the old revision moves into hash-linked history and its old slot is released. Rebinding must use the new effective time, exact creative and native scheduling-window evidence. Reload, bind and submitting all check the policy bytes and the candidate day's accepted, ready, revised and submitting allocations. The local 30-day allocation file is a proposal, not a TikTok schedule or an authority to skip these checks.
 
 ## Native music without an exposed numeric ID
 
