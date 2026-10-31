@@ -63,6 +63,7 @@ export function validateBrief(brief,item){
   if(brief.intentId!==item.id||brief.intentHash!==item.intentHash||typeof brief.script!=='string'||brief.script.length<250||brief.script.length>1500
     ||brief.clipIds?.length!==4||new Set(brief.clipIds).size!==4)throw Error('A specific hash-bound story and four reviewed intervals are required');
   if(brief.openingMode!==undefined&&!['context','identity_to_context'].includes(brief.openingMode))throw Error('Unsupported opening mode');
+  if(brief.contextFraming!==undefined&&!['crop','fit_blur'].includes(brief.contextFraming))throw Error('Unsupported context framing');
   for(const key of ['script','headline','tension','decision','identity','questions','price','stockLabel',...['caption','captionQualification'].filter(key=>brief[key]!==undefined)]){
     if(typeof brief[key]!=='string'||!brief[key].trim())throw Error('Missing story text:'+key);assertEvergreen(brief[key]);
     const text=brief[key].normalize('NFD').replace(/\p{M}/gu,'').replaceAll('đ','d').toLowerCase();
@@ -83,6 +84,14 @@ export function identityOpeningGraph(mode,source,productInputIndex){
   if(mode!=='identity_to_context'||!/^\w+$/u.test(source)||!Number.isSafeInteger(productInputIndex)||productInputIndex<0)throw Error('Invalid identity opening graph');
   return {filters:[`[${productInputIndex}:v]trim=duration=0.85,setpts=PTS-STARTPTS,format=rgba,fade=t=out:st=0.65:d=0.2:alpha=1[openingidentity]`,
     `[${source}][openingidentity]overlay=0:0:eof_action=pass:enable='lt(t,0.85)'[openingstory]`],output:'openingstory'};
+}
+export function contextFramingGraph(scene,mode='crop'){
+  if(!['crop','fit_blur'].includes(mode))throw Error('Unsupported context framing');
+  if(!Number.isFinite(scene.width)||!Number.isFinite(scene.height)||scene.width<=0||scene.height<=0)throw Error('Invalid source dimensions');
+  if(mode==='fit_blur')return 'split=2[backdrop][foreground];[backdrop]scale=1080:1440:force_original_aspect_ratio=increase,crop=1080:1440,boxblur=20:2[blurred];[foreground]scale=1080:1440:force_original_aspect_ratio=decrease[whole];[blurred][whole]overlay=(W-w)/2:(H-h)/2';
+  const center=scene.cropCenterX??.5;
+  if(!Number.isFinite(center)||center<0||center>1)throw Error('Invalid crop center');
+  return scene.height>scene.width?'scale=1080:1440:force_original_aspect_ratio=decrease,pad=1080:1440:(ow-iw)/2:(oh-ih)/2:color=0xf8f2ed':`scale=1080:1440:force_original_aspect_ratio=increase,crop=1080:1440:x='max(0,min(iw-1080,iw*${center}-540))':y=(ih-1440)/2`;
 }
 export function wrapStoryCard(text){
   return text.normalize('NFC').split(/\r?\n/u).map(line=>wrapVideoText(line)).join('\n');
@@ -200,6 +209,7 @@ async function main(args){
   const scenes=brief.clipIds.map(id=>{
     const clip=review.clips.find(c=>c.id===id),range=review.recommendedRanges.find(r=>r.id===id);
     if(!clip?.allowedForRootNeutralPool||!clip.catalogHashMatches||!clip.intervalContactSheet?.visuallyInspected||!range?.intervalFrameReviewVerified||range.end-range.start<2.99||range.end>clip.duration)throw Error('A visually reviewed3s interval is required:'+id);
+    if(clip.requiredContextFraming&&clip.requiredContextFraming!==(brief.contextFraming??'crop')||range.requiredContextFraming&&range.requiredContextFraming!==(brief.contextFraming??'crop'))throw Error('Reviewed source requires its approved framing:'+id);
     return {id,source:clip.source,sha256:clip.sourceSha256,sourceUrl:clip.sourceUrl,width:clip.width,height:clip.height,start:range.start,duration:3,cropCenterX:range.cropCenterX??.5,role:'stock_context_not_product_demo'};
   });
   for(const scene of scenes)if(await hashFile(scene.source)!==scene.sha256)throw Error('Footage source changed:'+scene.id);
@@ -208,7 +218,7 @@ async function main(args){
   const prepared=options['voice-receipt']?validatePreparedVoice(JSON.parse(await readFile(options['voice-receipt'],'utf8')),brief.script,profile):null;
   if(prepared&&(await hashFile(prepared.path)!==prepared.sha256||prepared.modelManifestSha256!==runtime.modelSha256||prepared.runtimeConfigSha256!==await hashFile(runtime.configFile)))throw Error('Prepared narration bytes/runtime changed');
   const helper=path.join(root,'scripts/voice-vieneu.py'),productSha256=await hashFile(productImage),scriptSha256=scaleHash(brief.script),
-    binding={intentId:item.id,intentHash:item.intentHash,planHash:plan.planHash,brief,groundingBindingHash:grounding.bindingHash,scenes,productSha256,profile,voiceModelManifestSha256:runtime.modelSha256,voiceHelperSha256:await hashFile(helper),ffmpegSha256:editing.ffmpegSha256,renderer:'scale-evergreen-preview-v9-optional-identity-opening',...(prepared?{preparedVoiceSha256:prepared.sha256}: {})},revision=scaleHash(binding).slice(0,16),
+    binding={intentId:item.id,intentHash:item.intentHash,planHash:plan.planHash,brief,groundingBindingHash:grounding.bindingHash,scenes,productSha256,profile,voiceModelManifestSha256:runtime.modelSha256,voiceHelperSha256:await hashFile(helper),ffmpegSha256:editing.ffmpegSha256,renderer:'scale-evergreen-preview-v10-context-framing',...(prepared?{preparedVoiceSha256:prepared.sha256}: {})},revision=scaleHash(binding).slice(0,16),
     directory=path.join(root,'state/scale-video-preview',`${item.id}-${revision}`);
   await mkdir(directory,{recursive:true});const resolved=await realpath(directory),privateBase=await realpath(path.join(root,'state/scale-video-preview'));
   if(!resolved.startsWith(privateBase+path.sep))throw Error('Output must remain in the private preview folder');
@@ -236,7 +246,7 @@ async function main(args){
   await copyFile('C:/Windows/Fonts/arial.ttf',path.join(directory,'Arial.ttf'));await copyFile('C:/Windows/Fonts/arialbd.ttf',path.join(directory,'Arial-Bold.ttf'));
   const segments=[];
   for(const [index,scene]of scenes.entries()){
-    const framing=scene.height>scene.width?'scale=1080:1440:force_original_aspect_ratio=decrease,pad=1080:1440:(ow-iw)/2:(oh-ih)/2:color=0xf8f2ed':`scale=1080:1440:force_original_aspect_ratio=increase,crop=1080:1440:x='max(0,min(iw-1080,iw*${scene.cropCenterX}-540))':y=(ih-1440)/2`;
+    const framing=contextFramingGraph(scene,brief.contextFraming);
     const cut=path.join(directory,`cut-${index}.mp4`);await run(editing.ffmpeg,['-hide_banner','-loglevel','error','-y','-ss',String(scene.start),'-i',scene.source,'-t','3','-an','-vf',`${framing},pad=1080:1920:0:240:color=0xf8f2ed,setsar=1,fps=30`,'-c:v','libx264','-preset','veryfast','-crf','21','-threads','2','-pix_fmt','yuv420p',cut],{timeout:120000,windowsHide:true});segments.push(cut);
   }
   const packshot=path.join(directory,'identity.mp4');await run(editing.ffmpeg,['-hide_banner','-loglevel','error','-y','-loop','1','-i',productImage,'-t',String(packshotSeconds),'-an','-vf','scale=900:950:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:510:color=0xf8f2ed,setsar=1,fps=30','-c:v','libx264','-preset','veryfast','-crf','20','-threads','2','-pix_fmt','yuv420p',packshot],{timeout:120000,windowsHide:true});segments.push(packshot);
@@ -254,7 +264,7 @@ async function main(args){
   if(v?.width!==1080||v.height!==1920||v.codec_name!=='h264'||a?.codec_name!=='aac'||Math.abs(Number(probe.format.duration)-seconds)>.2)throw Error('Scale preview technical video QA failed');
   const caption=publicVideoCopy(brief).caption;assertEvergreen(caption);
   const receipt={schemaVersion:1,intentId:item.id,intentHash:item.intentHash,planHash:plan.planHash,sourcePlanFile:path.resolve(options.plan),sourcePlanSha256:await hashFile(options.plan),revision,path:video,sha256:await hashFile(video),seconds,voice,caption,leadCode:item.leadCode,scenes,grounding,
-    producerSource:{snapshot:producerSnapshot,sha256:await hashFile(producerSnapshot)},
+    producerSource:{snapshot:producerSnapshot,sha256:await hashFile(producerSnapshot)},contextFraming:brief.contextFraming??'crop',
     productImage:{path:productImage,sha256:productSha256,role:'user_supplied_product_identity_reference',manufacturerLabelClaimsVerified:false},opening:{mode:brief.openingMode??'context',...(identityOpening?{identityVisibleFromSeconds:0,fadeToContextStartSeconds:.65,fadeDurationSeconds:.2,ctaVisibleFromSeconds:seconds-4,timingScope:'editorial visual timing, not word alignment',performanceValidated:false}:{})},reviewManifestSha256:await hashFile(reviewFile),editingRuntime:{...editing,ffprobeSha256:await hashFile(editing.ffprobe)},captions,
     status:'needs_listening',blockers:['exact_audio_listening_review','final_video_playback_review',captions.status,'music_selection_missing','native_schedule_window_unverified'],musicAdded:false,stockIsProductDemo:false,efficacyDemoEvidence:null,listeningVerified:false,visualPlaybackVerified:false,
     publicationReady:false,published:false,scheduled:false,canonicalQueueModified:false,createdAt:new Date().toISOString()};

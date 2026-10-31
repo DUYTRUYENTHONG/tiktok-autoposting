@@ -1,8 +1,23 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {curatedStory,validateBrief,publicVideoCopy,groundVideoBrief,videoGroundingCopy,wrapStoryCard,identityOpeningGraph} from '../scripts/render-scale-video-preview.mjs';
+import {curatedStory,validateBrief,publicVideoCopy,groundVideoBrief,videoGroundingCopy,wrapStoryCard,identityOpeningGraph,contextFramingGraph} from '../scripts/render-scale-video-preview.mjs';
 import {buildIndex,hash} from '../src/knowledge/index.mjs';
 import {evergreenRequiredSourceIds} from '../src/knowledge/production-grounding.mjs';
+
+test('full-scene framing preserves the foreground instead of cropping the action',()=>{
+  const item={id:'sakura-scale-10002',intentHash:'fixture',creative:{sourceHypothesisId:'sakura-pain-chia-viec'}},brief=curatedStory(item);
+  assert.equal(validateBrief({...brief,contextFraming:'fit_blur'},item).contextFraming,'fit_blur');
+  assert.throws(()=>validateBrief({...brief,contextFraming:'stretch'},item),/framing/);
+  const landscape={width:1920,height:1080,cropCenterX:.61};
+  const normal=contextFramingGraph(landscape),whole=contextFramingGraph(landscape,'fit_blur');
+  assert.match(normal,/iw\*0.61-540/);
+  assert.match(whole,/\[foreground\]scale=1080:1440:force_original_aspect_ratio=decrease\[whole\]/);
+  assert.match(whole,/boxblur=20:2/);assert.doesNotMatch(whole,/stretch|force_original_aspect_ratio=disable/);
+  assert.match(contextFramingGraph({width:720,height:1280}),/pad=1080:1440/);
+  assert.throws(()=>contextFramingGraph(landscape,'unknown'),/framing/);
+  assert.throws(()=>contextFramingGraph({...landscape,width:0}),/dimensions/);
+  assert.throws(()=>contextFramingGraph({...landscape,cropCenterX:Infinity}),/center/);
+});
 
 test('optional identity opening preserves the default and validates its selected source',()=>{
   const item={id:'sakura-scale-10002',intentHash:'fixture',creative:{sourceHypothesisId:'sakura-pain-chia-viec'}},brief=curatedStory(item);
