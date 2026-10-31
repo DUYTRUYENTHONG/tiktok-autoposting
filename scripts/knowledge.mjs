@@ -12,7 +12,7 @@ try {
     console.log(JSON.stringify({changed:result.changed,sources:result.index.sources.length,corpusHash:result.index.corpusHash,file:result.filename},null,2));
   } else if (command === 'query' || command === 'hybrid-query') {
     const modelName=command==='hybrid-query'?args.shift():null;
-    const [query,productId='sakura-cleaner-500ml',promotionKey='buy1-get1-tiktok-first50'] = args;
+    const [query,productId='sakura-cleaner-500ml',promotionKey='evergreen-no-discount'] = args;
     const index=await loadIndex(directory);
     const hybrid=modelName?await createHybridRetriever(index,modelName,{directory}):null;
     try {
