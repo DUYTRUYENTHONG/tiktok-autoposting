@@ -7,7 +7,7 @@ import {voiceRuntime} from './voice.mjs';
 import {loadReviewedVoice} from './reviewed-voice.mjs';
 import {vietnamDay} from './daily-kpi.mjs';
 import {painpointStories} from './content-bank.mjs';
-import {rollingLimits,tenDayReference,videoRolloutReference} from './ten-day-cadence.mjs';
+import {rollingLimits,tenDayReference,videoRolloutReference,mixedRolloutReference} from './ten-day-cadence.mjs';
 
 const HOUR=3600000,DAY=24*HOUR,MINUTE=60000;
 export const scalePolicy=Object.freeze({version:1,campaignId:'sakura-scale-1000-20261029',account:'saigomlia',productId:'sakura-cleaner-500ml',earliestDay:'2026-10-29',total:1000,photo:500,video:500,dailyTotal:20,dailyPhoto:10,dailyVideo:10,minSpacingMinutes:20,windowStart:'08:00',windowEnd:'22:15',timezone:'Asia/Ho_Chi_Minh',location:'Vựa Sầu Riêng Cô Ba, 322 Đ. Huỳnh Thị Hai'});
@@ -192,7 +192,7 @@ export async function bindScaleCreative(item,evidence,{state={},now=new Date().t
     const publicText=[evidence.caption,evidence.spokenScript,evidence.photoTitle].filter(x=>typeof x==='string').join(' ').normalize('NFD').replace(/\p{M}/gu,'').toUpperCase();
     if(/\b(?:ANH|GIONG|BEP)\s*\d{3,}\b|SAKURA[-_](?:SCALE[-_])?\d+/u.test(publicText)||publicText.includes(item.id.toUpperCase()))blockers.push('public_internal_identifier');
   }else if(typeof evidence.caption!=='string'||!evidence.caption.includes(item.leadCode))blockers.push('caption_or_lead_code_missing');
-  const story=evidence.photoStory,fivePhoto=story?.adapter==='native-five-photo-v1'&&story.sourceIntentHash===item.intentHash&&story.assetCount===5&&story.voiceOverAttached===false&&item.format==='photo'&&item.scheduleRevision?.policyReference===tenDayReference&&state.campaign?.rollingGoal?.policyReference===tenDayReference;
+  const story=evidence.photoStory,fivePhoto=story?.adapter==='native-five-photo-v1'&&story.sourceIntentHash===item.intentHash&&story.assetCount===5&&story.voiceOverAttached===false&&item.format==='photo'&&[tenDayReference,mixedRolloutReference].includes(item.scheduleRevision?.policyReference)&&state.campaign?.rollingGoal?.policyReference===item.scheduleRevision.policyReference;
   if(story&&!fivePhoto)blockers.push('unapproved_photo_story_adaptation');
   if(fivePhoto&&(typeof evidence.photoTitle!=='string'||!evidence.photoTitle.trim()||[...evidence.photoTitle].length>90))blockers.push('native_photo_title_missing_or_too_long');
   if(fivePhoto&&(evidence.voice||evidence.spokenScript!==''))blockers.push('native_photo_narration_must_remain_separate');
@@ -206,7 +206,7 @@ export async function bindScaleCreative(item,evidence,{state={},now=new Date().t
   const spoken=evidence.spokenScript??item.creative.videoScript??'';
   if(offerReview?.containsDiscount||containsDiscount((evidence.caption??'')+' '+spoken+' '+(evidence.photoTitle??''))){
     let contactEligible=false;
-    const currentVideo=item.format==='video'&&item.scheduleRevision?.policyReference===videoRolloutReference&&state.campaign?.rollingGoal?.policyReference===videoRolloutReference;
+    const currentVideo=item.format==='video'&&[videoRolloutReference,mixedRolloutReference].includes(item.scheduleRevision?.policyReference)&&state.campaign?.rollingGoal?.policyReference===item.scheduleRevision.policyReference;
     if((fivePhoto||currentVideo)&&evidence.contactOfferLedger){
       const ledger=evidence.contactOfferLedger,current=state.campaign?.currentPromotionBrief;
       await verifyBytes(ledger,'contact_offer_ledger',blockers);
@@ -229,7 +229,7 @@ export async function bindScaleCreative(item,evidence,{state={},now=new Date().t
   if(window?.verified!==true||window.account!==item.account||!reviewTime(window.verifiedAt,now)||Date.parse(now)-Date.parse(window.verifiedAt)>24*HOUR||!validTime(window.earliest)||!validTime(window.latest)||Date.parse(item.proposedPublishAt)<Date.parse(window.earliest)||Date.parse(item.proposedPublishAt)>Date.parse(window.latest))blockers.push('actual_native_schedule_window_missing');
   try{const existing=collectScaleReservations(state).filter(r=>r.day===vietnamDay(item.proposedPublishAt));
     if(existing.some(r=>r.queueId===item.id))blockers.push('already_accepted_intent');
-    if(item.scheduleRevision?.policyKind==='scale-rolling-policy'){const {cap,spacingMinutes}=rollingLimits(state,item.proposedPublishAt);if(existing.length>=cap||existing.some(r=>Math.abs(Date.parse(r.at)-Date.parse(item.proposedPublishAt))<spacingMinutes*MINUTE))blockers.push('current_quota_or_spacing_conflict');}
+    if(item.scheduleRevision?.policyKind==='scale-rolling-policy'){const {cap,spacingMinutes}=rollingLimits(state,item.proposedPublishAt);if(state.campaign?.rollingGoal?.policyReference===mixedRolloutReference&&existing.filter(r=>r.format===item.format).length>=(item.format==='photo'?30:20))blockers.push('current_format_quota_conflict');if(existing.length>=cap||existing.some(r=>Math.abs(Date.parse(r.at)-Date.parse(item.proposedPublishAt))<spacingMinutes*MINUTE))blockers.push('current_quota_or_spacing_conflict');}
     else if(item.scheduleRevision){if(existing.length>=40||existing.some(r=>Math.abs(Date.parse(r.at)-Date.parse(item.proposedPublishAt))<5*MINUTE))blockers.push('current_quota_or_spacing_conflict');}
     else if(existing.length>=20||existing.filter(r=>r.format===item.format).length>=10||existing.some(r=>Math.abs(Date.parse(r.at)-Date.parse(item.proposedPublishAt))<20*MINUTE))blockers.push('current_quota_or_spacing_conflict');
   }catch(error){blockers.push('reconciliation_required: '+error.message);}

@@ -6,12 +6,25 @@ import path from 'node:path';
 import {buildScaleCampaign,scalePostHash,bindScaleCreative} from '../src/scale-campaign.mjs';
 import {createScaleProgress} from '../src/scale-progress.mjs';
 import {hashFile} from '../src/store.mjs';
-import {videoRolloutReference,rollingLimits,isVideoRolloutPolicy} from '../src/ten-day-cadence.mjs';
+import {videoRolloutReference,rollingLimits,isVideoRolloutPolicy,mixedRolloutReference,isMixedRolloutPolicy} from '../src/ten-day-cadence.mjs';
 
 const now='2026-10-31T09:00:00+07:00',day='2026-10-31';
 const oldReference='2026-10-30 user: still need30posts more for today; answer Five-minute spacing tonight in call_f551da25c867465c87e34a607f80a12a';
 const rollingReference='2026-10-31 user: we do need 30 posts per day. schedule it for the next 30 days.';
 const fiftyReference='2026-10-31 user: continue to schedule20posts per day; schedule for50days first; set the goal again.';
+
+test('mixed30photo20video policy preserves reservations and supports native five-photo adaptation',async()=>{const f=await fixture();try{
+ f.clock.value='2026-11-01T08:00:00+07:00';const file=path.join(f.dir,'mixed.json'),policy={...f.policy,startDay:'2026-11-01',endDay:'2026-11-21',dailyTotal:50,targetTotal:1050,targetPhoto:30,targetVideo:20,minSpacingMinutes:15,verifiedAt:f.clock.value,policyReference:mixedRolloutReference};assert.equal(isMixedRolloutPolicy(policy),true);await writeFile(file,JSON.stringify(policy));
+ const s=await f.readState();s.campaign.rollingGoal={startDay:policy.startDay,endDay:policy.endDay,dailyTarget:50,minSpacingMinutes:15,policyReference:mixedRolloutReference};const kept=structuredClone(s.queue);await writeFile(f.campaignFile,JSON.stringify(s));
+ const photo=f.plan.items.find(x=>x.format==='photo'),video=f.plan.items.find(x=>x.format==='video'),b=f.bridge();
+ const revised=await b.revise(photo.id,await f.input(photo,'2026-11-01T10:00:00+07:00',file)),record=JSON.parse(await readFile(f.journalFile,'utf8')).records[photo.id],item={...photo,proposedPublishAt:revised.effectivePublishAt,scheduleRevision:record.scheduleRevision},e=await f.evidence(item);
+ e.assets=e.assets.slice(0,5);e.photoTitle='Chọn đúng nhu cầu trước khi mua';e.spokenScript='';e.photoStory={adapter:'native-five-photo-v1',sourceIntentHash:item.intentHash,assetCount:5,voiceOverAttached:false};const h=scalePostHash(item,e);e.visualReview.postHash=h;e.offerReview.postHash=h;e.preflight.postHash=h;
+ assert.equal((await b.bind(photo.id,e)).status,'ready');await b.revise(video.id,await f.input(video,'2026-11-01T10:15:00+07:00',file));assert.deepEqual((await f.readState()).queue,kept);
+ const full=await f.readState();for(let n=0;n<30;n++)full.queue.push({id:'mixed-photo-'+n,account:'saigomlia',format:'photo',status:'scheduled',receipt:{platformId:String(7750000000000000000n+BigInt(n)),scheduledAt:new Date(Date.parse('2026-11-02T08:00:00+07:00')+n*15*60000).toISOString(),scheduledVerifiedAt:f.clock.value}});await writeFile(f.campaignFile,JSON.stringify(full));
+ const anotherPhoto=f.plan.items.find(x=>x.format==='photo'&&x.id!==photo.id),anotherVideo=f.plan.items.find(x=>x.format==='video'&&x.id!==video.id);
+ await assert.rejects(b.revise(anotherPhoto.id,await f.input(anotherPhoto,'2026-11-02T21:00:00+07:00',file)),/format cap/);
+ await b.revise(anotherVideo.id,await f.input(anotherVideo,'2026-11-02T21:00:00+07:00',file));assert.equal((await b.status()).items.find(x=>x.id===anotherVideo.id).effectivePublishAt,'2026-11-02T21:00:00+07:00');
+}finally{await f.cleanup();}});
 
 test('video conditional offer uses the customer ledger and cannot extend beyondNovember10',async()=>{const f=await fixture();try{
  f.clock.value='2026-11-01T08:00:00+07:00';const original=f.plan.items.find(x=>x.format==='video'),s=await f.readState(),file=path.join(f.dir,'contacts.json');
