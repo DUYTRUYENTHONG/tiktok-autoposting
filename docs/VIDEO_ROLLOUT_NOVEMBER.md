@@ -1,5 +1,7 @@
 # Requested November video rollout
 
+Superseded format allocation: the latest user request is30 carousels plus20 videos daily within50 total. Read [mixed rollout](MIXED_ROLLOUT_NOVEMBER.md) and canonical campaign.rollingGoal. Historical video-only numbers below describe the earlier proposal, not current production requirements. The first free CapCut scene has now succeeded and settled0 credits, but remains on visual hold because the bottle lettering deforms; no native submission was made.
+
 Latest user messages onNovember1 explicitly confirmed actual video posts and requested50posts for today and the next20days. This meansNovember1–21inclusive,21days and1,050positions. Preserve existing posts and reservations; their actual format may be photo. Newly prepared positions prioritize actual video, not narrated photo exports presented as native carousels.
 
 The canonical `campaign.requestedRollout` registers a hash-bound private allocation. At creation, three campaign carousels were verified published today, leaving47new videos today and50/day on the following20days:1,047new videos. The immutable source plan has487unaccepted video intents, so560additional original video intents/media are missing. A source intent is not a rendered asset, approval or native schedule. The allocation created no native schedules.
