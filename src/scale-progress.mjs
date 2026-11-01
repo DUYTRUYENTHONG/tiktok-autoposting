@@ -157,7 +157,13 @@ function checkCohort(state,item){
   const angle=angleFor(item),existing=state.angles?.find(a=>a.id===angle.id);
   if(existing&&['productId','format','distribution','promotionKey'].some(k=>existing[k]!==angle[k]))throw Error('Scale angle/cohort conflict');
 }
-function queueItem(item,bound,at){const e=bound.boundCreative;return {id:item.id,phase:'scale',campaignId:item.campaignId,account:item.account,productId:item.productId,angleId:angleFor(item).id,variantId:item.format==='photo'?(e.photoStory?'scale-native-five-photo':'scale-evergreen-six'):'scale-evergreen-video',format:item.format,title:item.creative.hook,caption:e.caption,leadCode:item.leadCode,publishMode:'scheduled',publishAt:item.proposedPublishAt,timezone:'Asia/Ho_Chi_Minh',location:item.location,promotionKey:'evergreen-no-discount',discountIncluded:false,assets:clone(e.assets),approved:true,assetsVerified:true,status:'submitting',scalePostHash:bound.postHash,intentHash:item.intentHash,...(item.scheduleRevision?{scheduleRevisionHash:digest(item.scheduleRevision)}:{}),music:clone(e.music),audience:'Everyone',disclosures:{aiGenerated:true,ownBrand:true},scalePreflight:clone(e.preflight),submissionStartedAt:at,receipt:null};}
+export function observedScalePromotion(bound){
+  const e=bound?.boundCreative;
+  if(e?.offerReview?.containsDiscount===false)return {promotionKey:'evergreen-no-discount',discountIncluded:false};
+  if(e?.offerReview?.containsDiscount===true&&e.contactOfferLedger&&e.offerReview.conditionalOfferDisclosureVerified===true&&e.offerReview.containsRemainingCountClaim===false)return {promotionKey:'buy1-get1-first50-tiktok-contacts',discountIncluded:true};
+  return {promotionKey:'unknown',discountIncluded:e?.offerReview?.containsDiscount===true?true:null};
+}
+function queueItem(item,bound,at){const e=bound.boundCreative;return {id:item.id,phase:'scale',campaignId:item.campaignId,account:item.account,productId:item.productId,angleId:angleFor(item).id,variantId:item.format==='photo'?(e.photoStory?'scale-native-five-photo':'scale-evergreen-six'):'scale-evergreen-video',format:item.format,title:item.creative.hook,caption:e.caption,leadCode:item.leadCode,publishMode:'scheduled',publishAt:item.proposedPublishAt,timezone:'Asia/Ho_Chi_Minh',location:item.location,...observedScalePromotion(bound),assets:clone(e.assets),approved:true,assetsVerified:true,status:'submitting',scalePostHash:bound.postHash,intentHash:item.intentHash,...(item.scheduleRevision?{scheduleRevisionHash:digest(item.scheduleRevision)}:{}),music:clone(e.music),audience:'Everyone',disclosures:{aiGenerated:true,ownBrand:true},scalePreflight:clone(e.preflight),submissionStartedAt:at,receipt:null};}
 
 export function createScaleProgress({campaignFile=defaultFile,journalFile,now=()=>new Date().toISOString(),fault=()=>{}}={}){
   const clock=()=>{const value=now();if(!validTime(value))throw Error('Invalid progress clock');return value;};
@@ -205,9 +211,9 @@ export function createScaleProgress({campaignFile=defaultFile,journalFile,now=()
         validateTransition(item,{...record,status:record.beforeReceiptStatus??record.status,receipts:record.receipts.filter(r=>r.hash!==receiptHash(receipt))},receipt,state,clock());
         if(q.receipt&&q.receipt.platformId!==receipt.platformId)throw Error('Canonical platform identity changed');
         q.receiptHistory??=[];if(q.receipt&&digest(q.receipt)!==digest(receipt))q.receiptHistory.push(clone(q.receipt));
-        q.receipt={...q.receipt,...clone(receipt),...(receipt.status==='scheduled'?{scheduledVerifiedAt:receipt.verifiedAt}:receipt.status==='published'?{publishedVerifiedAt:receipt.verifiedAt}:{submittedVerifiedAt:receipt.verifiedAt})};q.status=receipt.status;
+        q.receipt={...q.receipt,...clone(receipt),...(receipt.status==='scheduled'?{scheduledVerifiedAt:receipt.verifiedAt}:receipt.status==='published'?{publishedVerifiedAt:receipt.verifiedAt}:{submittedVerifiedAt:receipt.verifiedAt})};q.status=receipt.status;Object.assign(q,observedScalePromotion(record.boundReady));
         if(receipt.status==='published'){
-          state.posts??=[];const post={id:receipt.platformId,queueId:item.id,productId:item.productId,angleId:q.angleId,variantId:q.variantId,format:item.format,publishedAt:receipt.publishedAt,distribution:'organic',promotionKey:'evergreen-no-discount',...(receipt.url?{url:receipt.url}:{})};
+          state.posts??=[];const post={id:receipt.platformId,queueId:item.id,productId:item.productId,angleId:q.angleId,variantId:q.variantId,format:item.format,publishedAt:receipt.publishedAt,distribution:'organic',...observedScalePromotion(record.boundReady),...(receipt.url?{url:receipt.url}:{})};
           const prior=state.posts.find(p=>String(p.id)===receipt.platformId);if(prior&&['queueId','productId','format','publishedAt'].some(k=>prior[k]!==post[k]))throw Error('Published observation conflict');if(!prior)state.posts.push(post);
         }
       }
