@@ -1,5 +1,15 @@
 # Operations
 
+## Faster native submission
+
+Prepare the ordered five-image manifest, hashes, final Vietnamese title/caption and offer checks before opening the composer. Upload all five files in one supported file-chooser operation. Keep one final-submission owner.
+
+While media is generating or processing, prepare independent copy/evidence work and select a distinct available music candidate. Keep a private shortlist of exact native title, artist and duration with observation time; recheck availability and selection in the composer. Do not repeatedly search guessed song names or claim national chart status from account recommendations.
+
+Batch deterministic form actions in one browser call, followed by the cheapest fresh state check needed for the next decision. Capture screenshots for visual gates and receipts, rather than after every field. Preserve actual five-slide Feed review, location, audience, music, disclosures and time validation. Avoid fixed sleeps and redundant reloads. An unchanged upload is inspected, not restarted.
+
+Record generation, upload, form/review and submission times separately when measuring throughput. Do not claim a speed improvement without comparable observations. Native processing time and fresh creative generation are separate from upload time. After one final click, inspect the result and reconcile its receipt before proceeding to another submission.
+
 ## First-post acceptance
 
 1. Confirm the user is signed in to the expected account in the internal browser. Verify its handle in the UI, not just the local configuration.
