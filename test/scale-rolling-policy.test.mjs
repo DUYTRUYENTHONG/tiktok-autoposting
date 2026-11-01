@@ -6,11 +6,42 @@ import path from 'node:path';
 import {buildScaleCampaign,scalePostHash,bindScaleCreative} from '../src/scale-campaign.mjs';
 import {createScaleProgress} from '../src/scale-progress.mjs';
 import {hashFile} from '../src/store.mjs';
+import {videoRolloutReference,rollingLimits,isVideoRolloutPolicy} from '../src/ten-day-cadence.mjs';
 
 const now='2026-10-31T09:00:00+07:00',day='2026-10-31';
 const oldReference='2026-10-30 user: still need30posts more for today; answer Five-minute spacing tonight in call_f551da25c867465c87e34a607f80a12a';
 const rollingReference='2026-10-31 user: we do need 30 posts per day. schedule it for the next 30 days.';
 const fiftyReference='2026-10-31 user: continue to schedule20posts per day; schedule for50days first; set the goal again.';
+
+test('video conditional offer uses the customer ledger and cannot extend beyondNovember10',async()=>{const f=await fixture();try{
+ f.clock.value='2026-11-01T08:00:00+07:00';const original=f.plan.items.find(x=>x.format==='video'),s=await f.readState(),file=path.join(f.dir,'contacts.json');
+ const ledger={campaignId:'sakura-contact-50-november',terms:{unit:'customers',capacity:50,channel:'TikTok-origin contact',startDay:'2026-11-01',endDay:'2026-11-10'},countsVerified:true,countVerifiedAt:f.clock.value,countSource:{kind:'user-confirmation',reference:'chat:actual-count'},remainingCustomers:50,allocatedCustomers:0,executionPolicy:{mode:'conditional-contact-check',source:'chat:call_297ccc4180d841f88c8587bfadf08034',availabilityCheckedWhenCustomerCalls:true}};await writeFile(file,JSON.stringify(ledger));
+ s.campaign.rollingGoal={startDay:'2026-11-01',endDay:'2026-11-21',dailyTarget:50,minSpacingMinutes:15,policyReference:videoRolloutReference};s.campaign.currentPromotionBrief={file,sha256:await hashFile(file)};
+ const item={...original,proposedPublishAt:'2026-11-02T12:00:00+07:00',scheduleRevision:{policyKind:'scale-rolling-policy',policyReference:videoRolloutReference,originalPublishAt:original.proposedPublishAt}},e=await f.evidence(item);e.caption='Mua 1 tặng 1 cho 50 khách hàng đầu tiên liên hệ từ TikTok. Gọi để kiểm tra ưu đãi còn áp dụng không và điều kiện nhận quà. Gọi số điện thoại trong bio để được tư vấn.';e.contactOfferLedger={path:file,sha256:await hashFile(file)};e.offerReview.containsDiscount=true;e.offerReview.containsRemainingCountClaim=false;e.offerReview.conditionalOfferDisclosureVerified=true;
+ const h=scalePostHash(item,e);e.offerReview.postHash=h;e.visualReview.postHash=h;e.preflight.postHash=h;
+ // Offer-only coverage: missing video/audio production evidence must still keep the whole item unready.
+ const first=await bindScaleCreative(item,e,{state:s,now:f.clock.value});assert.equal(first.readiness.blockers.includes('discount_not_verified_for_actual_publication_time'),false);assert.equal(first.readiness.ready,false);
+ const later=await bindScaleCreative({...item,proposedPublishAt:'2026-11-11T12:00:00+07:00'},e,{state:s,now:f.clock.value});assert.ok(later.readiness.blockers.includes('discount_not_verified_for_actual_publication_time'));
+ e.caption=e.caption.replace('Gọi để kiểm tra ưu đãi còn áp dụng không và điều kiện nhận quà.','');const missing=await bindScaleCreative(item,e,{state:s,now:f.clock.value});assert.ok(missing.readiness.blockers.includes('conditional_offer_disclosure_missing'));
+}finally{await f.cleanup();}});
+
+test('November video policy preserves historical allocations, accepts only videos and bounds21days',async()=>{const f=await fixture();try{
+ const video=f.plan.items.find(x=>x.format==='video'),photo=f.plan.items.find(x=>x.format==='photo'),b=f.bridge();
+ await b.revise(video.id,await f.input(video));
+ f.clock.value='2026-11-01T08:00:00+07:00';
+ const file=path.join(f.dir,'november-video.json'),policy={...f.policy,startDay:'2026-11-01',endDay:'2026-11-21',dailyTotal:50,targetTotal:1050,targetPhoto:0,targetVideo:50,minSpacingMinutes:15,verifiedAt:f.clock.value,policyReference:videoRolloutReference};
+ assert.equal(isVideoRolloutPolicy(policy),true);await writeFile(file,JSON.stringify(policy));
+ const s=await f.readState(),preserved=structuredClone(s.queue);s.campaign.rollingGoal={startDay:policy.startDay,endDay:policy.endDay,dailyTarget:50,minSpacingMinutes:15,policyReference:videoRolloutReference};await writeFile(f.campaignFile,JSON.stringify(s));
+ assert.deepEqual(rollingLimits(s,'2026-11-21T12:00:00+07:00'),{cap:50,spacingMinutes:15});
+ await assert.rejects(b.revise(photo.id,await f.input(photo,'2026-11-01T10:00:00+07:00',file)),/video intents only/);
+ const result=await b.revise(video.id,await f.input(video,'2026-11-21T10:00:00+07:00',file));assert.equal(result.revisionCount,2);
+ assert.equal((await f.bridge().status()).items.find(x=>x.id===video.id).effectivePublishAt,'2026-11-21T10:00:00+07:00');assert.deepEqual((await f.readState()).queue,preserved);
+ const other=f.plan.items.find(x=>x.format==='video'&&x.id!==video.id);
+ await assert.rejects(b.revise(other.id,await f.input(other,'2026-11-22T10:00:00+07:00',file)),/outside authorized/);
+ await assert.rejects(b.revise(other.id,await f.input(other,'2026-11-01T08:25:00+07:00',file)),/outside authorized/);
+ const full=await f.readState();for(let n=0;n<50;n++){const t=new Date(Date.parse('2026-11-02T08:00:00+07:00')+n*15*60000).toISOString();full.queue.push({id:'nov-kept-'+n,format:'photo',account:'saigomlia',status:'scheduled',receipt:{platformId:String(7740000000000000000n+BigInt(n)),scheduledAt:t,scheduledVerifiedAt:f.clock.value}});}await writeFile(f.campaignFile,JSON.stringify(full));
+ await assert.rejects(b.revise(other.id,await f.input(other,'2026-11-02T21:00:00+07:00',file)),/daily cap/);
+}finally{await f.cleanup();}});
 async function fixture(){const dir=await mkdtemp(path.join(tmpdir(),'scale-rolling-')),campaignFile=path.join(dir,'campaign.json'),planFile=path.join(dir,'plan.json'),journalFile=path.join(dir,'progress.json'),policyFile=path.join(dir,'rolling-policy.json'),oldPolicyFile=path.join(dir,'old-policy.json');
   const state={account:'saigomlia',campaign:{publicPostCodes:false},products:[{id:'sakura-cleaner-500ml'}],queue:[{id:'existing',account:'saigomlia',format:'photo',status:'scheduled',receipt:{platformId:'7711000000000000001',scheduledAt:`${day}T10:00:00+07:00`,scheduledVerifiedAt:now}}],posts:[],angles:[]};
   const plan=buildScaleCampaign(state,{now:'2026-10-28T08:00:00Z'});await writeFile(planFile,JSON.stringify(plan));state.campaign.scaleCampaign={campaignId:plan.campaignId,planHash:plan.planHash,manifestFile:planFile,manifestSha256:await hashFile(planFile),counts:plan.counts};await writeFile(campaignFile,JSON.stringify(state));

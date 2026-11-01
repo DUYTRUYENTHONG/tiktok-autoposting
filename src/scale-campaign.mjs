@@ -7,7 +7,7 @@ import {voiceRuntime} from './voice.mjs';
 import {loadReviewedVoice} from './reviewed-voice.mjs';
 import {vietnamDay} from './daily-kpi.mjs';
 import {painpointStories} from './content-bank.mjs';
-import {rollingLimits,tenDayReference} from './ten-day-cadence.mjs';
+import {rollingLimits,tenDayReference,videoRolloutReference} from './ten-day-cadence.mjs';
 
 const HOUR=3600000,DAY=24*HOUR,MINUTE=60000;
 export const scalePolicy=Object.freeze({version:1,campaignId:'sakura-scale-1000-20261029',account:'saigomlia',productId:'sakura-cleaner-500ml',earliestDay:'2026-10-29',total:1000,photo:500,video:500,dailyTotal:20,dailyPhoto:10,dailyVideo:10,minSpacingMinutes:20,windowStart:'08:00',windowEnd:'22:15',timezone:'Asia/Ho_Chi_Minh',location:'Vựa Sầu Riêng Cô Ba, 322 Đ. Huỳnh Thị Hai'});
@@ -206,7 +206,8 @@ export async function bindScaleCreative(item,evidence,{state={},now=new Date().t
   const spoken=evidence.spokenScript??item.creative.videoScript??'';
   if(offerReview?.containsDiscount||containsDiscount((evidence.caption??'')+' '+spoken+' '+(evidence.photoTitle??''))){
     let contactEligible=false;
-    if(fivePhoto&&evidence.contactOfferLedger){
+    const currentVideo=item.format==='video'&&item.scheduleRevision?.policyReference===videoRolloutReference&&state.campaign?.rollingGoal?.policyReference===videoRolloutReference;
+    if((fivePhoto||currentVideo)&&evidence.contactOfferLedger){
       const ledger=evidence.contactOfferLedger,current=state.campaign?.currentPromotionBrief;
       await verifyBytes(ledger,'contact_offer_ledger',blockers);
       if(ledger.path!==current?.file||ledger.sha256!==current?.sha256)blockers.push('current_contact_offer_ledger_mismatch');
