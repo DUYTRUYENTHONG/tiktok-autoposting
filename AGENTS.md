@@ -1,5 +1,7 @@
 # TikTok Autoposting agent instructions
 
+- November1 traffic direction: use stronger debate-led hooks challenging a familiar cleaning or shopping habit, with a concrete payoff in the next card. Read prompts/CONTROVERSIAL_HOOK_TESTS_VI.md. These are hypotheses, not proven winners. No fabricated customer outcomes, personal accusations or unsupported efficacy comparisons. Preserve accepted posts; distinguish traffic from qualified calls and orders.
+
 - November1 reference-photo direction: base new carousel designs on the user's supplied footage stills and photos. Record the exact reference paths and hashes privately, inspect each source, preserve authentic Sakura500ml identity, and redesign composition for native Feed readability. Reference scenes are not evidence of product efficacy or actor endorsement. Keep accepted posts unchanged; any new image bytes need fresh visual/native review.
 
 - November1 frame correction: user reports prior actor content exceeds TikTok's frame. Read docs/TIKTOK_FRAME_QA.md. Every new slide must pass actual native Feed overlay review; keep essential hooks, conditions, product and CTA away from the right interaction rail and bottom caption/location area. Current3:4 design starting bounds are x8–78%,y8–72%, not a universal platform specification. Aspect ratio alone is insufficient. Preserve accepted posts; fix unsubmitted drafts before submission.
