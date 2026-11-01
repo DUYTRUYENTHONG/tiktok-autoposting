@@ -5,6 +5,8 @@ description: Create Vietnamese product carousel copy and image-generation prompt
 
 # Carousel sản phẩm tiếng Việt
 
+Frame gate: user reported older actor content hidden by TikTok framing. For this kit read docs/TIKTOK_FRAME_QA.md. Keep a consistent native photo aspect ratio and inspect each uploaded slide with actual Feed caption/location/interaction overlays. Start essential content inside x8–78%,y8–72% for current3:4 media; treat these as local conservative design bounds, not official platform guarantees. Covered hook, offer conditions, product or CTA blocks submission. Correct unsubmitted drafts; preserve accepted posts.
+
 Latest hook/export rule: no scheduling/status watermarks, blanket “demo này không phải sản phẩm Sakura” wording or internal production labels in new images/hooks. Keep source provenance private and platform disclosures enabled. Use truthful scenes and supported copy that stand without a demo disclaimer. Preserve already accepted media; review unsubmitted image bytes before exporting.
 
 Latest1,000-post expansion is500carousels/500videos at20/day including preserved reservations. For new unsubmitted media, show discounts only while verified eligible; unknown remaining orders means evergreen/no-discount, overriding earlier required offer-first cards. BẾP301 has a reviewed evergreen six-slide variant with discount copy removed from both cover and offer card. Reuse the registered immutable scale plan, create fresh reviewed story assets, respect native five-minute slots and the actual format-specific scheduling horizon, then record a real receipt. A CSV of500photo intents is not500ready carousels.
