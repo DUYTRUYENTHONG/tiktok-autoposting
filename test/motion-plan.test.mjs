@@ -13,6 +13,13 @@ test('motion scenes cover the exact frame timeline and preserve phrase timing',(
   for(const broken of [[0,90,90,360,480,600],[0,10,270,360,480,600],[0,90,270,360,480,599]])assert.throws(()=>motionSceneModel(plan,broken,cues));
   for(const broken of [[{start:0,end:21,text:'Long'}],[{start:2,end:1,text:'Backwards'}],[{start:0,end:3,text:'A'},{start:2,end:4,text:'B'}]])assert.throws(()=>motionSceneModel(plan,bounds,broken),/phrase cues/);
 });
+test('caption-free exports retain timing and require an explicit boolean',()=>{
+  assert.equal(motionSceneModel(plan,bounds,cues).burnCaptions,true);
+  const model=motionSceneModel({...plan,burnCaptions:false},bounds,cues);
+  assert.equal(model.burnCaptions,false);
+  assert.deepEqual(model.cues,cues);
+  assert.throws(()=>motionSceneModel({...plan,burnCaptions:'false'},bounds,cues),/boolean/);
+});
 test('animation copy rejects internal codes, offers, workflow labels and unsupported claims before rendering',()=>{
   assert.equal(validateMotionCopy(plan),plan);
   for(const hook of ['ẢNH10024','GIỌNG10024','Bài đăng này đã được lên lịch','demo này không phải sản phẩm Sakura','Mua 1 tặng 1','Nhắn shop ngay','Diệt khuẩn tuyệt đối'])assert.throws(()=>validateMotionCopy({...plan,hook}),undefined,hook);

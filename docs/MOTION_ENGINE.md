@@ -2,6 +2,8 @@
 
 Codex can now edit a local scene plan and JavaScript composition, then export a real vertical MP4. The first implemented production preset uses two reviewed photographs, an authentic Sakura product crop and an existing approved Vietnamese narration. These are animated photo stories; they are not newly filmed product demonstrations or a trained generative-video model.
 
+Set `burnCaptions` to `false` in a private plan to omit narration captions from the rendered frames. It defaults to `true`; timing evidence and the exact approved audio remain required either way. This option does not enable native TikTok captions or approve a post, and this two-photo renderer does not implement the requested six-image, 30-second format.
+
 ## Components and upstream adoption
 
 - [Canvas composition](../src/motion-canvas.mjs): measured Vietnamese text, photograph motion, spring-driven product continuity, question cards, crossfades and phrase captions.

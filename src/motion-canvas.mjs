@@ -54,7 +54,7 @@ export function installMotionCanvas(){
     for(const candidate of [scene,model.scenes[index-1]].filter(Boolean)){const asset=assets.get(candidate.assetId);if(asset instanceof HTMLVideoElement){const wanted=Math.max(0,Math.min(asset.duration-.035,t-candidate.start));if(Math.abs(asset.currentTime-wanted)>.015)await new Promise(resolve=>{asset.onseeked=resolve;asset.currentTime=wanted;});}}
     ctx.clearRect(0,0,1080,1920);const previous=model.scenes[index-1],local=t-scene.start,transition=scene.transitionSeconds??.18;
     if(previous&&local<transition){sceneBody(previous,t,t-previous.start);ctx.save();ctx.globalAlpha=clamp(local/transition);sceneBody(scene,t,local);ctx.restore();}else sceneBody(scene,t,local);
-    productLayer(t);caption(t);return canvas.toDataURL('image/jpeg',.96).split(',')[1];
+    productLayer(t);if(model.burnCaptions!==false)caption(t);return canvas.toDataURL('image/jpeg',.96).split(',')[1];
   };
   window.motionAudit=()=>({textOverflow:bounds.slice(0,100),textOverflowCount:bounds.length,framesRendered:frameNumber+1,canvas:{width:1080,height:1920},deterministicClock:true,voiceRetimed:false,fonts:'Arial'});
 }

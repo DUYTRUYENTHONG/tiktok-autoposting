@@ -14,7 +14,8 @@ export function motionSceneModel(plan,boundaries,cues){
   if(boundaries.length!==6||boundaries[0]!==0||boundaries.some((f,i)=>!Number.isInteger(f)||(i&&f<=boundaries[i-1])))throw Error('A complete frame-bound story timeline is required');
   if(boundaries.at(-1)<600||boundaries.at(-1)>750||boundaries.some((f,i)=>i&&f-boundaries[i-1]<24))throw Error('Use readable20–25second story beats');
   if(!Array.isArray(cues)||!cues.length||cues.some((c,i)=>typeof c.text!=='string'||!Number.isFinite(c.start)||!Number.isFinite(c.end)||c.start<0||c.end<=c.start||c.end>boundaries.at(-1)/30||(i&&c.start<cues[i-1].end)))throw Error('Use ordered actual phrase cues within the export');
-  return {fps:30,durationFrames:boundaries.at(-1),background:'#f3f0e8',ink:'#193344',accent:plan.accent.replace('0x','#'),contextHeader:plan.contextHeader,cues,
+  if(plan.burnCaptions!==undefined && typeof plan.burnCaptions!=='boolean')throw Error('burnCaptions must be a boolean');
+  return {fps:30,durationFrames:boundaries.at(-1),background:'#f3f0e8',ink:'#193344',accent:plan.accent.replace('0x','#'),contextHeader:plan.contextHeader,cues,burnCaptions:plan.burnCaptions!==false,
     scenes:[
       {type:'media',assetId:'context-0',context:true,heading:plan.hook,transitionSeconds:0},
       {type:'media',assetId:'context-1',context:true,heading:plan.bodyHeading,detail:plan.bodyDetail,transitionSeconds:.16},
