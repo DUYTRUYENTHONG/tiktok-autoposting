@@ -174,10 +174,26 @@ export function buildScaleCampaign(state,{now=new Date().toISOString(),startDay=
 
 function nativeMusicIdentity(music){return {title:music.title,artist:music.artist,duration:music.duration,language:music.language,identitySource:music.identitySource,catalogEvidenceSha256:music.catalogEvidence?.sha256,selectionEvidenceSha256:music.selectionEvidence?.sha256};}
 export function scalePostHash(item,evidence){return scaleHash({intentId:item.id,intentHash:item.intentHash,...(item.scheduleRevision?{scheduleRevisionHash:scaleHash(item.scheduleRevision)}:{}),account:evidence.account,format:item.format,publishAt:item.proposedPublishAt,location:evidence.location,caption:evidence.caption,
-  assets:(evidence.assets??[]).map(a=>({order:a.order,sha256:a.sha256})),...(evidence.photoStory?{photoStory:evidence.photoStory,photoTitle:evidence.photoTitle}:{}),voiceSha256:evidence.voice?.sha256??null,spokenScript:evidence.spokenScript??item.creative.videoScript,musicSoundId:evidence.music?.soundId??null,...(evidence.music?.soundId===null?{musicNativeIdentity:nativeMusicIdentity(evidence.music)}:{}),demoKind:evidence.demoKind});}
+  assets:(evidence.assets??[]).map(a=>({order:a.order,sha256:a.sha256})),...(evidence.photoStory?{photoStory:evidence.photoStory,photoTitle:evidence.photoTitle}:{}),voiceSha256:evidence.voice?.sha256??null,spokenScript:evidence.spokenScript??item.creative.videoScript,musicSoundId:evidence.music?.soundId??null,...(evidence.music?.soundId===null?{musicNativeIdentity:nativeMusicIdentity(evidence.music)}:{}),...(evidence.captionOptOut?{captionOptOutSha256:evidence.captionOptOut.sha256}:{}),demoKind:evidence.demoKind});}
 async function verifyBytes(asset,label,blockers){if(!asset||!path.isAbsolute(asset.path??'')||!/^[a-f0-9]{64}$/.test(asset.sha256??'')){blockers.push(label+'_path_or_hash_missing');return;}
   try{if(await hashFile(asset.path)!==asset.sha256)blockers.push(label+'_hash_mismatch');}catch{blockers.push(label+'_file_unavailable');}}
 const reviewTime=(value,now)=>validTime(value)&&Date.parse(value)<=Date.parse(now);
+// A user may explicitly waive captions for one exact video; a registered,
+// hash-checked approval is required and can never carry over to other bytes.
+export async function checkCaptionOptOut(item,evidence,state,now){
+  const ref=evidence.captionOptOut,registered=state.campaign?.captionOptOutApproval;
+  if(!ref||!registered||!path.isAbsolute(ref.path??'')||ref.path!==registered.path||ref.sha256!==registered.sha256||!/^[a-f0-9]{64}$/.test(ref.sha256??''))return false;
+  try{
+    if(await hashFile(ref.path)!==ref.sha256)return false;
+    const a=JSON.parse((await readFile(ref.path,'utf8')).replace(/^\uFEFF/,''));
+    return a.verified===true&&a.reviewer==='user'&&typeof a.source==='string'&&/^chat:.+/.test(a.source)&&reviewTime(a.verifiedAt,now)&&a.mode==='no-captions'&&a.intentId===item.id&&a.intentHash===item.intentHash&&a.account===item.account&&/^[a-f0-9]{64}$/.test(a.audioSha256??'')&&a.audioSha256===evidence.voice?.sha256&&a.scriptSha256===scaleHash(evidence.spokenScript??'')&&Array.isArray(a.assetSha256)&&a.assetSha256.length>0&&a.assetSha256.length===(evidence.assets??[]).length&&a.assetSha256.every((sha,i)=>/^[a-f0-9]{64}$/.test(sha)&&sha===evidence.assets[i]?.sha256);
+  }catch{return false;}
+}
+// exactReviewedProfile must only be set after loadReviewedVoice validates the
+// immutable source receipt and the intent-scoped human listening approval.
+export function acceptedVoiceProfile(voice,spoken,exactReviewedProfile=false){
+  return voice?.voice==='Thùy Dung'&&(exactReviewedProfile||(voice?.speed===1.2&&voice?.referenceStyle==='speaker-only'))&&voice?.scriptSha256===scaleHash(spoken);
+}
 export async function bindScaleCreative(item,evidence,{state={},now=new Date().toISOString()}={}){
   if(!validTime(now)||item.intentHash!==scaleHash(intentPayload(item)))throw Error('Intent checksum/time mismatch');
   if(item.receipt||!['planned','ready'].includes(item.status))throw Error('Cannot bind an accepted/submitted intent');
@@ -245,9 +261,10 @@ export async function bindScaleCreative(item,evidence,{state={},now=new Date().t
         if(!exactReviewedProfile)blockers.push('reviewed_voice_provenance_mismatch');
       }catch{blockers.push('reviewed_voice_provenance_mismatch');}
     }
-    if(voice?.voice!=='Thùy Dung'||voice?.speed!==1.2||voice?.referenceStyle!=='speaker-only'&&!exactReviewedProfile||voice?.scriptSha256!==scaleHash(spoken))blockers.push('voice_profile_or_script_mismatch');
+    if(!acceptedVoiceProfile(voice,spoken,exactReviewedProfile))blockers.push('voice_profile_or_script_mismatch');
     if(voice?.listeningReview?.verified!==true||voice.listeningReview.queueId!==item.id||voice.listeningReview.audioSha256!==voice.sha256||!reviewTime(voice.listeningReview.verifiedAt,now))blockers.push('exact_noninherited_voice_listening_missing');
-    await verifyBytes(evidence.subtitles,'subtitles',blockers);if(evidence.subtitles?.audioSha256!==voice?.sha256||evidence.subtitles?.scriptSha256!==scaleHash(spoken))blockers.push('subtitle_audio_or_script_binding_missing');
+    if(evidence.captionOptOut){if(!await checkCaptionOptOut(item,evidence,state,now))blockers.push('caption_opt_out_approval_missing_or_mismatch');}
+    else {await verifyBytes(evidence.subtitles,'subtitles',blockers);if(evidence.subtitles?.audioSha256!==voice?.sha256||evidence.subtitles?.scriptSha256!==scaleHash(spoken))blockers.push('subtitle_audio_or_script_binding_missing');}
     if(evidence.playbackReview?.verified!==true||evidence.playbackReview.postHash!==postHash||!reviewTime(evidence.playbackReview.verifiedAt,now)||music?.mixBelowNarrationVerified!==true)blockers.push('final_playback_or_music_mix_review_missing');
   }
   return {...item,status:blockers.length?'planned':'ready',postHash,boundCreative:evidence,readiness:{ready:!blockers.length,blockers},receipt:null};
