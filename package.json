@@ -15,7 +15,8 @@
     "motion": "node scripts/motion.mjs",
     "voice:corrections": "node scripts/voice-corrections.mjs",
     "voice:gwen:prepare": "node scripts/prepare-gwen-training.mjs",
-    "prepare:content-tuning": "node scripts/prepare-content-tuning.mjs"
+    "prepare:content-tuning": "node scripts/prepare-content-tuning.mjs",
+    "prepare:parallel-content": "node scripts/prepare-parallel-content.mjs"
   },
   "dependencies": {
     "@huggingface/transformers": "4.3.2",

@@ -1,0 +1,23 @@
+import path from 'node:path';
+import {readFile,writeFile,mkdir,realpath} from 'node:fs/promises';
+import {homedir} from 'node:os';
+import {createHash,randomUUID} from 'node:crypto';
+import {fileURLToPath} from 'node:url';
+import {validateContentJobs,runBounded,runContentWorker} from '../src/parallel-content.mjs';
+
+const [input,concurrencyArg='3']=process.argv.slice(2);
+if (!input || !path.isAbsolute(input) || process.argv.length > 4) throw Error('Usage: node scripts/prepare-parallel-content.mjs ABSOLUTE_JOBS_JSON [1–3]');
+const jobs=validateContentJobs(JSON.parse((await readFile(input,'utf8')).replace(/^\uFEFF/,'')));
+const concurrency=Number(concurrencyArg);
+if (!Number.isInteger(concurrency) || concurrency<1 || concurrency>3) throw Error('Concurrency must be 1–3');
+const root=fileURLToPath(new URL('../',import.meta.url));
+const directory=path.join(homedir(),'.codex','data','tiktok-autoposting','parallel-content');
+await mkdir(directory,{recursive:true});
+const actual=await realpath(directory),checkout=await realpath(root);
+if (actual===checkout || actual.startsWith(checkout+path.sep)) throw Error('Private output must be outside checkout');
+const results=await runBounded(jobs,runContentWorker,concurrency);
+const sha256=createHash('sha256').update(JSON.stringify(jobs)).digest('hex');
+const filename=path.join(actual,`${new Date().toISOString().replace(/[:.]/g,'-')}-${randomUUID()}.json`);
+await writeFile(filename,JSON.stringify({schemaVersion:1,createdAt:new Date().toISOString(),concurrency,inputSha256:sha256,mode:'grounded-prompt-preparation-only',posting:false,results},null,2),{flag:'wx'});
+console.log(JSON.stringify({file:filename,total:results.length,completed:results.filter(r=>r.status==='completed').length,failed:results.filter(r=>r.status==='failed').length,mode:'prompt-preparation-only'}));
+if(results.some(r=>r.status==='failed')) process.exitCode=1;
