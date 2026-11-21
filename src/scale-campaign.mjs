@@ -7,7 +7,7 @@ import {voiceRuntime} from './voice.mjs';
 import {loadReviewedVoice} from './reviewed-voice.mjs';
 import {vietnamDay} from './daily-kpi.mjs';
 import {painpointStories} from './content-bank.mjs';
-import {rollingLimits,tenDayReference,videoRolloutReference,mixedRolloutReference} from './ten-day-cadence.mjs';
+import {rollingLimits,tenDayReference,videoRolloutReference,mixedRolloutReference,continuationReference} from './ten-day-cadence.mjs';
 
 const HOUR=3600000,DAY=24*HOUR,MINUTE=60000;
 export const scalePolicy=Object.freeze({version:1,campaignId:'sakura-scale-1000-20261029',account:'saigomlia',productId:'sakura-cleaner-500ml',earliestDay:'2026-10-29',total:1000,photo:500,video:500,dailyTotal:20,dailyPhoto:10,dailyVideo:10,minSpacingMinutes:20,windowStart:'08:00',windowEnd:'22:15',timezone:'Asia/Ho_Chi_Minh',location:'Vựa Sầu Riêng Cô Ba, 322 Đ. Huỳnh Thị Hai'});
@@ -20,7 +20,13 @@ const nextDay=day=>new Date(Date.parse(localAt(day,'12:00'))+DAY+7*HOUR).toISOSt
 const fold=text=>String(text).normalize('NFD').replace(/\p{M}/gu,'').replaceAll('đ','d').replaceAll('Đ','D').toLowerCase().replace(/[^a-z\d]/g,'');
 const accountKey=value=>String(value).replace(/^@/,'').toLowerCase();
 const leadKey=value=>String(value).normalize('NFC').replace(/\s/g,'').toLocaleUpperCase('vi');
-export const containsDiscount=text=>/mua\d+tang\d+|muamottang|muahaitang|50dondautien|nammuoidondautien|buy\d+get\d+|buyonegetone|giam\d+|giamgia|khuyenmai|tangqua|mienphigiaohang|freeship/.test(fold(text))||/\d+\s*%/.test(String(text));
+export function containsDiscount(text){
+  // Classify the owner's exact cleaning commitment separately from a price offer.
+  // This does not substantiate the claim or approve its publication.
+  const percentageText=String(text).normalize('NFD').replace(/\p{M}/gu,'').toLowerCase()
+    .replace(/\bcam\s*ket\s*sach\s*99\s*%\s*vet\s*ban\b/g,'');
+  return /mua\d+tang\d+|muamottang|muahaitang|50dondautien|nammuoidondautien|buy\d+get\d+|buyonegetone|giam\d+|giamgia|khuyenmai|tangqua|mienphigiaohang|freeship/.test(fold(text))||/\d+\s*%/.test(percentageText);
+}
 
 export function collectScaleReservations(state,{account=scalePolicy.account}={}){
   const records=[],uncertain=(state.queue??[]).filter(q=>(!q.account||accountKey(q.account)===accountKey(account))&&['submitting','needs_review'].includes(q.status));
@@ -208,7 +214,7 @@ export async function bindScaleCreative(item,evidence,{state={},now=new Date().t
     const publicText=[evidence.caption,evidence.spokenScript,evidence.photoTitle].filter(x=>typeof x==='string').join(' ').normalize('NFD').replace(/\p{M}/gu,'').toUpperCase();
     if(/\b(?:ANH|GIONG|BEP)\s*\d{3,}\b|SAKURA[-_](?:SCALE[-_])?\d+/u.test(publicText)||publicText.includes(item.id.toUpperCase()))blockers.push('public_internal_identifier');
   }else if(typeof evidence.caption!=='string'||!evidence.caption.includes(item.leadCode))blockers.push('caption_or_lead_code_missing');
-  const story=evidence.photoStory,fivePhoto=story?.adapter==='native-five-photo-v1'&&story.sourceIntentHash===item.intentHash&&story.assetCount===5&&story.voiceOverAttached===false&&item.format==='photo'&&[tenDayReference,mixedRolloutReference].includes(item.scheduleRevision?.policyReference)&&state.campaign?.rollingGoal?.policyReference===item.scheduleRevision.policyReference;
+  const story=evidence.photoStory,fivePhoto=story?.adapter==='native-five-photo-v1'&&story.sourceIntentHash===item.intentHash&&story.assetCount===5&&story.voiceOverAttached===false&&item.format==='photo'&&[tenDayReference,mixedRolloutReference,continuationReference].includes(item.scheduleRevision?.policyReference)&&state.campaign?.rollingGoal?.policyReference===item.scheduleRevision.policyReference;
   if(story&&!fivePhoto)blockers.push('unapproved_photo_story_adaptation');
   if(fivePhoto&&(typeof evidence.photoTitle!=='string'||!evidence.photoTitle.trim()||[...evidence.photoTitle].length>90))blockers.push('native_photo_title_missing_or_too_long');
   if(fivePhoto&&(evidence.voice||evidence.spokenScript!==''))blockers.push('native_photo_narration_must_remain_separate');
@@ -245,7 +251,7 @@ export async function bindScaleCreative(item,evidence,{state={},now=new Date().t
   if(window?.verified!==true||window.account!==item.account||!reviewTime(window.verifiedAt,now)||Date.parse(now)-Date.parse(window.verifiedAt)>24*HOUR||!validTime(window.earliest)||!validTime(window.latest)||Date.parse(item.proposedPublishAt)<Date.parse(window.earliest)||Date.parse(item.proposedPublishAt)>Date.parse(window.latest))blockers.push('actual_native_schedule_window_missing');
   try{const existing=collectScaleReservations(state).filter(r=>r.day===vietnamDay(item.proposedPublishAt));
     if(existing.some(r=>r.queueId===item.id))blockers.push('already_accepted_intent');
-    if(item.scheduleRevision?.policyKind==='scale-rolling-policy'){const {cap,spacingMinutes}=rollingLimits(state,item.proposedPublishAt);if(state.campaign?.rollingGoal?.policyReference===mixedRolloutReference&&existing.filter(r=>r.format===item.format).length>=(item.format==='photo'?30:20))blockers.push('current_format_quota_conflict');if(existing.length>=cap||existing.some(r=>Math.abs(Date.parse(r.at)-Date.parse(item.proposedPublishAt))<spacingMinutes*MINUTE))blockers.push('current_quota_or_spacing_conflict');}
+    if(item.scheduleRevision?.policyKind==='scale-rolling-policy'){const {cap,spacingMinutes}=rollingLimits(state,item.proposedPublishAt);if([mixedRolloutReference,continuationReference].includes(state.campaign?.rollingGoal?.policyReference)&&existing.filter(r=>r.format===item.format).length>=(item.format==='photo'?30:20))blockers.push('current_format_quota_conflict');if(existing.length>=cap||existing.some(r=>Math.abs(Date.parse(r.at)-Date.parse(item.proposedPublishAt))<spacingMinutes*MINUTE))blockers.push('current_quota_or_spacing_conflict');}
     else if(item.scheduleRevision){if(existing.length>=40||existing.some(r=>Math.abs(Date.parse(r.at)-Date.parse(item.proposedPublishAt))<5*MINUTE))blockers.push('current_quota_or_spacing_conflict');}
     else if(existing.length>=20||existing.filter(r=>r.format===item.format).length>=10||existing.some(r=>Math.abs(Date.parse(r.at)-Date.parse(item.proposedPublishAt))<20*MINUTE))blockers.push('current_quota_or_spacing_conflict');
   }catch(error){blockers.push('reconciliation_required: '+error.message);}

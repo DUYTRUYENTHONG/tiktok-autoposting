@@ -6,12 +6,33 @@ import path from 'node:path';
 import {buildScaleCampaign,scalePostHash,bindScaleCreative} from '../src/scale-campaign.mjs';
 import {createScaleProgress} from '../src/scale-progress.mjs';
 import {hashFile} from '../src/store.mjs';
-import {videoRolloutReference,rollingLimits,isVideoRolloutPolicy,mixedRolloutReference,isMixedRolloutPolicy} from '../src/ten-day-cadence.mjs';
+import {videoRolloutReference,rollingLimits,isVideoRolloutPolicy,mixedRolloutReference,isMixedRolloutPolicy,continuationReference} from '../src/ten-day-cadence.mjs';
 
 const now='2026-10-31T09:00:00+07:00',day='2026-10-31';
 const oldReference='2026-10-30 user: still need30posts more for today; answer Five-minute spacing tonight in call_f551da25c867465c87e34a607f80a12a';
 const rollingReference='2026-10-31 user: we do need 30 posts per day. schedule it for the next 30 days.';
 const fiftyReference='2026-10-31 user: continue to schedule20posts per day; schedule for50days first; set the goal again.';
+
+test('November18 continuation keeps immutable plans and reservations while extending checked mixed scheduling',async()=>{const f=await fixture();try{
+ f.clock.value='2026-11-18T09:00:00+07:00';const b=f.bridge(),photo=f.plan.items.find(x=>x.format==='photo');
+ const oldPlan=await readFile(f.planFile,'utf8'),kept=(await f.readState()).queue;
+ const file=path.join(f.dir,'continuation.json'),policy={...f.policy,startDay:'2026-11-18',endDay:'2026-12-18',dailyTotal:50,targetTotal:1550,targetPhoto:30,targetVideo:20,minSpacingMinutes:15,verifiedAt:f.clock.value,policyReference:continuationReference};
+ await writeFile(file,JSON.stringify(policy));const s=await f.readState();s.campaign.rollingGoal={...policy,dailyTarget:50};await writeFile(f.campaignFile,JSON.stringify(s));
+ assert.deepEqual(rollingLimits(s,'2026-12-18T12:00:00+07:00'),{cap:50,spacingMinutes:15});
+ await assert.rejects(b.revise(photo.id,await f.input(photo,'2026-11-18T09:25:00+07:00',file)),/outside authorized/);
+ await assert.rejects(b.revise(photo.id,await f.input(photo,'2026-12-19T12:00:00+07:00',file)),/outside authorized/);
+ const revised=await b.revise(photo.id,await f.input(photo,'2026-12-18T12:00:00+07:00',file));
+ const record=JSON.parse(await readFile(f.journalFile,'utf8')).records[photo.id],item={...photo,proposedPublishAt:revised.effectivePublishAt,scheduleRevision:record.scheduleRevision};
+ const e=await f.evidence(item);e.assets=e.assets.slice(0,5);e.photoTitle='Hỏi đúng nhu cầu';e.spokenScript='';e.photoStory={adapter:'native-five-photo-v1',sourceIntentHash:item.intentHash,assetCount:5,voiceOverAttached:false};e.scheduleWindow.latest=item.proposedPublishAt;
+ const h=scalePostHash(item,e);e.visualReview.postHash=h;e.offerReview.postHash=h;e.preflight.postHash=h;
+ assert.equal((await b.bind(photo.id,e)).status,'ready');
+ assert.equal((await f.bridge().status()).items.find(x=>x.id===photo.id).effectivePublishAt,item.proposedPublishAt);
+ const other=f.plan.items.find(x=>x.format==='photo'&&x.id!==photo.id);await assert.rejects(b.revise(other.id,await f.input(other,'2026-12-18T12:10:00+07:00',file)),/spacing/);
+ const full=await f.readState();for(let n=0;n<30;n++)full.queue.push({id:'continue-photo-'+n,account:'saigomlia',format:'photo',status:'scheduled',receipt:{platformId:String(7760000000000000000n+BigInt(n)),scheduledAt:new Date(Date.parse('2026-12-01T08:00:00+07:00')+n*15*60000).toISOString(),scheduledVerifiedAt:f.clock.value}});await writeFile(f.campaignFile,JSON.stringify(full));
+ await assert.rejects(b.revise(other.id,await f.input(other,'2026-12-01T21:00:00+07:00',file)),/format cap/);
+ assert.equal(await readFile(f.planFile,'utf8'),oldPlan);assert.deepEqual((await f.readState()).queue.slice(0,kept.length),kept);
+ const wrong={...policy,dailyTotal:51};await writeFile(file,JSON.stringify(wrong));await assert.rejects(b.status(),/checksum/);
+}finally{await f.cleanup();}});
 
 test('mixed30photo20video policy preserves reservations and supports native five-photo adaptation',async()=>{const f=await fixture();try{
  f.clock.value='2026-11-01T08:00:00+07:00';const file=path.join(f.dir,'mixed.json'),policy={...f.policy,startDay:'2026-11-01',endDay:'2026-11-21',dailyTotal:50,targetTotal:1050,targetPhoto:30,targetVideo:20,minSpacingMinutes:15,verifiedAt:f.clock.value,policyReference:mixedRolloutReference};assert.equal(isMixedRolloutPolicy(policy),true);await writeFile(file,JSON.stringify(policy));

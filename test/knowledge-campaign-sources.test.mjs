@@ -66,7 +66,10 @@ test('changed label, reviewed editorial section or call-only policy fail closed'
 
 test('knowledge CLI defaults to evergreen rather than the retired offer and cannot authorize unknown discounts',async()=>{
   const f=await fixture();try{
-    const directory=path.join(f.dir,'cli-index');await persistIndex(await f.sources(),directory);
+    // The CLI intentionally uses the real clock; keep synthetic identity evidence current.
+    // Historical/stale evidence is tested above with explicit asOf values.
+    const directory=path.join(f.dir,'cli-index'),now=new Date().toISOString();
+    const sources=(await f.sources()).map(s=>({...s,verifiedAt:now}));await persistIndex(sources,directory);
     const run=query=>spawnSync(process.execPath,['scripts/knowledge.mjs','query',query],{cwd:root,encoding:'utf8',env:{...process.env,TIKTOK_KNOWLEDGE_DIR:directory}});
     const identity=run('Dung tích Sakura?');assert.equal(identity.status,0,identity.stderr);const result=JSON.parse(identity.stdout);
     assert.equal(result.status,'retrieved');assert.match(result.prompt,/Ưu đãi: evergreen-no-discount/);assert.doesNotMatch(result.prompt,/buy1-get1-tiktok-first50/);
